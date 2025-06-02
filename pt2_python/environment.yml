@@ -1,0 +1,13 @@
+name: pt2_env
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - uproot
+  - awkward
+  - jupyterlab
+  - ipykernel
