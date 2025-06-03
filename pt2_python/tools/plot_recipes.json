@@ -1,0 +1,297 @@
+{
+    "default_settings":{
+        "xaxis_log"         : false,
+        "nbins"             : 180,
+        "pt_range"          : [0, 250],
+        "eta_range"         : [-4.5,4.5],
+        "phi_range"         : [-3.15,3.15],
+        "has_ratio"         : false,
+        "pt_xlabel"         : "pT [Gev]",
+        "phi_xlabel"        : "phi",
+        "eta_xlabel"        : "eta",
+        "x_label_size"      : 8,
+        "title_label_size"  : 14,
+        "y_axis_label"      : "Number of Objects",
+        "plot_log_also"     : true
+    },
+    "used_ls_pt":{
+        "title"  : "Used LS pT",
+        "objects": ["ls_used_real_pt","ls_used_isfake_pt"],
+        "legend" :["Real LS", "Fake LS"],
+        "xaxis_log": true
+    }, 
+    "used_ls_phi":{
+        "title": "Used LS Phi",
+        "objects": ["ls_used_real_phi","ls_used_isfake_phi"],
+        "legend" :["Real LS", "Fake LS"]
+    },
+    "used_ls_eta":{
+        "title": "Used LS Eta",
+        "objects": ["ls_used_real_eta","ls_used_isfake_eta"],
+        "legend" :["Real LS", "Fake LS"]
+    },
+    "unused_ls_pt":{
+        "title":"Unused LS pT",
+        "objects": ["ls_unused_real_pt","ls_unused_isfake_pt"],
+        "legend" :["Real LS", "Fake LS"],
+        "xaxis_log": true
+    },
+    "unused_ls_phi":{
+        "title":"Unused LS Phi",
+        "objects": ["ls_unused_real_phi","ls_unused_isfake_phi"],
+        "legend": ["Real LS","Fake LS"]
+    },        
+    "unused_ls_eta":{
+        "title": "Unused LS Eta",
+        "objects": ["ls_unused_real_eta","ls_unused_isfake_eta"],
+        "legend": ["Real LS","Fake LS"]
+    },
+    "used_pls_pt":{
+        "title": "Used pLS pT",
+        "objects": ["pls_used_real_pt","pls_used_isfake_pt"],
+        "legend": ["Real pLS","Fake pLS"],
+        "xaxis_log": true
+    },
+    "used_pls_phi":{
+        "title": "Used pLS Phi",
+        "objects": ["pls_used_real_phi","pls_used_isfake_phi"],
+        "legend": ["Real pLS","Fake pLS"]
+    },
+    "used_pls_eta":{
+        "title": "Used pLS Eta",
+        "objects": ["pls_used_real_eta","pls_used_isfake_eta"],
+        "legend": ["Real pLS","Fake pLS"]
+    },
+    "unused_pls_pt":{
+        "title": "Unused pLS pT",
+        "objects": ["pls_unused_real_pt","pls_unused_isfake_pt"],
+        "legend": ["Real pLS","Fake pLS"],
+        "xaxis_log": true
+    },
+    "unused_pls_phi":{
+        "title": "Unused pLS Phi",
+        "objects": ["pls_unused_real_phi","pls_unused_isfake_phi"],
+        "legend": ["Real pLS","Fake pLS"]
+    },
+    "unused_pls_eta":{
+        "title": "Unused pLS Eta",
+        "objects": ["pls_unused_real_eta","pls_unused_isfake_eta"],
+        "legend": ["Real","Fake"]
+    },
+    "all_pls_pt":{
+        "title": "All pLS pT",
+        "objects": ["pls_all_real_pt","pls_all_isfake_pt"],
+        "legend": ["Real pLS","Fake pLS"],
+        "xaxis_log": true
+    }, 
+    "all_pls_phi":{
+        "title": "All pLS Phi",
+        "objects": ["pls_all_real_phi","pls_all_isfake_phi"],
+        "legend": ["Real pLS","Fake pLS"]
+    },
+    "all_pls_eta":{
+        "title": "All pLS Eta",
+        "objects": ["pls_all_real_eta","pls_all_isfake_eta"],
+        "legend": ["Real Eta","Fake Eta"]
+    },
+    "all_ls_pt":{
+        "title": "All LS pT",
+        "objects": ["ls_all_real_pt","ls_all_isfake_pt"],
+        "legend": ["Real LS","Fake LS"],
+        "xaxis_log": true
+    },
+    "all_ls_phi":{
+        "title": "All LS Phi",
+        "objects": ["ls_all_real_phi","ls_all_isfake_phi"],
+        "legend": ["Real LS","Fake LS"]
+    }, 
+    "all_ls_eta":{
+        "title": "All LS Eta",
+        "objects": ["ls_all_real_eta","ls_all_isfake_eta"],
+        "legend": ["Real LS","Fake LS"]
+    },
+    "used_ls_simIdx_breakdown_pt":{
+        "title": "Used LS pT by simIdx Matching",
+        "objects": [
+            "ls_used_real_simIdxmacthes_pls_unused_real_pt",
+            "ls_used_real_simIdxmacthes_pls_used_real_pt",
+            "ls_used_real_simIdxmacthes_none_pt",
+            "ls_used_isfake_pt"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ],
+        "xaxis_log": true
+    },
+    "used_ls_simIdx_breakdown_phi":{
+        "title": "Used LS Phi by simIdx Matching",
+        "objects": [
+            "ls_used_real_simIdxmacthes_pls_unused_real_phi",
+            "ls_used_real_simIdxmacthes_pls_used_real_phi",
+            "ls_used_real_simIdxmacthes_none_phi",
+            "ls_used_isfake_phi"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ]
+    },
+    "used_ls_simIdx_breakdown_eta":{
+        "title": "Used LS Eta by simIdx Matching",
+        "objects": [
+            "ls_used_real_simIdxmacthes_pls_unused_real_eta",
+            "ls_used_real_simIdxmacthes_pls_used_real_eta",
+            "ls_used_real_simIdxmacthes_none_eta",
+            "ls_used_isfake_eta"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ]
+    },
+    "unused_ls_simIdx_breakdown_pt":{
+        "title": "Unused LS pT by simIdx Matching",
+        "objects": [
+            "ls_unused_real_simIdxmacthes_pls_unused_real_pt",
+            "ls_unused_real_simIdxmacthes_pls_used_real_pt",
+            "ls_unused_real_simIdxmacthes_none_pt",
+            "ls_unused_isfake_pt"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ],
+        "xaxis_log": true
+    },
+    "unused_ls_simIdx_breakdown_phi":{
+        "title": "Unused LS Phi by simIdx Matching",
+        "objects": [
+            "ls_unused_real_simIdxmacthes_pls_unused_real_phi",
+            "ls_unused_real_simIdxmacthes_pls_used_real_phi",
+            "ls_unused_real_simIdxmacthes_none_phi",
+            "ls_unused_isfake_phi"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ]
+    },
+    "unused_ls_simIdx_breakdown_eta":{
+        "title": "Unused LS Eta by simIdx Matching",
+        "objects": [
+            "ls_unused_real_simIdxmacthes_pls_unused_real_eta",
+            "ls_unused_real_simIdxmacthes_pls_used_real_eta",
+            "ls_unused_real_simIdxmacthes_none_eta",
+            "ls_unused_isfake_eta"
+        ],
+        "legend": [
+            "Real LS: Matches Unused Real pLS",
+            "Real LS: Matches Used Real pLS",
+            "Real LS: No pLS Matches",
+            "Fake"
+        ]
+    },
+    "used_pls_simIdx_breakdown_pt":{
+        "title": "Used pLS pT by simIdx Matching", 
+        "objects": [
+            "pls_used_real_simIdxmacthes_ls_unused_real_pt",
+            "pls_used_real_simIdxmacthes_ls_used_real_pt",
+            "pls_used_real_simIdxmacthes_none_pt",
+            "pls_used_isfake_pt"
+        ],
+        "legend": [
+            "Real pLS: Matches Unused Real LS",
+            "Real pLS: Matches Used Real LS",
+            "Real pLS: No LS Matches",
+            "Fake"
+        ],
+        "xaxis_log": true
+    },
+    "used_pls_simIdx_breakdown_phi":{
+        "title": "Used pLS Phi by simIdx Matching",
+        "objects": [
+            "pls_used_real_simIdxmacthes_ls_unused_real_phi",
+            "pls_used_real_simIdxmacthes_ls_used_real_phi",
+            "pls_used_real_simIdxmacthes_none_phi",
+            "pls_used_isfake_phi"
+        ],
+        "legend": [
+            "Real pLS: Matches Unused Real LS",
+            "Real pLS: Matches Used Real LS",
+            "Real pLS: No LS Matches",
+            "Fake"
+        ]
+    },
+    "used_pls_simIdx_breakdown_eta":{
+        "title":"Used pLS Eta by simIdx Matching",
+        "objects": [
+            "pls_used_real_simIdxmacthes_ls_unused_real_eta",
+            "pls_used_real_simIdxmacthes_ls_used_real_eta",
+            "pls_used_real_simIdxmacthes_none_eta",
+            "pls_used_isfake_eta"
+        ],
+        "legend": [
+            "Real pLS: Matches Unused Real LS",
+            "Real pLS: Matches Used Real LS",
+            "Real pLS: No LS Matches",
+            "Fake"
+        ]
+    },
+    "unused_pls_simIdx_breakdown_pt":{
+        "title": "Unused pLS pT by simIdx Matching",
+        "objects": [
+            "pls_unused_real_simIdxmacthes_ls_unused_real_pt",
+            "pls_unused_real_simIdxmacthes_ls_used_real_pt",
+            "pls_unused_real_simIdxmacthes_none_pt",
+            "pls_unused_isfake_pt"
+        ],
+        "legend": [
+            "Real pLS: Matches Unused Real LS",
+            "Real pLS: Matches Used Real LS",
+            "Real pLS: No LS Matches",
+            "Fake"
+        ],
+        "xaxis_log": true
+    },
+    "unused_pls_simIdx_breakdown_phi":{
+        "title": "Unused pLS Phi by simIdx Matching",
+        "objects": [
+            "pls_unused_real_simIdxmacthes_ls_unused_real_phi",
+            "pls_unused_real_simIdxmacthes_ls_used_real_phi",
+            "pls_unused_real_simIdxmacthes_none_phi",
+            "pls_unused_isfake_phi"
+        ],
+        "legend": [
+            "Real pLS: Matches Unused Real LS",
+            "Real pLS: Matches Used Real LS",
+            "Real pLS: No LS Matches",
+            "Fake"
+        ]
+    },
+    "unused_pls_simIdx_breakdown_eta":{
+        "title": "Unused pLS Eta by simIdx Matching",
+        "objects": [
+            "pls_unused_real_simIdxmacthes_ls_unused_real_eta",
+            "pls_unused_real_simIdxmacthes_ls_used_real_eta",
+            "pls_unused_real_simIdxmacthes_none_eta",
+            "pls_unused_isfake_eta"
+        ],
+        "legend": [
+            "Real and Matches Unused Real LS",
+            "Real and Matches Used Real LS",
+            "Real and No LS Matches",
+            "Fake"
+        ]
+    }
+}
