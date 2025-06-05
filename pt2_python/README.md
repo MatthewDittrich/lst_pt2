@@ -39,3 +39,9 @@ Activate conda environment:
 ```
 conda activate lst_env
 ```
+
+Run the Code:
+
+```
+sh run_pt2.sh
+```
