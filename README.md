@@ -1,6 +1,6 @@
 # LST PT2 Studies
 
-This repository is used to study the potential for adding pT2 objects into the CMS LST algorithm.
+This repository is used to study the potential for creating and adding pT2 objects into the CMS LST algorithm.
 
 ## pT2 Objects
 
@@ -13,7 +13,7 @@ pT2 objects are constrcuted of the following:
 
 ### Input
 
-As of June 3, 2025, this repository used the output from the LST OD-ntuple.
+As of June 3, 2025, this repository uses the output from the LST OD-ntuple.
 
 ### Running
 
