@@ -6,7 +6,7 @@ import os
 import concurrent.futures  # Updated to use concurrent.futures
 
 from tools import pt2_methods
-from tools import pt2_plotting
+from tools.plotting import pt2_plotting
 from tools.GatorMaker import print_gator
 
 
@@ -25,45 +25,58 @@ branches_to_load = [
 
 def pt2_processor(events):
 
-    # Make the used masks
-    used_ls_mask, used_pls_mask = pt2_methods.ls_pls_used_masks(events)
+    # Get Masks for the LS
+    ls_isfrom_pt5 = pt2_methods.ls_masks(events, "pt5")
+    ls_isfrom_t5 = pt2_methods.ls_masks(events, "t5")
+    ls_isfrom_pt3 = pt2_methods.ls_masks(events, "pt3")
+    # Get Masks for the pLS
+    pls_isfrom_pt5 = pt2_methods.pls_masks(events, "pt5")
+    pls_isfrom_pLS = pt2_methods.pls_masks(events, "pLS")
+    pls_isfrom_pt3 = pt2_methods.pls_masks(events, "pt3")
 
     # Make the fake masks
     fake_ls_mask = (events.ls_isFake == 1)
     fake_pls_mask = (events.pls_isFake == 1)
 
-    # Define some of the final masks
-    # LS
-    fake_used_ls_mask = (fake_ls_mask & used_ls_mask)
-    real_used_ls_mask = ((~fake_ls_mask) & used_ls_mask)
-    fake_unused_ls_mask = (fake_ls_mask & (~used_ls_mask))
-    real_unused_ls_mask = ((~fake_ls_mask) & (~used_ls_mask))
-    # pLS
-    fake_used_pls_mask = (fake_pls_mask & used_pls_mask)
-    real_used_pls_mask = ((~fake_pls_mask) & used_pls_mask)
-    fake_unused_pls_mask = (fake_pls_mask & (~used_pls_mask))
-    real_unused_pls_mask = ((~fake_pls_mask) & (~used_pls_mask))
+    # Define used and unused masks (for pLS, we do not consider coming from TC pLS as used)
+    ls_used_mask = (ls_isfrom_pt5 | ls_isfrom_t5 | ls_isfrom_pt3 )
+    ls_unused_mask = (~ls_used_mask)
+    pls_used_mask = (pls_isfrom_pt5 | pls_isfrom_pt3)
+    pls_unused_mask = (~pls_used_mask)
 
-    # Make masks for simIdx matching
-    ls_matches_usedrealpls_mask, \
-    ls_matches_unusedrealpls_mask = pt2_methods.ls_pls_matching_simIdx(
-        events, 
-        used_ls_mask, 
-        fake_ls_mask, 
-        used_pls_mask, 
-        fake_pls_mask, 
-        "ls"
-    ) 
+    # Get simIdx matching masks
+    ls_matches_used_hard_pls_mask = pt2_methods.ls_simIdx_matching(events,fake_pls_mask,pls_used_mask,"used","hard")
+    ls_matches_used_pu_pls_mask = pt2_methods.ls_simIdx_matching(events,fake_pls_mask,pls_used_mask,"used","pu")
+    ls_matches_unused_hard_pls_mask = pt2_methods.ls_simIdx_matching(events,fake_pls_mask,pls_used_mask,"unused","hard")
+    ls_matches_unused_pu_pls_mask = pt2_methods.ls_simIdx_matching(events,fake_pls_mask,pls_used_mask,"unused","pu")
+    pls_matches_used_hard_ls_mask = pt2_methods.pls_simIdx_matching(events,fake_ls_mask,ls_used_mask,"used","hard")
+    pls_matches_used_pu_ls_mask = pt2_methods.pls_simIdx_matching(events,fake_ls_mask,ls_used_mask,"used","pu")
+    pls_matches_unused_hard_ls_mask = pt2_methods.pls_simIdx_matching(events,fake_ls_mask,ls_used_mask,"unused","hard")
+    pls_matches_unused_pu_ls_mask = pt2_methods.pls_simIdx_matching(events,fake_ls_mask,ls_used_mask,"unused","pu")
 
-    pls_matches_usedrealls_mask, \
-    pls_matches_unusedrealls_mask = pt2_methods.ls_pls_matching_simIdx(
-        events, 
-        used_ls_mask, 
-        fake_ls_mask, 
-        used_pls_mask, 
-        fake_pls_mask, 
-        "pls"
-    ) 
+    # Define some of the common masks
+    # fake/real & used/unused
+    fake_used_ls_mask = (fake_ls_mask & ls_used_mask)
+    real_used_ls_mask = ((~fake_ls_mask) & ls_used_mask) 
+    fake_unused_ls_mask = (fake_ls_mask & ls_unused_mask)
+    real_unused_ls_mask = ((~fake_ls_mask) & ls_unused_mask)
+    fake_used_pls_mask = (fake_pls_mask & pls_used_mask) 
+    real_used_pls_mask = ((~fake_pls_mask) & pls_used_mask)
+    fake_unused_pls_mask = (fake_pls_mask & pls_unused_mask)
+    real_unused_pls_mask = ((~fake_pls_mask) & pls_unused_mask)
+    # simIdx mask combinations
+    ls_matches_used_pls = (ls_matches_used_hard_pls_mask | ls_matches_used_pu_pls_mask)
+    ls_matches_unused_pls = (ls_matches_unused_hard_pls_mask | ls_matches_unused_pu_pls_mask)
+    ls_matches_pu_pls = (ls_matches_used_pu_pls_mask | ls_matches_unused_pu_pls_mask)
+    ls_matches_hard_pls = (ls_matches_used_hard_pls_mask | ls_matches_unused_hard_pls_mask)
+    ls_matches_pls = (ls_matches_used_pls | ls_matches_unused_pls)
+    ls_matches_none = (~ls_matches_pls)
+    pls_matches_used_ls = (pls_matches_used_hard_ls_mask | pls_matches_used_pu_ls_mask)
+    pls_matches_unused_ls = (pls_matches_unused_hard_ls_mask | pls_matches_unused_pu_ls_mask)
+    pls_matches_pu_ls = (pls_matches_used_pu_ls_mask | pls_matches_unused_pu_ls_mask)
+    pls_matches_hard_ls = (pls_matches_used_hard_ls_mask | pls_matches_unused_hard_ls_mask)
+    pls_matches_ls = (pls_matches_used_ls | pls_matches_unused_ls)
+    pls_matches_none = (~pls_matches_ls)
 
 
     # Final objects dictionary
@@ -86,27 +99,67 @@ def pt2_processor(events):
         "ls_unused_real_pt": events.ls_pt[real_unused_ls_mask],
         "ls_unused_real_eta": events.ls_eta[real_unused_ls_mask],
         "ls_unused_real_phi": events.ls_phi[real_unused_ls_mask],
-        "ls_used_real_simIdxmacthes_pls_used_real_pt": events.ls_pt[real_used_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_used_real_simIdxmacthes_pls_used_real_eta": events.ls_eta[real_used_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_used_real_simIdxmacthes_pls_used_real_phi": events.ls_phi[real_used_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_used_real_simIdxmacthes_pls_unused_real_pt": events.ls_pt[real_used_ls_mask & ls_matches_unusedrealpls_mask],
-        "ls_used_real_simIdxmacthes_pls_unused_real_eta": events.ls_eta[real_used_ls_mask & ls_matches_unusedrealpls_mask],
-        "ls_used_real_simIdxmacthes_pls_unused_real_phi": events.ls_phi[real_used_ls_mask & ls_matches_unusedrealpls_mask],
 
-        "ls_used_real_simIdxmacthes_none_pt": events.ls_pt[real_used_ls_mask & ~ls_matches_unusedrealpls_mask & ~ls_matches_usedrealpls_mask],
-        "ls_used_real_simIdxmacthes_none_eta": events.ls_eta[real_used_ls_mask & ~ls_matches_unusedrealpls_mask & ~ls_matches_usedrealpls_mask],
-        "ls_used_real_simIdxmacthes_none_phi": events.ls_phi[real_used_ls_mask & ~ls_matches_unusedrealpls_mask & ~ls_matches_usedrealpls_mask],
-
-        "ls_unused_real_simIdxmacthes_pls_used_real_pt": events.ls_pt[real_unused_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_unused_real_simIdxmacthes_pls_used_real_eta": events.ls_eta[real_unused_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_unused_real_simIdxmacthes_pls_used_real_phi": events.ls_phi[real_unused_ls_mask & ls_matches_usedrealpls_mask],
-        "ls_unused_real_simIdxmacthes_pls_unused_real_pt": events.ls_pt[real_unused_ls_mask & ls_matches_unusedrealpls_mask],
-        "ls_unused_real_simIdxmacthes_pls_unused_real_eta": events.ls_eta[real_unused_ls_mask & ls_matches_unusedrealpls_mask],
-        "ls_unused_real_simIdxmacthes_pls_unused_real_phi": events.ls_phi[real_unused_ls_mask & ls_matches_unusedrealpls_mask],
-
-        "ls_unused_real_simIdxmacthes_none_pt": events.ls_pt[real_unused_ls_mask & (~ls_matches_unusedrealpls_mask) & (~ls_matches_usedrealpls_mask)],
-        "ls_unused_real_simIdxmacthes_none_eta": events.ls_eta[real_unused_ls_mask & (~ls_matches_unusedrealpls_mask) & (~ls_matches_usedrealpls_mask)],
-        "ls_unused_real_simIdxmacthes_none_phi": events.ls_phi[real_unused_ls_mask & (~ls_matches_unusedrealpls_mask) & (~ls_matches_usedrealpls_mask)],
+        "ls_used_real_simIdxmacthes_pls_used_pt": events.ls_pt[real_used_ls_mask & ls_matches_used_pls],
+        "ls_used_real_simIdxmacthes_pls_used_eta": events.ls_eta[real_used_ls_mask & ls_matches_used_pls],
+        "ls_used_real_simIdxmacthes_pls_used_phi": events.ls_phi[real_used_ls_mask & ls_matches_used_pls],
+        "ls_used_real_simIdxmacthes_pls_unused_pt": events.ls_pt[real_used_ls_mask & ls_matches_unused_pls],
+        "ls_used_real_simIdxmacthes_pls_unused_eta": events.ls_eta[real_used_ls_mask & ls_matches_unused_pls],
+        "ls_used_real_simIdxmacthes_pls_unused_phi": events.ls_phi[real_used_ls_mask & ls_matches_unused_pls],
+        "ls_used_real_simIdxmacthes_none_pt": events.ls_pt[real_used_ls_mask & ls_matches_none],
+        "ls_used_real_simIdxmacthes_none_eta": events.ls_eta[real_used_ls_mask & ls_matches_none],
+        "ls_used_real_simIdxmacthes_none_phi": events.ls_phi[real_used_ls_mask & ls_matches_none],
+        "ls_used_real_simIdxmacthes_pls_pt": events.ls_pt[real_used_ls_mask & ls_matches_pls],
+        "ls_used_real_simIdxmacthes_pls_eta": events.ls_eta[real_used_ls_mask & ls_matches_pls],
+        "ls_used_real_simIdxmacthes_pls_phi": events.ls_phi[real_used_ls_mask & ls_matches_pls],
+        "ls_used_real_simIdxmacthes_pls_hard_pt": events.ls_pt[real_used_ls_mask & ls_matches_hard_pls],
+        "ls_used_real_simIdxmacthes_pls_hard_eta": events.ls_eta[real_used_ls_mask & ls_matches_hard_pls],
+        "ls_used_real_simIdxmacthes_pls_hard_phi": events.ls_phi[real_used_ls_mask & ls_matches_hard_pls],
+        "ls_used_real_simIdxmacthes_pls_pu_pt": events.ls_pt[real_used_ls_mask & ls_matches_pu_pls],
+        "ls_used_real_simIdxmacthes_pls_pu_eta": events.ls_eta[real_used_ls_mask & ls_matches_pu_pls],
+        "ls_used_real_simIdxmacthes_pls_pu_phi": events.ls_phi[real_used_ls_mask & ls_matches_pu_pls],
+        "ls_used_real_simIdxmacthes_pls_hard_used_pt": events.ls_pt[real_used_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_hard_used_eta": events.ls_eta[real_used_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_hard_used_phi": events.ls_phi[real_used_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_hard_unused_pt": events.ls_pt[real_used_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_hard_unused_eta": events.ls_eta[real_used_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_hard_unused_phi": events.ls_phi[real_used_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_used_pt": events.ls_pt[real_used_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_used_eta": events.ls_eta[real_used_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_used_phi": events.ls_phi[real_used_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_unused_pt": events.ls_pt[real_used_ls_mask & ls_matches_unused_pu_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_unused_eta": events.ls_eta[real_used_ls_mask & ls_matches_unused_pu_pls_mask],
+        "ls_used_real_simIdxmacthes_pls_pu_unused_phi": events.ls_phi[real_used_ls_mask & ls_matches_unused_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_used_pt": events.ls_pt[real_unused_ls_mask & ls_matches_used_pls],
+        "ls_unused_real_simIdxmacthes_pls_used_eta": events.ls_eta[real_unused_ls_mask & ls_matches_used_pls],
+        "ls_unused_real_simIdxmacthes_pls_used_phi": events.ls_phi[real_unused_ls_mask & ls_matches_used_pls],
+        "ls_unused_real_simIdxmacthes_pls_unused_pt": events.ls_pt[real_unused_ls_mask & ls_matches_unused_pls],
+        "ls_unused_real_simIdxmacthes_pls_unused_eta": events.ls_eta[real_unused_ls_mask & ls_matches_unused_pls],
+        "ls_unused_real_simIdxmacthes_pls_unused_phi": events.ls_phi[real_unused_ls_mask & ls_matches_unused_pls],
+        "ls_unused_real_simIdxmacthes_none_pt": events.ls_pt[real_unused_ls_mask & ls_matches_none],
+        "ls_unused_real_simIdxmacthes_none_eta": events.ls_eta[real_unused_ls_mask & ls_matches_none],
+        "ls_unused_real_simIdxmacthes_none_phi": events.ls_phi[real_unused_ls_mask & ls_matches_none],
+        "ls_unused_real_simIdxmacthes_pls_pt": events.ls_pt[real_unused_ls_mask & ls_matches_pls],
+        "ls_unused_real_simIdxmacthes_pls_eta": events.ls_eta[real_unused_ls_mask & ls_matches_pls],
+        "ls_unused_real_simIdxmacthes_pls_phi": events.ls_phi[real_unused_ls_mask & ls_matches_pls],
+        "ls_unused_real_simIdxmacthes_pls_hard_pt": events.ls_pt[real_unused_ls_mask & ls_matches_hard_pls],
+        "ls_unused_real_simIdxmacthes_pls_hard_eta": events.ls_eta[real_unused_ls_mask & ls_matches_hard_pls],
+        "ls_unused_real_simIdxmacthes_pls_hard_phi": events.ls_phi[real_unused_ls_mask & ls_matches_hard_pls],
+        "ls_unused_real_simIdxmacthes_pls_pu_pt": events.ls_pt[real_unused_ls_mask & ls_matches_pu_pls],
+        "ls_unused_real_simIdxmacthes_pls_pu_eta": events.ls_eta[real_unused_ls_mask & ls_matches_pu_pls],
+        "ls_unused_real_simIdxmacthes_pls_pu_phi": events.ls_phi[real_unused_ls_mask & ls_matches_pu_pls],
+        "ls_unused_real_simIdxmacthes_pls_hard_used_pt": events.ls_pt[real_unused_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_hard_used_eta": events.ls_eta[real_unused_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_hard_used_phi": events.ls_phi[real_unused_ls_mask & ls_matches_used_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_hard_unused_pt": events.ls_pt[real_unused_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_hard_unused_eta": events.ls_eta[real_unused_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_hard_unused_phi": events.ls_phi[real_unused_ls_mask & ls_matches_unused_hard_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_used_pt": events.ls_pt[real_unused_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_used_eta": events.ls_eta[real_unused_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_used_phi": events.ls_phi[real_unused_ls_mask & ls_matches_used_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_unused_pt": events.ls_pt[real_unused_ls_mask & ls_matches_unused_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_unused_eta": events.ls_eta[real_unused_ls_mask & ls_matches_unused_pu_pls_mask],
+        "ls_unused_real_simIdxmacthes_pls_pu_unused_phi": events.ls_phi[real_unused_ls_mask & ls_matches_unused_pu_pls_mask],
 
         "pls_all_isfake_pt": events.pls_pt[fake_pls_mask],
         "pls_all_isfake_phi": events.pls_phi[fake_pls_mask],
@@ -126,24 +179,68 @@ def pt2_processor(events):
         "pls_unused_real_pt": events.pls_pt[real_unused_pls_mask],
         "pls_unused_real_eta": events.pls_eta[real_unused_pls_mask],
         "pls_unused_real_phi": events.pls_phi[real_unused_pls_mask],
-        "pls_used_real_simIdxmacthes_ls_used_real_pt": events.pls_pt[real_used_pls_mask & pls_matches_usedrealls_mask],
-        "pls_used_real_simIdxmacthes_ls_used_real_eta": events.pls_eta[real_used_pls_mask & pls_matches_usedrealls_mask],
-        "pls_used_real_simIdxmacthes_ls_used_real_phi": events.pls_phi[real_used_pls_mask & pls_matches_usedrealls_mask],
-        "pls_used_real_simIdxmacthes_ls_unused_real_pt": events.pls_pt[real_used_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_used_real_simIdxmacthes_ls_unused_real_eta": events.pls_eta[real_used_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_used_real_simIdxmacthes_ls_unused_real_phi": events.pls_phi[real_used_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_used_real_simIdxmacthes_none_pt": events.pls_pt[real_used_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
-        "pls_used_real_simIdxmacthes_none_eta": events.pls_eta[real_used_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
-        "pls_used_real_simIdxmacthes_none_phi": events.pls_phi[real_used_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
-        "pls_unused_real_simIdxmacthes_ls_used_real_pt": events.pls_pt[real_unused_pls_mask & pls_matches_usedrealls_mask],
-        "pls_unused_real_simIdxmacthes_ls_used_real_eta": events.pls_eta[real_unused_pls_mask & pls_matches_usedrealls_mask],
-        "pls_unused_real_simIdxmacthes_ls_used_real_phi": events.pls_phi[real_unused_pls_mask & pls_matches_usedrealls_mask],
-        "pls_unused_real_simIdxmacthes_ls_unused_real_pt": events.pls_pt[real_unused_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_unused_real_simIdxmacthes_ls_unused_real_eta": events.pls_eta[real_unused_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_unused_real_simIdxmacthes_ls_unused_real_phi": events.pls_phi[real_unused_pls_mask & pls_matches_unusedrealls_mask],
-        "pls_unused_real_simIdxmacthes_none_pt": events.pls_pt[real_unused_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
-        "pls_unused_real_simIdxmacthes_none_eta": events.pls_eta[real_unused_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
-        "pls_unused_real_simIdxmacthes_none_phi": events.pls_phi[real_unused_pls_mask & (~pls_matches_unusedrealls_mask) & (~pls_matches_usedrealls_mask)],
+
+        "pls_used_real_simIdxmacthes_ls_used_pt": events.pls_pt[real_used_pls_mask & pls_matches_used_ls],
+        "pls_used_real_simIdxmacthes_ls_used_eta": events.pls_eta[real_used_pls_mask & pls_matches_used_ls],
+        "pls_used_real_simIdxmacthes_ls_used_phi": events.pls_phi[real_used_pls_mask & pls_matches_used_ls],
+        "pls_used_real_simIdxmacthes_ls_unused_pt": events.pls_pt[real_used_pls_mask & pls_matches_unused_ls],
+        "pls_used_real_simIdxmacthes_ls_unused_eta": events.pls_eta[real_used_pls_mask & pls_matches_unused_ls],
+        "pls_used_real_simIdxmacthes_ls_unused_phi": events.pls_phi[real_used_pls_mask & pls_matches_unused_ls],
+        "pls_used_real_simIdxmacthes_none_pt": events.pls_pt[real_used_pls_mask & pls_matches_none],
+        "pls_used_real_simIdxmacthes_none_eta": events.pls_eta[real_used_pls_mask & pls_matches_none],
+        "pls_used_real_simIdxmacthes_none_phi": events.pls_phi[real_used_pls_mask & pls_matches_none],
+        "pls_used_real_simIdxmacthes_ls_pt": events.pls_pt[real_used_pls_mask & pls_matches_ls],
+        "pls_used_real_simIdxmacthes_ls_eta": events.pls_eta[real_used_pls_mask & pls_matches_ls],
+        "pls_used_real_simIdxmacthes_ls_phi": events.pls_phi[real_used_pls_mask & pls_matches_ls],
+        "pls_used_real_simIdxmacthes_ls_hard_pt": events.pls_pt[real_used_pls_mask & pls_matches_hard_ls],
+        "pls_used_real_simIdxmacthes_ls_hard_eta": events.pls_eta[real_used_pls_mask & pls_matches_hard_ls],
+        "pls_used_real_simIdxmacthes_ls_hard_phi": events.pls_phi[real_used_pls_mask & pls_matches_hard_ls],
+        "pls_used_real_simIdxmacthes_ls_pu_pt": events.pls_pt[real_used_pls_mask & pls_matches_pu_ls],
+        "pls_used_real_simIdxmacthes_ls_pu_eta": events.pls_eta[real_used_pls_mask & pls_matches_pu_ls],
+        "pls_used_real_simIdxmacthes_ls_pu_phi": events.pls_phi[real_used_pls_mask & pls_matches_pu_ls],
+        "pls_used_real_simIdxmacthes_ls_hard_used_pt": events.pls_pt[real_used_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_hard_used_eta": events.pls_eta[real_used_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_hard_used_phi": events.pls_phi[real_used_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_hard_unused_pt": events.pls_pt[real_used_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_hard_unused_eta": events.pls_eta[real_used_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_hard_unused_phi": events.pls_phi[real_used_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_used_pt": events.pls_pt[real_used_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_used_eta": events.pls_eta[real_used_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_used_phi": events.pls_phi[real_used_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_unused_pt": events.pls_pt[real_used_pls_mask & pls_matches_unused_pu_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_unused_eta": events.pls_eta[real_used_pls_mask & pls_matches_unused_pu_ls_mask],
+        "pls_used_real_simIdxmacthes_ls_pu_unused_phi": events.pls_phi[real_used_pls_mask & pls_matches_unused_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_used_pt": events.pls_pt[real_unused_pls_mask & pls_matches_used_ls],
+        "pls_unused_real_simIdxmacthes_ls_used_eta": events.pls_eta[real_unused_pls_mask & pls_matches_used_ls],
+        "pls_unused_real_simIdxmacthes_ls_used_phi": events.pls_phi[real_unused_pls_mask & pls_matches_used_ls],
+        "pls_unused_real_simIdxmacthes_ls_unused_pt": events.pls_pt[real_unused_pls_mask & pls_matches_unused_ls],
+        "pls_unused_real_simIdxmacthes_ls_unused_eta": events.pls_eta[real_unused_pls_mask & pls_matches_unused_ls],
+        "pls_unused_real_simIdxmacthes_ls_unused_phi": events.pls_phi[real_unused_pls_mask & pls_matches_unused_ls],
+        "pls_unused_real_simIdxmacthes_none_pt": events.pls_pt[real_unused_pls_mask & pls_matches_none],
+        "pls_unused_real_simIdxmacthes_none_eta": events.pls_eta[real_unused_pls_mask & pls_matches_none],
+        "pls_unused_real_simIdxmacthes_none_phi": events.pls_phi[real_unused_pls_mask & pls_matches_none],
+        "pls_unused_real_simIdxmacthes_ls_pt": events.pls_pt[real_unused_pls_mask & pls_matches_ls],
+        "pls_unused_real_simIdxmacthes_ls_eta": events.pls_eta[real_unused_pls_mask & pls_matches_ls],
+        "pls_unused_real_simIdxmacthes_ls_phi": events.pls_phi[real_unused_pls_mask & pls_matches_ls],
+        "pls_unused_real_simIdxmacthes_ls_hard_pt": events.pls_pt[real_unused_pls_mask & pls_matches_hard_ls],
+        "pls_unused_real_simIdxmacthes_ls_hard_eta": events.pls_eta[real_unused_pls_mask & pls_matches_hard_ls],
+        "pls_unused_real_simIdxmacthes_ls_hard_phi": events.pls_phi[real_unused_pls_mask & pls_matches_hard_ls],
+        "pls_unused_real_simIdxmacthes_ls_pu_pt": events.pls_pt[real_unused_pls_mask & pls_matches_pu_ls],
+        "pls_unused_real_simIdxmacthes_ls_pu_eta": events.pls_eta[real_unused_pls_mask & pls_matches_pu_ls],
+        "pls_unused_real_simIdxmacthes_ls_pu_phi": events.pls_phi[real_unused_pls_mask & pls_matches_pu_ls],
+        "pls_unused_real_simIdxmacthes_ls_hard_used_pt": events.pls_pt[real_unused_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_hard_used_eta": events.pls_eta[real_unused_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_hard_used_phi": events.pls_phi[real_unused_pls_mask & pls_matches_used_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_hard_unused_pt": events.pls_pt[real_unused_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_hard_unused_eta": events.pls_eta[real_unused_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_hard_unused_phi": events.pls_phi[real_unused_pls_mask & pls_matches_unused_hard_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_used_pt": events.pls_pt[real_unused_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_used_eta": events.pls_eta[real_unused_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_used_phi": events.pls_phi[real_unused_pls_mask & pls_matches_used_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_unused_pt": events.pls_pt[real_unused_pls_mask & pls_matches_unused_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_unused_eta": events.pls_eta[real_unused_pls_mask & pls_matches_unused_pu_ls_mask],
+        "pls_unused_real_simIdxmacthes_ls_pu_unused_phi": events.pls_phi[real_unused_pls_mask & pls_matches_unused_pu_ls_mask],
+
     }
 
     return plot_objects
