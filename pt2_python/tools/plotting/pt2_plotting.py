@@ -4,14 +4,14 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from tools.make_index_file import generate_html_indexes
+from tools.plotting.make_index_file import generate_html_indexes
 
 colors = ['#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00', '#CC79A7', '#999999', '#ADFF2F', '#8B4513']
 
 def make_plots(data_dict, output_dir):
 
     # Open the plot recipes`
-    with open("tools/plot_recipes.json","r") as f:
+    with open("tools/plotting/plot_recipes.json","r") as f:
         plot_recipes = json.load(f)
 
     # Grab the deault settings
