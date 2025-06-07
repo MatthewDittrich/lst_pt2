@@ -8,25 +8,22 @@ def generate_html_indexes(base_dir):
     for root, dirs, files in os.walk(base_dir):
         root_path = Path(root)
 
-        # Find matching .png and .pdf pairs
         pngs = {f.stem for f in root_path.glob("*.png")}
         pdfs = {f.stem for f in root_path.glob("*.pdf")}
         common = sorted(pngs & pdfs)
 
-        if not common:
-            continue  # Skip if no valid pairs
-
-        # Warn about unmatched files
-        unmatched = (pngs ^ pdfs)
+        unmatched = pngs ^ pdfs
         for name in unmatched:
             warnings.warn(f"Missing pair for: {name} in {root_path}")
 
-        # Start writing index.html
+        # Link all subdirectories (because all will get index.html)
+        subdirs = sorted(dirs)
+
         index_path = root_path / "index.html"
         with open(index_path, "w") as f:
             f.write("<!DOCTYPE html>\n<html>\n<head>\n")
             f.write("<meta charset='utf-8'>\n")
-            f.write("<title>Plot Index</title>\n")
+            f.write("<title>Index of {}</title>\n".format(root_path.relative_to(base_dir)))
             f.write("""
 <style>
 body { font-family: sans-serif; margin: 20px; }
@@ -41,23 +38,24 @@ body { font-family: sans-serif; margin: 20px; }
 """)
             f.write(f"<h1>Index of {root_path.relative_to(base_dir)}</h1>\n")
 
-            # Subdirectory links
-            f.write("<div class='subdirs'>\n")
-            for subdir in sorted(dirs):
-                sub_index = root_path / subdir / "index.html"
-                if sub_index.exists():
+            if subdirs:
+                f.write("<div class='subdirs'>\n")
+                for subdir in subdirs:
                     f.write(f"<a href='{subdir}/index.html'>{subdir}</a>\n")
-            f.write("</div>\n")
-
-            # Plot grid
-            f.write("<div class='grid'>\n")
-            for name in common:
-                png_file = f"{name}.png"
-                pdf_file = f"{name}.pdf"
-                f.write(f"<div class='item'>\n")
-                f.write(f"<a href='{pdf_file}'><img src='{png_file}' alt='{name}'></a>\n")
-                f.write(f"<p>{name}</p>\n")
                 f.write("</div>\n")
-            f.write("</div>\n</body>\n</html>")
+
+            if common:
+                f.write("<div class='grid'>\n")
+                for name in common:
+                    png_file = f"{name}.png"
+                    pdf_file = f"{name}.pdf"
+                    f.write(f"<div class='item'>\n")
+                    f.write(f"<a href='{pdf_file}'><img src='{png_file}' alt='{name}'></a>\n")
+                    f.write(f"<p>{name}</p>\n")
+                    f.write("</div>\n")
+                f.write("</div>\n")
+
+            f.write("</body>\n</html>")
 
         print(f"Created {index_path}")
+
