@@ -1,5 +1,6 @@
 {
     "default_settings":{
+        "plot_legend_onside": true,
         "xaxis_log"         : false,
         "nbins"             : 180,
         "pt_range"          : [0, 250],
@@ -121,6 +122,8 @@
             "ls_used_real_simIdxmacthes_pls_hard_used_pt",
             "ls_used_real_simIdxmacthes_pls_pu_used_pt",
             "ls_used_real_simIdxmacthes_none_pt",
+            "ls_used_real_simIdxmacthes_two_pls_hard_pt",
+            "ls_used_real_simIdxmacthes_two_pls_pu_pt",
             "ls_used_isfake_pt"
         ],
         "legend": [
@@ -129,6 +132,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ],
         "xaxis_log": true
@@ -141,6 +146,8 @@
             "ls_used_real_simIdxmacthes_pls_hard_used_phi",
             "ls_used_real_simIdxmacthes_pls_pu_used_phi",
             "ls_used_real_simIdxmacthes_none_phi",
+            "ls_used_real_simIdxmacthes_two_pls_hard_phi",
+            "ls_used_real_simIdxmacthes_two_pls_pu_phi",
             "ls_used_isfake_phi"
         ],
         "legend": [
@@ -149,6 +156,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ]
     },
@@ -160,6 +169,8 @@
             "ls_used_real_simIdxmacthes_pls_hard_used_eta",
             "ls_used_real_simIdxmacthes_pls_pu_used_eta",
             "ls_used_real_simIdxmacthes_none_eta",
+            "ls_used_real_simIdxmacthes_two_pls_hard_eta",
+            "ls_used_real_simIdxmacthes_two_pls_pu_eta",
             "ls_used_isfake_eta"
         ],
         "legend": [
@@ -168,6 +179,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ]
     },
@@ -179,6 +192,8 @@
             "ls_unused_real_simIdxmacthes_pls_hard_used_pt",
             "ls_unused_real_simIdxmacthes_pls_pu_used_pt",
             "ls_unused_real_simIdxmacthes_none_pt",
+            "ls_unused_real_simIdxmacthes_two_pls_hard_pt",
+            "ls_unused_real_simIdxmacthes_two_pls_pu_pt",
             "ls_unused_isfake_pt"
         ],
         "legend": [
@@ -187,6 +202,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ],
         "xaxis_log": true
@@ -199,6 +216,8 @@
             "ls_unused_real_simIdxmacthes_pls_hard_used_phi",
             "ls_unused_real_simIdxmacthes_pls_pu_used_phi",
             "ls_unused_real_simIdxmacthes_none_phi",
+            "ls_unused_real_simIdxmacthes_two_pls_hard_phi",
+            "ls_unused_real_simIdxmacthes_two_pls_pu_phi",
             "ls_unused_isfake_phi"
         ],
         "legend": [
@@ -207,6 +226,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ]
     },
@@ -218,6 +239,8 @@
             "ls_unused_real_simIdxmacthes_pls_hard_used_eta",
             "ls_unused_real_simIdxmacthes_pls_pu_used_eta",
             "ls_unused_real_simIdxmacthes_none_eta",
+            "ls_unused_real_simIdxmacthes_two_pls_hard_eta",
+            "ls_unused_real_simIdxmacthes_two_pls_pu_eta",
             "ls_unused_isfake_eta"
         ],
         "legend": [
@@ -226,6 +249,8 @@
             "Real LS: Matches Used PV pLS",
             "Real LS: Matches Used PU pLS",
             "Real LS: No pLS Matches",
+            "Real LS: Matches Used and Unused PV pLS",
+            "Real LS: Matches Used and Unused PU pLS",
             "Fake"
         ]
     },
@@ -237,6 +262,8 @@
             "pls_used_real_simIdxmacthes_ls_hard_used_pt",
             "pls_used_real_simIdxmacthes_ls_pu_used_pt",
             "pls_used_real_simIdxmacthes_none_pt",
+            "pls_used_real_simIdxmacthes_two_ls_hard_pt",
+            "pls_used_real_simIdxmacthes_two_ls_pu_pt",
             "pls_used_isfake_pt"
         ],
         "legend": [
@@ -245,6 +272,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ],
         "xaxis_log": true
@@ -257,6 +286,8 @@
             "pls_used_real_simIdxmacthes_ls_hard_used_phi",
             "pls_used_real_simIdxmacthes_ls_pu_used_phi",
             "pls_used_real_simIdxmacthes_none_phi",
+            "pls_used_real_simIdxmacthes_two_ls_hard_phi",
+            "pls_used_real_simIdxmacthes_two_ls_pu_phi",
             "pls_used_isfake_phi"
         ],
         "legend": [
@@ -265,6 +296,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ]
     },
@@ -276,6 +309,8 @@
             "pls_used_real_simIdxmacthes_ls_hard_used_eta",
             "pls_used_real_simIdxmacthes_ls_pu_used_eta",
             "pls_used_real_simIdxmacthes_none_eta",
+            "pls_used_real_simIdxmacthes_two_ls_hard_eta",
+            "pls_used_real_simIdxmacthes_two_ls_pu_eta",
             "pls_used_isfake_eta"
         ],
         "legend": [
@@ -284,6 +319,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ]
     },
@@ -295,6 +332,8 @@
             "pls_unused_real_simIdxmacthes_ls_hard_used_pt",
             "pls_unused_real_simIdxmacthes_ls_pu_used_pt",
             "pls_unused_real_simIdxmacthes_none_pt",
+            "pls_unused_real_simIdxmacthes_two_ls_hard_pt",
+            "pls_unused_real_simIdxmacthes_two_ls_pu_pt",
             "pls_unused_isfake_pt"
         ],
         "legend": [
@@ -303,6 +342,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ],
         "xaxis_log": true
@@ -315,6 +356,8 @@
             "pls_unused_real_simIdxmacthes_ls_hard_used_phi",
             "pls_unused_real_simIdxmacthes_ls_pu_used_phi",
             "pls_unused_real_simIdxmacthes_none_phi",
+            "pls_unused_real_simIdxmacthes_two_ls_hard_phi",
+            "pls_unused_real_simIdxmacthes_two_ls_pu_phi",
             "pls_unused_isfake_phi"
         ],
         "legend": [
@@ -323,6 +366,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ]
     },
@@ -334,6 +379,8 @@
             "pls_unused_real_simIdxmacthes_ls_hard_used_eta",
             "pls_unused_real_simIdxmacthes_ls_pu_used_eta",
             "pls_unused_real_simIdxmacthes_none_eta",
+            "pls_unused_real_simIdxmacthes_two_ls_hard_eta",
+            "pls_unused_real_simIdxmacthes_two_ls_pu_eta",
             "pls_unused_isfake_eta"
         ],
         "legend": [
@@ -342,6 +389,8 @@
             "Real pLS: Matches Used PV LS",
             "Real pLS: Matches Used PU LS",
             "Real pLS: No LS Matches",
+            "Real pLS: Matches Used and Unused PV LS",
+            "Real pLS: Matches Used and Unused PU LS",
             "Fake"
         ]
     }
