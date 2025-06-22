@@ -35,17 +35,20 @@ def make_plots(data_dict, output_dir):
                 raise Exception(f"{plot_name} has no values!")
             for val in plot_cfg["values"]:
                 if plot_name.startswith("simIdx"):
-                    ref_obj = "LS" if lst_obj.startswith("ls") else "pLS"
-                    other_obj = "pLS" if ref_obj == "LS" else "LS"
+                    ref_obj = "ls" if lst_obj.startswith("ls") else "pls"
+                    other_obj = "pls" if ref_obj == "ls" else "ls"
                     used_unused = "Used" if "used" in lst_obj else "Unused"
                     title = f"{used_unused} {ref_obj}  " + plot_cfg["title"]
                     legend = [f"Real {ref_obj}: {leg} {other_obj}" for leg in plot_cfg["legend"][:-1]]
                     legend.append(f"{plot_cfg['legend'][-1]} {ref_obj}")
+                    objects = [f"{lst_obj}_{base}_{other_obj}_{val}" for base in plot_cfg["objects_base"][:-1]]
+                    objects.append(f"{lst_obj}_{plot_cfg['objects_base'][-1]}_{val}")
+
                 else:
+                    objects = [f"{lst_obj}_{base}_{val}" for base in plot_cfg["objects_base"]]
                     title = plot_cfg["title"] + f" {lst_obj} {val}"
                     legend = [f"{leg} {lst_obj}" for leg in plot_cfg["legend"]]
 
-                objects = [f"{lst_obj}_{base}_{val}" for base in plot_cfg["objects_base"]]
                 xaxis_log = True if val == "pt" else plot_cfg.get("xaxis_log", default["xaxis_log"])
                 yaxis_log = plot_cfg.get("yaxis_log", False)
                 plot_log_also = plot_cfg.get("plot_log_also", default["plot_log_also"])
@@ -109,10 +112,13 @@ def make_plots(data_dict, output_dir):
                         base_dir = os.path.join(output_dir, subdir) if subdir else output_dir
 
                     os.makedirs(base_dir, exist_ok=True)
-                    return os.path.join(base_dir, plot_name + f"{lst_obj}_{val}"  + ("_log" if is_log_version else ""))
+                    if plot_name.startswith("simIdx"):
+                        return os.path.join(base_dir, f"{lst_obj}_{plot_name}_{other_obj}_{val}" + ("_log" if is_log_version else ""))
+                    else:
+                        return os.path.join(base_dir, f"{lst_obj}_{plot_name}_{val}" + ("_log" if is_log_version else ""))
 
                 def create_and_save_plot(is_log_version=False):
-                    fig, ax_main = plt.subplots(figsize=(10, 5) if plot_legend_onside else (8, 5))
+                    fig, ax_main = plt.subplots(figsize=(10, 5) if default["plot_legend_onside"] else (8, 5))
 
                     ax_main.hist(
                         hist_data,
@@ -131,7 +137,7 @@ def make_plots(data_dict, output_dir):
 
                     if xaxis_log:
                         ax_main.set_xscale('log')
-                    if var == "pt":
+                    if val == "pt":
                         ax_main.axvline(x=0.8, color='red', linestyle='--', linewidth=1.5, label='x = 0.8')
                     if is_log_version or yaxis_log:
                         ax_main.set_yscale('log')
@@ -140,7 +146,7 @@ def make_plots(data_dict, output_dir):
                     fig.savefig(f"{path}.png", bbox_inches='tight')
                     fig.savefig(f"{path}.pdf", bbox_inches='tight')
                     plt.close(fig)
-                    print(f"Plot {plot_name + ('_log' if is_log_version else '')} has been created!")
+                    print(f"Plot {path} has been created!")
 
                 if has_ratio:
                     raise Exception("Not Quite Ready for that yet")

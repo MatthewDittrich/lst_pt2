@@ -19,21 +19,21 @@
         "title"  : "Used",
         "lst_objects": ["ls","pls"],
         "values": ["pt","eta","phi"],
-        "objects_base": ["used_real","used_isfake"],
+        "objects_base": ["used_real","used_fake"],
         "legend" :["Real", "Fake"]
     }, 
     "unused":{
         "title":"Unused",
         "lst_objects": ["ls","pls"],
         "values": ["pt","eta","phi"],
-        "objects_base": ["unused_real","unused_isfake"],
+        "objects_base": ["unused_real","unused_fake"],
         "legend" :["Real", "Fake"]
     },
     "all":{
         "title": "All",
         "lst_objects": ["ls","pls"],
         "values": ["pt","eta","phi"],
-        "objects_base": ["all_real","all_isfake"],
+        "objects_base": ["all_real","all_fake"],
         "legend": ["Real","Fake"]
     }, 
     "simIdx_full_breakdown":{
@@ -41,14 +41,14 @@
         "lst_objects": ["ls_used", "ls_unused", "pls_used", "pls_unused"],
         "values": ["pt","eta","phi"],
         "objects_base": [
-            "real_simIdxmacthes_pls_hard_unused",
-            "real_simIdxmacthes_pls_pu_unused",
-            "real_simIdxmacthes_pls_hard_used",
-            "real_simIdxmacthes_pls_pu_used",
-            "real_simIdxmacthes_none",
-            "real_simIdxmacthes_both_pls_hard",
-            "real_simIdxmacthes_both_pls_pu",
-            "isfake"
+            "real_simIdxmatches_pv_unused",
+            "real_simIdxmatches_pu_unused",
+            "real_simIdxmatches_pv_used",
+            "real_simIdxmatches_pu_used",
+            "real_simIdxmatches_none",
+            "real_simIdxmatches_both_pv",
+            "real_simIdxmatches_both_pu",
+            "fake"
         ],
         "legend": [
             "Matches Unused PV",
