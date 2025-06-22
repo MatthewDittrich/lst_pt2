@@ -7,59 +7,65 @@ def unique_per_event(array_of_arrays):
 
 
 
-def ls_simIdx_matching(events,fake_pls_mask,pls_used_mask,used_key,hard_key):
-
-    if hard_key not in ["hard", "pu"]:
+def ls_simIdx_matching(ls, pls, used_key, hard_key, sim_length):
+    if hard_key not in ["pv", "pu"]:
         raise Exception(f"Key {hard_key} is not recognized!")
     if used_key not in ["used","unused"]:
         raise Exception(f"Key {used_key} is not recognized!")
-    # Define the ls_simIdx
-    ls_simIdx = events.ls_simIdx
-    # Get filtered pls_simIdx list
+    # Define the simIdx and needed masks
+    ls_simIdx = ls["simIdx"]
+    pls_simIdx = pls["simIdx"]
+    real_pls_mask = (~pls["isfake"])
+    pls_used_mask = pls["is_used"]
+    # Base mask for filtering pls_simidx
+    base_mask = (real_pls_mask & (pls_simIdx != -999))
     # Filters are dependent on keys
-    if (hard_key == "hard") and (used_key == "used"):
-        pls_simIdx = events.pls_simIdx[pls_used_mask & (~fake_pls_mask) & (events.pls_simIdx != -999) & (events.pls_simIdx < ak.num(events.sim_pt))]
-    elif (hard_key == "hard") and (used_key == "unused"):
-        pls_simIdx = events.pls_simIdx[(~pls_used_mask) & (~fake_pls_mask) & (events.pls_simIdx != -999) & (events.pls_simIdx < ak.num(events.sim_pt))]
+    if (hard_key == "pv") and (used_key == "used"):
+        base_mask = base_mask & pls_used_mask & (pls_simIdx < sim_length)
+    elif (hard_key == "pv") and (used_key == "unused"):
+        base_mask = base_mask & (~pls_used_mask) & (pls_simIdx < sim_length)
     elif (hard_key == "pu") and (used_key == "used"):
-        pls_simIdx = events.pls_simIdx[pls_used_mask & (~fake_pls_mask) & (events.pls_simIdx != -999) & (events.pls_simIdx >= ak.num(events.sim_pt))]
+        base_mask = base_mask & pls_used_mask & (pls_simIdx >= sim_length)
     elif (hard_key == "pu") and (used_key == "unused"):
-        pls_simIdx = events.pls_simIdx[(~pls_used_mask) & (~fake_pls_mask) & (events.pls_simIdx != -999) & (events.pls_simIdx >= ak.num(events.sim_pt))]
+        base_mask = base_mask & (~pls_used_mask) & (pls_simIdx >= sim_length)
+    pls_simIdx = pls_simIdx[base_mask]
     # Construct the mask
     ls_mask = []
     for ls_list, pls_list in zip(ls_simIdx, pls_simIdx):
         pls_set = set(pls_list) 
         ls_mask.append([a in pls_set for a in ls_list])
-
     # Return the mask
     return ak.Array(ls_mask)
 
 
 
-def pls_simIdx_matching(events,fake_ls_mask,ls_used_mask,used_key,hard_key):
-
-    if hard_key not in ["hard", "pu"]:
+def pls_simIdx_matching(pls, ls, used_key, hard_key, sim_length):
+    if hard_key not in ["pv", "pu"]:
         raise Exception(f"Key {hard_key} is not recognized!")
     if used_key not in ["used","unused"]:
         raise Exception(f"Key {used_key} is not recognized!")
-    # Define the pls_simIdx
-    pls_simIdx = events.pls_simIdx
-    # Get filtered ls_simIdx list
+    # Define the simIdx and needed masks
+    ls_simIdx = ls["simIdx"]
+    pls_simIdx = pls["simIdx"]
+    real_ls_mask = (~ls["isfake"])
+    ls_used_mask = ls["is_used"]
+    # Base mask for filtering pls_simidx
+    base_mask = (real_ls_mask & (ls_simIdx != -999))
     # Filters are dependent on keys
-    if (hard_key == "hard") and (used_key == "used"):
-        ls_simIdx = events.ls_simIdx[ls_used_mask & (~fake_ls_mask) & (events.ls_simIdx != -999) & (events.ls_simIdx < ak.num(events.sim_pt))]
-    elif (hard_key == "hard") and (used_key == "unused"):
-        ls_simIdx = events.ls_simIdx[(~ls_used_mask) & (~fake_ls_mask) & (events.ls_simIdx != -999) & (events.ls_simIdx < ak.num(events.sim_pt))]
+    if (hard_key == "pv") and (used_key == "used"):
+        base_mask = base_mask & ls_used_mask & (ls_simIdx < sim_length)
+    elif (hard_key == "pv") and (used_key == "unused"):
+        base_mask = base_mask & (~ls_used_mask) & (ls_simIdx < sim_length)
     elif (hard_key == "pu") and (used_key == "used"):
-        ls_simIdx = events.ls_simIdx[ls_used_mask & (~fake_ls_mask) & (events.ls_simIdx != -999) & (events.ls_simIdx >= ak.num(events.sim_pt))]
+        base_mask = base_mask & ls_used_mask & (ls_simIdx >= sim_length)
     elif (hard_key == "pu") and (used_key == "unused"):
-        ls_simIdx = events.ls_simIdx[(~ls_used_mask) & (~fake_ls_mask) & (events.ls_simIdx != -999) & (events.ls_simIdx >= ak.num(events.sim_pt))]
+        base_mask = base_mask & (~ls_used_mask) & (ls_simIdx >= sim_length)
+    ls_simIdx = ls_simIdx[base_mask]
     # Construct the mask
     pls_mask = []
     for pls_list, ls_list in zip(pls_simIdx, ls_simIdx):
         ls_set = set(ls_list) 
         pls_mask.append([a in ls_set for a in pls_list])
-
     # Return the mask
     return ak.Array(pls_mask)
 
@@ -148,8 +154,6 @@ def ls_masks(events, key):
         ls_from_pt3_mask = ak.Array(ls_from_pt3_mask_list)
 
         return ls_from_pt3_mask
-
-
 
 
 
