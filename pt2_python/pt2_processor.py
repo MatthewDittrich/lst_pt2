@@ -43,6 +43,16 @@ def pt2_processor(events):
     pls_matches_used_ls = (pls.matches_used_pv_ls | pls.matches_used_pu_ls)
     pls_matches_none = (~(pls_matches_unused_ls | pls_matches_used_ls))
 
+    # Attach these masks as they are crucial for pt2 building
+    ls["matches_unused_pls"] = ls_matches_unused_pls
+    pls["matches_unused_ls"] = pls_matches_unused_ls
+
+    # Get the Ideal pT2 objects
+    pt2 = pt2_objects.get_ideal_pt2(pls, ls)
+
+
+
+    # mask dictionary
     all_masks = {
         "ls": {
             "all_fake"                    : ls.isfake,
@@ -77,6 +87,9 @@ def pt2_processor(events):
             "simIdxmatches_used_ls"       : (pls_matches_used_ls),
             "simIdxmatches_both_pv_ls"    : (pls_matches_both_pv_ls),
             "simIdxmatches_both_pu_ls"    : (pls_matches_both_pu_ls),
+        },
+        "pt2": {
+            "is_ideal"                    : pt2.is_ideal,
         }
     }
 
@@ -91,10 +104,14 @@ def pt2_processor(events):
     objects = {
         "ls"  : ls,
         "pls" : pls,
+        "pt2" : pt2,
     }
 
     # Commonly plotted values
     common_values = ["pt","eta","phi"]    
+
+    # PT2 Values
+    pt2_vals = ["delta_pt", "delta_eta", "delta_phi", "delta_R"]
 
     for obj_key, obj in objects.items():
         for cat, mask in all_masks[obj_key].items():
@@ -108,6 +125,12 @@ def pt2_processor(events):
 
                     plot_objects[used_real_key] = used_real_obj
                     plot_objects[unused_real_key] = unused_real_obj
+            elif obj_key == "pt2":
+                for val in pt2_vals:
+                    plot_objects_key = f"{obj_key}_{cat}_{val}"
+                    plot_objects_array = getattr(obj,val)[mask]                                    
+
+                    plot_objects[plot_objects_key] = plot_objects_array
             else:
                 # Right now we are just doing common values
                 for val in common_values:

@@ -13,10 +13,10 @@ def ls_simIdx_matching(ls, pls, used_key, hard_key, sim_length):
     if used_key not in ["used","unused"]:
         raise Exception(f"Key {used_key} is not recognized!")
     # Define the simIdx and needed masks
-    ls_simIdx = ls["simIdx"]
-    pls_simIdx = pls["simIdx"]
-    real_pls_mask = (~pls["isfake"])
-    pls_used_mask = pls["is_used"]
+    ls_simIdx = ls.simIdx
+    pls_simIdx = pls.simIdx
+    real_pls_mask = ~pls.isfake
+    pls_used_mask = pls.is_used
     # Base mask for filtering pls_simidx
     base_mask = (real_pls_mask & (pls_simIdx != -999))
     # Filters are dependent on keys
@@ -45,10 +45,10 @@ def pls_simIdx_matching(pls, ls, used_key, hard_key, sim_length):
     if used_key not in ["used","unused"]:
         raise Exception(f"Key {used_key} is not recognized!")
     # Define the simIdx and needed masks
-    ls_simIdx = ls["simIdx"]
-    pls_simIdx = pls["simIdx"]
-    real_ls_mask = (~ls["isfake"])
-    ls_used_mask = ls["is_used"]
+    ls_simIdx = ls.simIdx
+    pls_simIdx = pls.simIdx
+    real_ls_mask = ~ls.isfake
+    ls_used_mask = ls.is_used
     # Base mask for filtering pls_simidx
     base_mask = (real_ls_mask & (ls_simIdx != -999))
     # Filters are dependent on keys
