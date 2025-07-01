@@ -50,8 +50,6 @@ def pt2_processor(events):
     # Get the Ideal pT2 objects
     pt2 = pt2_objects.get_ideal_pt2(pls, ls)
 
-
-
     # mask dictionary
     all_masks = {
         "ls": {

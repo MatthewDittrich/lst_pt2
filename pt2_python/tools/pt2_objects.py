@@ -90,45 +90,6 @@ def get_pls(events):
     return pls
 
 
-#def get_ideal_pt2(pls, ls):
-#    filtered_pls = pls[pls.matches_unused_ls]
-#    filtered_ls = ls[ls.matches_unused_pls]
-#
-#    filtered_pls_simIdx = filtered_pls.simIdx
-#    filtered_ls_simIdx = filtered_ls.simIdx
-#
-#    filtered_pls_idx = []
-#    filtered_ls_idx = []
-#
-#    for pls_evt_simIdx, ls_evt_simIdx in zip(filtered_pls_simIdx, filtered_ls_simIdx):
-#        pls_event_idx = []
-#        ls_event_idx = []
-#        for i, plssimIdx in enumerate(pls_evt_simIdx):
-#            for j, lssimIdx in enumerate(ls_evt_simIdx):
-#                if lssimIdx == plssimIdx:
-#                    pls_event_idx.append(i)
-#                    ls_event_idx.append(j)
-#
-#        filtered_pls_idx.append(pls_event_idx)
-#        filtered_ls_idx.append(ls_event_idx)
-#
-#    filtered_pls_idx = ak.Array(filtered_pls_idx)
-#    filtered_ls_idx = ak.Array(filtered_ls_idx)
-#
-#    pt2 = LST_OBJECT({
-#        "pls_pt": filtered_pls.pt[filtered_pls_idx],
-#        "pls_eta": filtered_pls.eta[filtered_pls_idx],
-#        "pls_phi": filtered_pls.phi[filtered_pls_idx],
-#        "ls_pt": filtered_ls.pt[filtered_ls_idx],
-#        "ls_eta": filtered_ls.eta[filtered_ls_idx],
-#        "ls_phi": filtered_ls.phi[filtered_ls_idx],
-#        "simIdx": filtered_ls.simIdx[filtered_ls_idx],
-#    })
-#
-#    return pt2
-
-
-
 def get_ideal_pt2(pls, ls):
     filtered_pls = pls[pls.matches_unused_ls]
     filtered_ls = ls[ls.matches_unused_pls]
