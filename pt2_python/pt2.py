@@ -25,10 +25,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("root_file_path", help="The path to the root file")
     parser.add_argument("-o", "--output-path", default="pt2_output", help="The path the output will be saved to")
+    parser.add_argument("-p", "--plot", action="store_true", help="Make plots")
+    parser.add_argument("-y", "--yields", action="store_true", help="Make yield table")
+    parser.add_argument("-r", "--root-file", action="store_true", help="Outputs root file with additional branches from the original")
     parser.add_argument("-n", "--number-workers", type=int, default=max(multiprocessing.cpu_count() - 2, 1), help="The number of workers")
     parser.add_argument("-c", "--chunk-size", type=int, default=5, help="Chunk Size")
     parser.add_argument("-d", "--debug", action="store_true", help="Run in debug mode (process only first event of first chunk)")
     args = parser.parse_args()
+
+    # The code should be set up to output something
+    if not (args.plot or args.root_file or args.yields):
+        raise Exception("Code will not output anything! Please ensure some form of output.")
 
     print("Attempting to get events...")
 
@@ -50,9 +57,18 @@ def main():
     # Merge the results
     merged_results = merge_results(results_list)
 
-    # Now pass merged_results to plotting function
-    pt2_plotting.make_plots(merged_results, args.output_path)
-    print("Plots Finished!")
+    if args.yields:
+        # TODO Set this up
+        raise Exception("Not set up yet!")
+
+    if args.root_file:
+        # TODO Set this up
+        raise Exception("Not set up yet!")
+
+    if args.plot:
+        # Pass Merged Results to Plotting Function
+        pt2_plotting.make_plots(merged_results, args.output_path)
+        print("Plots Finished!")
 
 if __name__ == "__main__":
     main()
