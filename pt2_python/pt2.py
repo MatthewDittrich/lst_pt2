@@ -4,20 +4,10 @@ import argparse
 import multiprocessing
 import concurrent.futures
 
+from tools.branches import branches_to_load
 from tools.plotting import pt2_plotting
 from tools.GatorMaker import print_gator
 from pt2_processor import pt2_processor
-
-branches_to_load = [
-    "sim_pt",
-    "ls_pt", "ls_eta", "ls_phi", "ls_isFake", "ls_simIdx",
-    "pls_pt", "pls_eta", "pls_phi", "pls_isFake", "pls_simIdx","pls_isDuplicate",
-    "tc_pt5Idx", "tc_t5Idx", "tc_pt3Idx","tc_plsIdx",
-    "t3_lsIdx0","t3_lsIdx1",
-    "t5_t3Idx0","t5_t3Idx1",
-    "pt3_plsIdx","pt3_t3Idx",
-    "pt5_plsIdx","pt5_t5Idx",
-]
 
 def merge_results(results_list):
     merged = {}
