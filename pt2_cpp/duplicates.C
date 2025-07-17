@@ -108,10 +108,10 @@ void duplicates() {
         inputTree->GetEntry(i);
 
         std::set<int> used_ls_indices_in_this_event;
-        // *** NEW: A set to track used PLS in this event ***
+        
         std::set<int> used_pls_indices_in_this_event;
         
-        // *** NEW: Trackers to spot duplicates *within this event* -> this makes sure that we are only looking duplciates in one event
+        //Trackers to spot duplicates *within this event* -> this makes sure that we are only looking duplciates in one event
         std::set<int> ls_usage_tracker_event;
         std::set<int> pls_usage_tracker_event;
         
