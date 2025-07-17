@@ -54,7 +54,7 @@ void used_unused() {
     inputTree->SetBranchAddress("ls_phi", &ls_phi_vec);
     inputTree->SetBranchAddress("ls_isFake", &ls_isFake_vec);
     
-    // Link ALL the index branches (ensure these names match your TTree exactly)
+    // Link ALL the index branches 
     inputTree->SetBranchAddress("tc_pt5Idx", &tc_pt5Idx_vec);
     inputTree->SetBranchAddress("pt5_t5Idx", &pt5_t5Idx_vec);
     inputTree->SetBranchAddress("t5_t3Idx0", &t5_t3Idx0_vec);
