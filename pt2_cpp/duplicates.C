@@ -210,8 +210,43 @@ void duplicates() {
         // Path 3: tc_t5 -> t5 -> t3 -> ls (No PLS in this path)
         for (int t5_Idx : *tc_t5Idx_vec) {
             if (t5_Idx != -999) {
-                // ... (This logic is the same as the t5 part of Path 1) ...
-            }
+                // Trace down to the LS
+                    int t3_0 = t5_t3Idx0_vec->at(t5_Idx);
+                    if (t3_0 != -999) {
+                        int ls0 = t3_lsIdx0_vec->at(t3_0);
+                        if (ls0 != -999) {
+                           used_ls_indices_in_this_event.insert(ls0);
+                           all_used_ls_indices_global.insert(ls0);
+                           if (ls_usage_tracker_event.count(ls0)) { duplicate_ls_count++; }
+                           else { ls_usage_tracker_event.insert(ls0); }
+                        }
+                        int ls1 = t3_lsIdx1_vec->at(t3_0);
+                        if (ls1 != -999) {
+                           used_ls_indices_in_this_event.insert(ls1);
+                           all_used_ls_indices_global.insert(ls1);
+                           if (ls_usage_tracker_event.count(ls1)) { duplicate_ls_count++; }
+                           else { ls_usage_tracker_event.insert(ls1); }
+                        }
+                    }
+                    int t3_1 = t5_t3Idx1_vec->at(t5_Idx);
+                    if (t3_1 != -999) {
+                        int ls2 = t3_lsIdx0_vec->at(t3_1);
+                        if (ls2 != -999) {
+                           used_ls_indices_in_this_event.insert(ls2);
+                           all_used_ls_indices_global.insert(ls2);
+                           if (ls_usage_tracker_event.count(ls2)) { duplicate_ls_count++; }
+                           else { ls_usage_tracker_event.insert(ls2); }
+                        }
+                        int ls3 = t3_lsIdx1_vec->at(t3_1);
+                        if (ls3 != -999) {
+                           used_ls_indices_in_this_event.insert(ls3);
+                           all_used_ls_indices_global.insert(ls3);
+                           if (ls_usage_tracker_event.count(ls3)) { duplicate_ls_count++; }
+                           else { ls_usage_tracker_event.insert(ls3); }
+                        }
+                    }
+                } 
+            
         }
         
         // Fill Histograms for LS objects
@@ -239,7 +274,8 @@ void duplicates() {
     THStack *hs_pt_used = new THStack("hs_pt_used", "pT Distribution of Used Tracks;p_{T} [GeV];Tracks");
     h_pt_real_used->SetFillColor(kBlue-6); 
     h_pt_fake_used->SetFillColor(kRed-6);
-    hs_pt_used->Add(h_pt_fake_used); hs_pt_used->Add(h_pt_real_used);
+    hs_pt_used->Add(h_pt_real_used);
+    hs_pt_used->Add(h_pt_fake_used); 
     hs_pt_used->Draw("HIST");
     auto legend_pt_used = new TLegend(0.6, 0.8, 0.9, 0.9);
     legend_pt_used->AddEntry(h_pt_real_used, "Real, Used", "f");
@@ -251,7 +287,8 @@ void duplicates() {
     c_pt_unused->SetLogy();
     THStack *hs_pt_unused = new THStack("hs_pt_unused", "pT Distribution of Unused Tracks;p_{T} [GeV];Tracks");
     h_pt_real_unused->SetFillColor(kBlue-9); h_pt_fake_unused->SetFillColor(kRed-9);
-    hs_pt_unused->Add(h_pt_fake_unused); hs_pt_unused->Add(h_pt_real_unused);
+    hs_pt_unused->Add(h_pt_real_unused);
+    hs_pt_unused->Add(h_pt_fake_unused);
     hs_pt_unused->Draw("HIST");
     auto legend_pt_unused = new TLegend(0.6, 0.8, 0.9, 0.9);
     legend_pt_unused->AddEntry(h_pt_real_unused, "Real, Unused", "f");
@@ -262,8 +299,10 @@ void duplicates() {
     // --- Eta Plots ---
     TCanvas *c_eta_used = new TCanvas("c_eta_used", "Eta of Used Tracks", 800, 600);
     THStack *hs_eta_used = new THStack("hs_eta_used", "Eta Distribution of Used Tracks;#eta;Tracks");
-    h_eta_real_used->SetFillColor(kGreen-7); h_eta_fake_used->SetFillColor(kOrange-9);
-    hs_eta_used->Add(h_eta_fake_used); hs_eta_used->Add(h_eta_real_used);
+    h_eta_real_used->SetFillColor(kGreen-7); 
+    h_eta_fake_used->SetFillColor(kOrange-9);
+    hs_eta_used->Add(h_eta_real_used);
+    hs_eta_used->Add(h_eta_fake_used); 
     hs_eta_used->Draw("HIST");
     auto legend_eta_used = new TLegend(0.2, 0.8, 0.5, 0.9);
     legend_eta_used->AddEntry(h_eta_real_used, "Real, Used", "f");
@@ -274,9 +313,10 @@ void duplicates() {
     TCanvas *c_eta_unused = new TCanvas("c_eta_unused", "Eta of Unused Tracks", 800, 600);
     THStack *hs_eta_unused = new THStack("hs_eta_unused", "Eta Distribution of Unused Tracks;#eta;Tracks");
     h_eta_real_unused->SetFillColor(kGreen-7); h_eta_fake_unused->SetFillColor(kOrange-9);
-    hs_eta_unused->Add(h_eta_fake_unused); hs_eta_unused->Add(h_eta_real_unused);
+    hs_eta_unused->Add(h_eta_real_unused);
+    hs_eta_unused->Add(h_eta_fake_unused); 
     hs_eta_unused->Draw("HIST");
-    auto legend_eta_unused = new TLegend(0.2, 0.8, 0.5, 0.9);
+    auto legend_eta_unused = new TLegend(0.2, 0.8, 0.45, 0.9);
     legend_eta_unused->AddEntry(h_eta_real_unused, "Real, Unused", "f");
     legend_eta_unused->AddEntry(h_eta_fake_unused, "Fake, Unused", "f");
     legend_eta_unused->Draw();
@@ -286,8 +326,8 @@ void duplicates() {
     TCanvas *c_phi_used = new TCanvas("c_phi_used", "Phi of Used Tracks", 800, 600);
     THStack *hs_phi_used = new THStack("hs_phi_used", "Phi Distribution of Used Tracks;#phi [rad];Tracks");
     h_phi_real_used->SetFillColor(kMagenta-7); h_phi_fake_used->SetFillColor(kCyan-7);
-    hs_phi_used->Add(h_phi_fake_used); 
     hs_phi_used->Add(h_phi_real_used);
+    hs_phi_used->Add(h_phi_fake_used); 
     hs_phi_used->Draw("HIST");
     auto legend_phi_used = new TLegend(0.4, 0.8, 0.7, 0.9);
     legend_phi_used->AddEntry(h_phi_real_used, "Real, Used", "f");
@@ -299,7 +339,8 @@ void duplicates() {
     THStack *hs_phi_unused = new THStack("hs_phi_unused", "Phi Distribution of Unused Tracks;#phi [rad];Tracks");
     h_phi_real_unused->SetFillColor(kMagenta-9); 
     h_phi_fake_unused->SetFillColor(kCyan-9);
-    hs_phi_unused->Add(h_phi_fake_unused); hs_phi_unused->Add(h_phi_real_unused);
+    hs_phi_unused->Add(h_phi_real_unused);
+    hs_phi_unused->Add(h_phi_fake_unused); 
     hs_phi_unused->Draw("HIST");
     auto legend_phi_unused = new TLegend(0.4, 0.8, 0.7, 0.9);
     legend_phi_unused->AddEntry(h_phi_real_unused, "Real, Unused", "f");
@@ -318,8 +359,19 @@ void duplicates() {
     std::cout << "Duplicate PLS Assignments (within events): " << duplicate_pls_count << std::endl;
     std::cout << "------------------------------------------" << std::endl;
 
-
-
+ // --- LS Category Breakdown with clean integer output ---
+    std::cout << "------------------------------------------" << std::endl;
+    std::cout << "--- LS Category Breakdown (from Histograms) ---" << std::endl;
+    std::cout << "Used, Real:   " << static_cast<long long>(h_pt_real_used->GetEntries()) << std::endl;
+    std::cout << "Used, Fake:   " << static_cast<long long>(h_pt_fake_used->GetEntries()) << std::endl;
+    std::cout << "Unused, Real: " << static_cast<long long>(h_pt_real_unused->GetEntries()) << std::endl;
+    std::cout << "Unused, Fake: " << static_cast<long long>(h_pt_fake_unused->GetEntries()) << std::endl;
+    long long sanity_check_total = static_cast<long long>(h_pt_real_used->GetEntries()) + 
+                                   static_cast<long long>(h_pt_fake_used->GetEntries()) +
+                                   static_cast<long long>(h_pt_real_unused->GetEntries()) + 
+                                   static_cast<long long>(h_pt_fake_unused->GetEntries());
+    std::cout << "Total (Sum of categories): " << sanity_check_total << " (Should match Total LS Objects)" << std::endl;
+    std::cout << "------------------------------------------" << std::endl;
 
     // --- Clean up ---
     inputFile->Close();
