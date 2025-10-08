@@ -7,6 +7,7 @@ git clone https://github.com/MatthewDittrich/lst_pt2.git
 ```
 Activate ROOT:
 ```
+cd lst_cpp/
 export SCRAM_ARCH=el8_amd64_gcc10
 export CMSSW_VERSION=CMSSW_12_5_0
 source /cvmfs/cms.cern.ch/cmsset_default.sh
