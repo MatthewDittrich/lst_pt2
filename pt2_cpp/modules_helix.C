@@ -89,9 +89,61 @@ std::pair<ROOT::Math::XYVector, double> fitCircle(const std::vector<ROOT::Math::
 
     return {ROOT::Math::XYVector(cx, cy), R};
 }
+
+ROOT::Math::XYVector fitCircleWithFixedRadius(
+    const std::vector<ROOT::Math::XYVector>& hits, 
+    double fixed_radius
+) {
+    if (hits.size() < 2) return {0, 0};
+
+    auto chi_squared_func = [&](const double *p) {
+        double h = p[0];
+        double k = p[1];
+        double chi2 = 0.0;
+        for (const auto& hit : hits) {
+            double dx = hit.X() - h;
+            double dy = hit.Y() - k;
+            double r_squared_from_center = dx*dx + dy*dy;
+            double residual = std::sqrt(r_squared_from_center) - fixed_radius;
+            chi2 += residual * residual;
+        }
+        return chi2;
+    };
+
+    ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
+    min.SetMaxFunctionCalls(10000);
+    min.SetMaxIterations(1000);
+    min.SetTolerance(0.001);
+    min.SetPrintLevel(-1);
+
+    ROOT::Math::Functor f(chi_squared_func, 2);
+    min.SetFunction(f);
+
+    double avg_x = 0.0, avg_y = 0.0;
+    for (const auto& hit : hits) {
+        avg_x += hit.X();
+        avg_y += hit.Y();
+    }
+    avg_x /= hits.size();
+    avg_y /= hits.size();
+    
+    min.SetVariable(0, "h", avg_x, 0.1);
+    min.SetVariable(1, "k", avg_y, 0.1);
+
+    min.Minimize();
+
+    if (min.Status() == 0) {
+        const double *result = min.X();
+        return {result[0], result[1]};
+    }
+
+    return {0, 0}; 
+}
+
+
 //-------This function uses the circle fitting to create the hellical trajectory---------
 std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(
-    int pls_idx, int ls_idx,
+    int pls_idx, int ls_idx, const std::vector<float>& pls_pt,
     // PLS hit position branches
     const std::vector<float>& pls_hit0_x, const std::vector<float>& pls_hit0_y, const std::vector<float>& pls_hit0_z,
     const std::vector<float>& pls_hit1_x, const std::vector<float>& pls_hit1_y, const std::vector<float>& pls_hit1_z,
@@ -122,11 +174,21 @@ std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(
 
     if (pls_hits_xy.size() < 3) return invalid_return;
 
-    // --- Fit circle ---
-    auto circle_params = fitCircle(pls_hits_xy);
-    ROOT::Math::XYVector circle_center = circle_params.first;
-    double circle_radius = circle_params.second;
-    if (circle_radius < 0) return invalid_return;
+    // --- Fit circle (Karimäki) ---
+    float reco_pt = pls_pt.at(pls_idx);
+
+    // Step B: Calculate the radius predicted by the reconstructed pT
+    const double B_FIELD_TESLA = 3.8; // IMPORTANT: Set your detector's value
+    double R_pred_cm = (reco_pt / (0.3 * B_FIELD_TESLA)) * 100.0;
+    
+    // Step C: Call the new fitter to find the center using the fixed radius
+    ROOT::Math::XYVector circle_center = fitCircleWithFixedRadius(pls_hits_xy, R_pred_cm);
+
+    // Step D: Check if the fit was successful and assign the final radius
+    if (circle_center.X() == 0 && circle_center.Y() == 0) {
+        return invalid_return; // The constrained fit failed
+    }
+    double circle_radius = R_pred_cm;
 
     // --- Build z vs angle graph ---
     TGraph z_vs_angle_graph;
@@ -196,7 +258,7 @@ std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(
 
             // clamp big steps to keep stability
             if (std::abs(step) > 1.0) {
-                phi += (step > 0) ? 1.0 : -1.0;
+                phi += (step > 0) ? 1.0 : -1.0; // back off a bit
             }
             if (std::abs(step) < 1e-10) break; // converged
         }
@@ -558,7 +620,7 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
                                   if (true_pt<= 2.0) {  
                                     // If it matches, perform the extrapolation
                                     auto distance_3d = extrapolatePlsHelicallyAndGetDistance(
-                                        i, ls_idx, 
+                                        i, ls_idx, pls_pt,
                                         pls_hit0_x, pls_hit0_y, pls_hit0_z, pls_hit1_x, pls_hit1_y, pls_hit1_z, 
                                         pls_hit2_x, pls_hit2_y, pls_hit2_z, pls_hit3_x, pls_hit3_y, pls_hit3_z, 
                                         ls_mdIdx0, ls_mdIdx1, 
