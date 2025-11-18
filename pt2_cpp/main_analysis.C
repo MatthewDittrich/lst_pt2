@@ -10,8 +10,8 @@
 #include <set>
 #include <map>
 #include "draw_maker.C"
-// Include the file with our helper functions
 #include "modules_helix.C"
+#include "pt2_builder.C"
 
 // Forward declaration of the gator function if it's not in the modules file
 void print_coding_gator();
@@ -39,35 +39,53 @@ void main_analysis() {
     std::vector<float> *pls_hit1_x_vec = nullptr, *pls_hit1_y_vec = nullptr, *pls_hit1_z_vec = nullptr;
     std::vector<float> *pls_hit2_x_vec = nullptr, *pls_hit2_y_vec = nullptr, *pls_hit2_z_vec = nullptr;
     std::vector<float> *pls_hit3_x_vec = nullptr, *pls_hit3_y_vec = nullptr, *pls_hit3_z_vec = nullptr;
-    std::vector<int> *md_layer_vec = nullptr;
+    std::vector<int> *md_layer_vec = nullptr, *md_detId_vec = nullptr;
     std::vector<float> *sim_pt_vec = nullptr;
     
-    inputTree->SetBranchAddress("ls_pt", &ls_pt_vec); inputTree->SetBranchAddress("ls_eta", &ls_eta_vec); inputTree->SetBranchAddress("ls_phi", &ls_phi_vec);
-    inputTree->SetBranchAddress("ls_isFake", &ls_isFake_vec); inputTree->SetBranchAddress("ls_simIdx", &ls_simIdx_vec);
-    inputTree->SetBranchAddress("tc_pt5Idx", &tc_pt5Idx_vec); inputTree->SetBranchAddress("pt5_t5Idx", &pt5_t5Idx_vec);
-    inputTree->SetBranchAddress("t5_t3Idx0", &t5_t3Idx0_vec); inputTree->SetBranchAddress("t5_t3Idx1", &t5_t3Idx1_vec);
-    inputTree->SetBranchAddress("t3_lsIdx0", &t3_lsIdx0_vec); inputTree->SetBranchAddress("t3_lsIdx1", &t3_lsIdx1_vec);
-    inputTree->SetBranchAddress("tc_pt3Idx", &tc_pt3Idx_vec); inputTree->SetBranchAddress("pt3_t3Idx", &pt3_t3Idx_vec);
-    inputTree->SetBranchAddress("tc_t5Idx", &tc_t5Idx_vec); inputTree->SetBranchAddress("pt5_plsIdx", &pt5_plsIdx_vec);
+    inputTree->SetBranchAddress("ls_pt", &ls_pt_vec); 
+    inputTree->SetBranchAddress("ls_eta", &ls_eta_vec); 
+    inputTree->SetBranchAddress("ls_phi", &ls_phi_vec);
+    inputTree->SetBranchAddress("ls_isFake", &ls_isFake_vec); 
+    inputTree->SetBranchAddress("ls_simIdx", &ls_simIdx_vec);
+    inputTree->SetBranchAddress("tc_pt5Idx", &tc_pt5Idx_vec); 
+    inputTree->SetBranchAddress("pt5_t5Idx", &pt5_t5Idx_vec);
+    inputTree->SetBranchAddress("t5_t3Idx0", &t5_t3Idx0_vec); 
+    inputTree->SetBranchAddress("t5_t3Idx1", &t5_t3Idx1_vec);
+    inputTree->SetBranchAddress("t3_lsIdx0", &t3_lsIdx0_vec); 
+    inputTree->SetBranchAddress("t3_lsIdx1", &t3_lsIdx1_vec);
+    inputTree->SetBranchAddress("tc_pt3Idx", &tc_pt3Idx_vec); 
+    inputTree->SetBranchAddress("pt3_t3Idx", &pt3_t3Idx_vec);
+    inputTree->SetBranchAddress("tc_t5Idx", &tc_t5Idx_vec); 
+    inputTree->SetBranchAddress("pt5_plsIdx", &pt5_plsIdx_vec);
     inputTree->SetBranchAddress("pt3_plsIdx", &pt3_plsIdx_vec);
-    inputTree->SetBranchAddress("pls_pt", &pls_pt_vec); inputTree->SetBranchAddress("pls_eta", &pls_eta_vec); inputTree->SetBranchAddress("pls_phi", &pls_phi_vec);
-    inputTree->SetBranchAddress("pls_isFake", &pls_isFake_vec); inputTree->SetBranchAddress("pls_simIdx", &pls_simIdx_vec);
-    inputTree->SetBranchAddress("ls_mdIdx0", &ls_mdIdx0_vec); inputTree->SetBranchAddress("ls_mdIdx1", &ls_mdIdx1_vec);
-    inputTree->SetBranchAddress("md_anchor_x", &md_anchor_x_vec); inputTree->SetBranchAddress("md_anchor_y", &md_anchor_y_vec);
-    inputTree->SetBranchAddress("md_anchor_z", &md_anchor_z_vec); inputTree->SetBranchAddress("md_other_x", &md_other_x_vec);
-    inputTree->SetBranchAddress("md_other_y", &md_other_y_vec); inputTree->SetBranchAddress("md_other_z", &md_other_z_vec);
-    inputTree->SetBranchAddress("pls_hit0_x", &pls_hit0_x_vec); inputTree->SetBranchAddress("pls_hit0_y", &pls_hit0_y_vec);
+    inputTree->SetBranchAddress("pls_pt", &pls_pt_vec); 
+    inputTree->SetBranchAddress("pls_eta", &pls_eta_vec); 
+    inputTree->SetBranchAddress("pls_phi", &pls_phi_vec);
+    inputTree->SetBranchAddress("pls_isFake", &pls_isFake_vec); 
+    inputTree->SetBranchAddress("pls_simIdx", &pls_simIdx_vec);
+    inputTree->SetBranchAddress("ls_mdIdx0", &ls_mdIdx0_vec); 
+    inputTree->SetBranchAddress("ls_mdIdx1", &ls_mdIdx1_vec);
+    inputTree->SetBranchAddress("md_anchor_x", &md_anchor_x_vec); 
+    inputTree->SetBranchAddress("md_anchor_y", &md_anchor_y_vec);
+    inputTree->SetBranchAddress("md_anchor_z", &md_anchor_z_vec); 
+    inputTree->SetBranchAddress("md_other_x", &md_other_x_vec);
+    inputTree->SetBranchAddress("md_other_y", &md_other_y_vec); 
+    inputTree->SetBranchAddress("md_other_z", &md_other_z_vec);
+    inputTree->SetBranchAddress("pls_hit0_x", &pls_hit0_x_vec); 
+    inputTree->SetBranchAddress("pls_hit0_y", &pls_hit0_y_vec);
     inputTree->SetBranchAddress("pls_hit0_z", &pls_hit0_z_vec);
-    inputTree->SetBranchAddress("pls_hit1_x", &pls_hit1_x_vec); inputTree->SetBranchAddress("pls_hit1_y", &pls_hit1_y_vec);
+    inputTree->SetBranchAddress("pls_hit1_x", &pls_hit1_x_vec); 
+    inputTree->SetBranchAddress("pls_hit1_y", &pls_hit1_y_vec);
     inputTree->SetBranchAddress("pls_hit1_z", &pls_hit1_z_vec);
-    inputTree->SetBranchAddress("pls_hit2_x", &pls_hit2_x_vec); inputTree->SetBranchAddress("pls_hit2_y", &pls_hit2_y_vec);
+    inputTree->SetBranchAddress("pls_hit2_x", &pls_hit2_x_vec); 
+    inputTree->SetBranchAddress("pls_hit2_y", &pls_hit2_y_vec);
     inputTree->SetBranchAddress("pls_hit2_z", &pls_hit2_z_vec);
-    inputTree->SetBranchAddress("pls_hit3_x", &pls_hit3_x_vec); inputTree->SetBranchAddress("pls_hit3_y", &pls_hit3_y_vec);
+    inputTree->SetBranchAddress("pls_hit3_x", &pls_hit3_x_vec); 
+    inputTree->SetBranchAddress("pls_hit3_y", &pls_hit3_y_vec);
     inputTree->SetBranchAddress("pls_hit3_z", &pls_hit3_z_vec);
     inputTree->SetBranchAddress("md_layer", &md_layer_vec);
+    inputTree->SetBranchAddress("md_detId", &md_detId_vec);
     inputTree->SetBranchAddress("sim_pt", &sim_pt_vec);
-
-
 
     // --- NEW: Create an array of histograms for delta_r, one for each layer ---
     int num_layers = 12; // We use 12 to hold layers 0 through 11
@@ -147,9 +165,9 @@ void main_analysis() {
     for (int i = 0; i < n_pls_hits_max; ++i) {
        TString name = TString::Format("h_extrapolation_delta_r_reverse_hit%d", i);
        TString title = TString::Format("R-Z Extrapolation #Delta r (LS -> PLS Hit %d);#Delta r [cm];Ideal pT2 Pairs", i);
-    // Use a narrower range, as we expect the result to be precise
+       //Use a narrower range, as we expect the result to be precise
        h_extrapolation_delta_r_reverse_by_hit.push_back(new TH1D(name, title, 180, -10.0, 10.0));
-}
+    }
 
 
     // --- The Main Event Loop ---
@@ -164,7 +182,20 @@ void main_analysis() {
         getPlsMatchStatus(simIdx_to_pls_status, *pls_isFake_vec, *pls_simIdx_vec, used_pls_indices);
         std::map<int, LsMatchStatus> simIdx_to_ls_status;
         getLsMatchStatus(simIdx_to_ls_status, *ls_isFake_vec, *ls_simIdx_vec, used_ls_indices);
-        
+
+        // ----- Making pT2s -----
+        // Function to grab the correct z value 
+        std::vector<float> pls_max_z_vec = maxHitZ(*pls_hit3_z_vec, *pls_hit2_z_vec);
+
+        // Initialize the pT2 index lists
+        // Here, these lists are indexes of the possible pt2 ls and pls matches
+        std::vector<int> pls_pt2_idx_vec;
+        std::vector<int> ls_pt2_idx_vec;
+        connectPLSandLS(*pls_pt_vec, pls_max_z_vec, *pls_eta_vec, *pls_phi_vec, *ls_mdIdx0_vec, *ls_mdIdx1_vec, *md_detId_vec, pls_pt2_idx_vec, ls_pt2_idx_vec);
+
+
+        std::cout << "Event " << i << ": " << pls_pt2_idx_vec.size() << " potential pT2s." << std::endl;
+
         //For ls
         for (size_t j = 0; j < ls_pt_vec->size(); ++j) {
             bool is_used = (used_ls_indices.count(j) > 0);
@@ -186,54 +217,34 @@ void main_analysis() {
     gStyle->SetOptStat(0);
     // Simple LS Plots
     createAndSaveSimpleStack("c_pt_ls_used", "pT of Used LS;p_{T} [GeV];LS Objects", "compare_pt_ls_used.png", "Used LS", h_pt_real_ls_used, h_pt_fake_ls_used, "Real, Used", "Fake, Used", kGreen+2, kOrange-3, true);
-    
     createAndSaveSimpleStack("c_eta_ls_used", "Eta of Used LS;#eta;LS Objects", "compare_eta_ls_used.png", "Used LS", h_eta_real_ls_used, h_eta_fake_ls_used, "Real, Used", "Fake, Used", kGreen+2, kOrange-3);
-    
     createAndSaveSimpleStack("c_phi_ls_used", "Phi of Used LS;#phi;LS Objects", "compare_phi_ls_used.png", "Used LS", h_phi_real_ls_used, h_phi_fake_ls_used, "Real, Used", "Fake, Used", kGreen+2, kOrange-3);
-    
     createAndSaveSimpleStack("c_pt_ls_unused", "pT of Unused LS;p_{T} [GeV];LS Objects", "compare_pt_ls_unused.png", "Unused LS", h_pt_real_ls_unused, h_pt_fake_ls_unused, "Real, Unused", "Fake, Unused", kGreen-7, kOrange-9, true);
-    
     createAndSaveSimpleStack("c_eta_ls_unused", "Eta of Unused LS;#eta;LS Objects", "compare_eta_ls_unused.png", "Unused LS", h_eta_real_ls_unused, h_eta_fake_ls_unused, "Real, Unused", "Fake, Unused", kGreen-7, kOrange-9);
-    
     createAndSaveSimpleStack("c_phi_ls_unused", "Phi of Unused LS;#phi;LS Objects", "compare_phi_ls_unused.png", "Unused LS", h_phi_real_ls_unused, h_phi_fake_ls_unused, "Real, Unused", "Fake, Unused", kGreen-7, kOrange-9);
     
     // Simple PLS Plots
     createAndSaveSimpleStack("c_pt_pls_used", "pT of Used PLS;p_{T} [GeV];PLS Objects", "compare_pt_pls_used.png", "Used PLS", h_pt_real_pls_used, h_pt_fake_pls_used, "Real, Used", "Fake, Used", kAzure+1, kRed-7, true);
-    
     createAndSaveSimpleStack("c_eta_pls_used", "Eta of Used PLS;#eta;PLS Objects", "compare_eta_pls_used.png", "Used PLS", h_eta_real_pls_used, h_eta_fake_pls_used, "Real, Used", "Fake, Used", kAzure+1, kRed-7);
-    
     createAndSaveSimpleStack("c_phi_pls_used", "Phi of Used PLS;#phi;PLS Objects", "compare_phi_pls_used.png", "Used PLS", h_phi_real_pls_used, h_phi_fake_pls_used, "Real, Used", "Fake, Used", kAzure+1, kRed-7);
-    
     createAndSaveSimpleStack("c_pt_pls_unused", "pT of Unused PLS;p_{T} [GeV];PLS Objects", "compare_pt_pls_unused.png", "Unused PLS", h_pt_real_pls_unused, h_pt_fake_pls_unused, "Real, Unused", "Fake, Unused", kAzure-9, kRed-9, true);
-    
     createAndSaveSimpleStack("c_eta_pls_unused", "Eta of Unused PLS;#eta;PLS Objects", "compare_eta_pls_unused.png", "Unused PLS", h_eta_real_pls_unused, h_eta_fake_pls_unused, "Real, Unused", "Fake, Unused", kAzure-9, kRed-9);
-    
     createAndSaveSimpleStack("c_phi_pls_unused", "Phi of Unused PLS;#phi;PLS Objects", "compare_phi_pls_unused.png", "Unused PLS", h_phi_real_pls_unused, h_phi_fake_pls_unused, "Real, Unused", "Fake, Unused", kAzure-9, kRed-9);
     
     // Detailed LS Plots
     createAndSaveDetailedStack("c_pt_ls_used_detailed", "pT of Used LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_used_detailed.png", "Used Real LS Matched To PLS:", true, h_pt_fake_ls_used_detailed, h_pt_real_ls_used_unmatched, h_pt_real_ls_used_matchedToUnusedOnly, h_pt_real_ls_used_matchedToBoth, h_pt_real_ls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_eta_ls_used_detailed", "Eta of Used LS (Detailed);#eta;LS Objects", "compare_eta_ls_used_detailed.png", "Used Real LS Matched To PLS:", false, h_eta_fake_ls_used_detailed, h_eta_real_ls_used_unmatched, h_eta_real_ls_used_matchedToUnusedOnly, h_eta_real_ls_used_matchedToBoth, h_eta_real_ls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_phi_ls_used_detailed", "Phi of Used LS (Detailed);#phi;LS Objects", "compare_phi_ls_used_detailed.png", "Used Real LS Matched To PLS:", false, h_phi_fake_ls_used_detailed, h_phi_real_ls_used_unmatched, h_phi_real_ls_used_matchedToUnusedOnly, h_phi_real_ls_used_matchedToBoth, h_phi_real_ls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_pt_ls_unused_detailed", "pT of Unused LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", true, h_pt_fake_ls_unused_detailed, h_pt_real_ls_unused_unmatched, h_pt_real_ls_unused_matchedToUnusedOnly, h_pt_real_ls_unused_matchedToBoth, h_pt_real_ls_unused_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_eta_ls_unused_detailed", "Eta of Unused LS (Detailed);#eta;LS Objects", "compare_eta_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", false, h_eta_fake_ls_unused_detailed, h_eta_real_ls_unused_unmatched, h_eta_real_ls_unused_matchedToUnusedOnly, h_eta_real_ls_unused_matchedToBoth, h_eta_real_ls_unused_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_phi_ls_unused_detailed", "Phi of Unused LS (Detailed);#phi;LS Objects", "compare_phi_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", false, h_phi_fake_ls_unused_detailed, h_phi_real_ls_unused_unmatched, h_phi_real_ls_unused_matchedToUnusedOnly, h_phi_real_ls_unused_matchedToBoth, h_phi_real_ls_unused_matchedToUsedOnly);
     
     // Detailed PLS Plots
     createAndSaveDetailedStack("c_pt_pls_used_detailed", "pT of Used PLS (Detailed);p_{T} [GeV];PLS Objects", "compare_pt_pls_used_detailed.png", "Used Real PLS Matched To LS:", true, h_pt_fake_pls_used_detailed, h_pt_real_pls_used_unmatched, h_pt_real_pls_used_matchedToUnusedOnly, h_pt_real_pls_used_matchedToBoth, h_pt_real_pls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_eta_pls_used_detailed", "Eta of Used PLS (Detailed);#eta;PLS Objects", "compare_eta_pls_used_detailed.png", "Used Real PLS Matched To LS:", false, h_eta_fake_pls_used_detailed, h_eta_real_pls_used_unmatched, h_eta_real_pls_used_matchedToUnusedOnly, h_eta_real_pls_used_matchedToBoth, h_eta_real_pls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_phi_pls_used_detailed", "Phi of Used PLS (Detailed);#phi;PLS Objects", "compare_phi_pls_used_detailed.png", "Used Real PLS Matched To LS:", false, h_phi_fake_pls_used_detailed, h_phi_real_pls_used_unmatched, h_phi_real_pls_used_matchedToUnusedOnly, h_phi_real_pls_used_matchedToBoth, h_phi_real_pls_used_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_pt_pls_unused_detailed", "pT of Unused PLS (Detailed);p_{T} [GeV];PLS Objects", "compare_pt_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", true, h_pt_fake_pls_unused_detailed, h_pt_real_pls_unused_unmatched, h_pt_real_pls_unused_matchedToUnusedOnly, h_pt_real_pls_unused_matchedToBoth, h_pt_real_pls_unused_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_eta_pls_unused_detailed", "Eta of Unused PLS (Detailed);#eta;PLS Objects", "compare_eta_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", false, h_eta_fake_pls_unused_detailed, h_eta_real_pls_unused_unmatched, h_eta_real_pls_unused_matchedToUnusedOnly, h_eta_real_pls_unused_matchedToBoth, h_eta_real_pls_unused_matchedToUsedOnly);
-    
     createAndSaveDetailedStack("c_phi_pls_unused_detailed", "Phi of Unused PLS (Detailed);#phi;PLS Objects", "compare_phi_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", false, h_phi_fake_pls_unused_detailed, h_phi_real_pls_unused_unmatched, h_phi_real_pls_unused_matchedToUnusedOnly, h_phi_real_pls_unused_matchedToBoth, h_phi_real_pls_unused_matchedToUsedOnly);
     
     // Delta Plots
@@ -242,7 +253,6 @@ void main_analysis() {
     createAndSaveSimplePlot("c_delta_phi", "delta_phi.png", h_delta_phi, "#Delta #phi (LS - PLS)", "#Delta #phi [rad]", "pT2 Objects");
     createAndSaveSimplePlot("c_delta_R", "delta_R.png", h_delta_R, "#Delta R (LS - PLS)", "#Delta R", "pT2 Objects");
     createAndSaveSimplePlot("c_extrapolation_dist_3d", "extrapolation_dist_3d.png", h_extrapolation_dist_3d,"3D Distance between extrapolated PLS and LS", "Distance [cm]", "Ideal pT2 Pairs");
-
     createAndSaveSimplePlot("c_extrapolation_delta_z", "extrapolation_delta_z.png", h_extrapolation_delta_z,"R-Z Extrapolation #Delta r (LS - PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
     //createAndSaveSimplePlot("c_extrapolation_delta_r_reverse", "extrapolation_delta_r_reverse.png", h_extrapolation_delta_r_reverse, "R-Z Extrapolation #Delta r (LS -> PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
     
@@ -286,8 +296,8 @@ void main_analysis() {
            TString file_name = TString::Format("extrapolation_dist_3d_layer_%d.png", i);
            TString plot_title = TString::Format("3D Distance (Layer %d)", i);
            createAndSaveSimplePlot(canvas_name.Data(), file_name.Data(), h_dist_3d_by_layer[i], plot_title.Data(), "Distance [cm]", "Entries");
+        }
     }
-}
     
    
 
@@ -295,7 +305,7 @@ void main_analysis() {
     
     
     std::cout << "-------------------------------------------------" << std::endl;
-     std::cout << "Total entries across all layers: " << total_layer_entries << std::endl;
+    std::cout << "Total entries across all layers: " << total_layer_entries << std::endl;
     std::cout << "\n--- FINAL COUNT --- \nTotal ideal pt2 objects found: " << ideal_pt2_count << "\n-------------------\n" << std::endl;
 
     // --- Clean up ---
