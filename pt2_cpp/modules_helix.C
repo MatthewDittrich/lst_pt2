@@ -578,7 +578,8 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
      const std::vector<int>& pls_isFake, const std::vector<int>& pls_simIdx, 
      const std::vector<float>& ls_pt, const std::vector<float>& ls_eta, const std::vector<float>& ls_phi, 
      const std::vector<int>& ls_isFake, const std::vector<int>& ls_simIdx, const std::set<int>& used_pls_indices, const std::set<int>& used_ls_indices, 
-     TH1D* h_delta_pt, TH1D* h_delta_eta, TH1D* h_delta_phi, TH1D* h_delta_R, TH1D* h_extrapolation_dist_3d, TH1D* h_extrapolation_delta_z,
+     TH1D* h_delta_pt, TH1D* h_delta_eta, TH1D* h_delta_phi, TH1D* h_delta_R, TH1D* h_extrapolation_dist_3d, TH1D* h_extrapolation_dist_3d_0,
+     TH1D* h_extrapolation_dist_3d_1, TH1D* h_extrapolation_delta_z,
      std::vector<TH1D*>& h_delta_r_by_layer, std::vector<TH1D*>& h_extrapolation_delta_r_reverse_by_hit, TH1D* h_extrapolation_delta_r_reverse_combined,
      const std::vector<float>& pls_hit0_x, const std::vector<float>& pls_hit0_y, const std::vector<float>& pls_hit0_z, 
      const std::vector<float>& pls_hit1_x, const std::vector<float>& pls_hit1_y, const std::vector<float>& pls_hit1_z, 
@@ -587,7 +588,8 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
      const std::vector<int>& ls_mdIdx0, const std::vector<int>& ls_mdIdx1, 
      const std::vector<float>& md_anchor_x, const std::vector<float>& md_anchor_y, const std::vector<float>& md_anchor_z, 
      const std::vector<float>& md_other_x, const std::vector<float>& md_other_y, const std::vector<float>& md_other_z,
-     const std::vector<int>& md_layer, long long& ideal_pt2_count, const std::vector<float>& sim_pt, std::vector<TH1D*>& h_dist_3d_by_layer) 
+     const std::vector<int>& md_layer, long long& ideal_pt2_count, long long& failed_extrapolations, long long& success_extrapolations, const std::vector<float>& sim_pt, std::vector<TH1D*>& h_dist_3d_by_layer,
+     std::vector<TH1D*>& h_dist_3d_by_layer_0, std::vector<TH1D*>& h_dist_3d_by_layer_1) 
 {
     std::map<int, std::vector<int>> ls_simIdx_map;
     for (size_t k = 0; k < ls_pt.size(); ++k) { if (ls_isFake.at(k) == 0 && ls_simIdx.at(k) != -999) { ls_simIdx_map[ls_simIdx.at(k)].push_back(k); } }
@@ -607,17 +609,19 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
     		
     		float reco_pt_pls = pls_pt.at(i);
                         if (reco_pt_pls <= 2.0) {	
-                            
+                            success_extrapolations++;
                             // --- New Truth Matching Filter ---
                             int sim_idx = pls_simIdx.at(i);
                             // Safety check for valid index
-                            if (sim_idx >= 0 && sim_idx < sim_pt.size()) {
-                                float true_pt = sim_pt.at(sim_idx);
+                            //if (sim_idx >= 0 && sim_idx < sim_pt.size()) {
+                              //if (sim_idx) {    
+                          
+                                //float true_pt = sim_pt.at(sim_idx);
                                 const float pT_tolerance = 0.1; // 100 MeV
 
                                 // Check if the pT matches the truth
                               //  if (std::abs(true_pt - reco_pt_pls) <= pT_tolerance) {
-                                  if (true_pt<= 2.0) {  
+                                  //if (true_pt<= 2.0) {  
                                     // If it matches, perform the extrapolation
                                     auto distance_3d = extrapolatePlsHelicallyAndGetDistance(
                                         i, ls_idx, pls_pt,
@@ -630,26 +634,32 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
                                     
                                     // And fill the distance histogram
                                     if (distance_3d.first >= 0) {
+                                    	 //success_extrapolations++;
                                         h_extrapolation_dist_3d->Fill(distance_3d.first);
+                                        h_extrapolation_dist_3d_0->Fill(distance_3d.first);
                                         int md_idx0 = ls_mdIdx0.at(ls_idx);
                                         if (md_idx0 >= 0) { // Safety check
                                            int layer0 = md_layer.at(md_idx0);
                                            if (layer0 < h_dist_3d_by_layer.size()) {
                 			        h_dist_3d_by_layer[layer0]->Fill(distance_3d.first);
-                                    }}}
+                			        h_dist_3d_by_layer_0[layer0]->Fill(distance_3d.first);
+                                    }}} else { failed_extrapolations++; }
                                     if (distance_3d.second >= 0) {
+                                    	 // success_extrapolations++;
                                         h_extrapolation_dist_3d->Fill(distance_3d.second);
+                                        h_extrapolation_dist_3d_1->Fill(distance_3d.second);
                                         int md_idx1 = ls_mdIdx1.at(ls_idx);
         				  if (md_idx1 >= 0) { // Safety check
             				      int layer1 = md_layer.at(md_idx1);
             				      if (layer1 < h_dist_3d_by_layer.size()) {
-                				  h_dist_3d_by_layer[layer1]->Fill(distance_3d.second);
+                				 h_dist_3d_by_layer[layer1]->Fill(distance_3d.second);  
+                				 h_dist_3d_by_layer_1[layer1]->Fill(distance_3d.second);
             }
         }
                                         
-                                    }
-                                } // end of truth match if
-                            } // end of safety check if
+                                    }else { failed_extrapolations++; }
+                                 // end of truth match if
+                            //} // end of safety check if
                         }
     		//USES LS and adds each hit
     		std::vector<double> delta_r_results = extrapolateLsInRZAndGetDeltaR_AllHits(
@@ -691,8 +701,10 @@ void processIdealPT2s(const std::vector<float>& pls_pt, const std::vector<float>
                 	     h_extrapolation_delta_z->Fill(delta_r_pair.second);
                             int layer1 = md_layer.at(md_idx1);
                             if (layer1 < h_delta_r_by_layer.size()) {
-                               h_delta_r_by_layer[layer1]->Fill(delta_r_pair.second); }} } } } }
+                               h_delta_r_by_layer[layer1]->Fill(delta_r_pair.second); 
+                               }} } } } }
 }}
+
 
 
 //---------------CREATING HISTOGRAMS------------------

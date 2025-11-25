@@ -11,12 +11,12 @@
 #include <map>
 #include "draw_maker.C"
 // Include the file with our helper functions
-#include "modules_helix.C"
-
+//#include "modules4.C" use this if you dont want to use pt for the radious
+#include "modules5.C"
 // Forward declaration of the gator function if it's not in the modules file
 void print_coding_gator();
 
-void main_analysis() {
+void main_matching5() {
     // --- Configuration & File Opening ---
     const char* input_filename = "LSTNtuple.root";
     const char* tree_name = "tree";
@@ -79,8 +79,30 @@ void main_analysis() {
     	TString hist_title = TString::Format("Z-R Extrapolation #Delta r (Layer %d);#Delta r [cm];Entries", i);
     	h_delta_r_by_layer.push_back(new TH1D(hist_name, hist_title, 180, -25.0, 25.0));
 	}
+
+    std::vector<TH1D*> h_dist_3d_by_layer_0;
+    h_dist_3d_by_layer_0.reserve(num_layers); // Optional: for performance
+    
+    for (int i = 0; i < num_layers; ++i) {
+    	TString hist_name = TString::Format("h_dist_3d_layer_0_%d", i);
+    	TString hist_title = TString::Format("3D Distance (Layer %d);Distance [cm] md0;Entries", i);
+    	h_dist_3d_by_layer_0.push_back(new TH1D(hist_name, hist_title, 180, 0, 100.0));
+	}
+    
+    std::vector<TH1D*> h_dist_3d_by_layer_1;
+    h_dist_3d_by_layer_1.reserve(num_layers); // Optional: for performance
+    
+    for (int i = 0; i < num_layers; ++i) {
+    	TString hist_name = TString::Format("h_dist_3d_layer_1_%d", i);
+    	TString hist_title = TString::Format("3D Distance (Layer %d);Distance [cm] md1;Entries", i);
+    	h_dist_3d_by_layer_1.push_back(new TH1D(hist_name, hist_title, 180, 0, 100.0));
+	}
+	
+	
     std::vector<TH1D*> h_dist_3d_by_layer;
     h_dist_3d_by_layer.reserve(num_layers);
+    
+    
     for (int i = 0; i < num_layers; ++i) {
     	TString hist_name = TString::Format("h_dist_3d_layer_%d", i);
     	TString hist_title = TString::Format("3D Distance (Layer %d);Distance [cm];Entries", i);
@@ -88,7 +110,7 @@ void main_analysis() {
     	h_dist_3d_by_layer.push_back(new TH1D(hist_name, hist_title, 180, 0, 100.0));
 	}
     // --- Define Histograms ---
-    int pt_bins = 180, eta_bins = 180, phi_bins = 180;
+    int pt_bins = 1, eta_bins = 180, phi_bins = 180;
     double pt_max = 250.0, eta_max = 4.5, phi_max = 3.15;
 
     // Histograms for Simple LS
@@ -119,26 +141,28 @@ void main_analysis() {
     TH1D *h_phi_real_pls_unused = new TH1D("h_phi_real_pls_unused", "", phi_bins, -phi_max, phi_max);
     TH1D *h_phi_fake_pls_unused = new TH1D("h_phi_fake_pls_unused", "", phi_bins, -phi_max, phi_max);
     
-    //Histograms for used, unused, matched 
     TH1D *h_pt_fake_ls_used_detailed = new TH1D("h_pt_fake_ls_used_detailed", "", pt_bins, 0, pt_max), *h_pt_fake_ls_unused_detailed = new TH1D("h_pt_fake_ls_unused_detailed", "", pt_bins, 0, pt_max), *h_eta_fake_ls_used_detailed = new TH1D("h_eta_fake_ls_used_detailed", "", eta_bins, -eta_max, eta_max), *h_eta_fake_ls_unused_detailed = new TH1D("h_eta_fake_ls_unused_detailed", "", eta_bins, -eta_max, eta_max), *h_phi_fake_ls_used_detailed = new TH1D("h_phi_fake_ls_used_detailed", "", phi_bins, -phi_max, phi_max), *h_phi_fake_ls_unused_detailed = new TH1D("h_phi_fake_ls_unused_detailed", "", phi_bins, -phi_max, phi_max);
     TH1D *h_pt_real_ls_used_unmatched = new TH1D("h_pt_real_ls_used_unmatched", "", pt_bins, 0, pt_max), *h_pt_real_ls_used_matchedToBoth = new TH1D("h_pt_real_ls_used_matchedToBoth", "", pt_bins, 0, pt_max), *h_pt_real_ls_used_matchedToUsedOnly = new TH1D("h_pt_real_ls_used_matchedToUsedOnly", "", pt_bins, 0, pt_max), *h_pt_real_ls_used_matchedToUnusedOnly = new TH1D("h_pt_real_ls_used_matchedToUnusedOnly", "", pt_bins, 0, pt_max), *h_eta_real_ls_used_unmatched = new TH1D("h_eta_real_ls_used_unmatched", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_used_matchedToBoth = new TH1D("h_eta_real_ls_used_matchedToBoth", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_used_matchedToUsedOnly = new TH1D("h_eta_real_ls_used_matchedToUsedOnly", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_used_matchedToUnusedOnly = new TH1D("h_eta_real_ls_used_matchedToUnusedOnly", "", eta_bins, -eta_max, eta_max), *h_phi_real_ls_used_unmatched = new TH1D("h_phi_real_ls_used_unmatched", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_used_matchedToBoth = new TH1D("h_phi_real_ls_used_matchedToBoth", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_used_matchedToUsedOnly = new TH1D("h_phi_real_ls_used_matchedToUsedOnly", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_used_matchedToUnusedOnly = new TH1D("h_phi_real_ls_used_matchedToUnusedOnly", "", phi_bins, -phi_max, phi_max);
+   
     TH1D *h_pt_real_ls_unused_unmatched = new TH1D("h_pt_real_ls_unused_unmatched", "", pt_bins, 0, pt_max), *h_pt_real_ls_unused_matchedToBoth = new TH1D("h_pt_real_ls_unused_matchedToBoth", "", pt_bins, 0, pt_max), *h_pt_real_ls_unused_matchedToUsedOnly = new TH1D("h_pt_real_ls_unused_matchedToUsedOnly", "", pt_bins, 0, pt_max), *h_pt_real_ls_unused_matchedToUnusedOnly = new TH1D("h_pt_real_ls_unused_matchedToUnusedOnly", "", pt_bins, 0, pt_max), *h_eta_real_ls_unused_unmatched = new TH1D("h_eta_real_ls_unused_unmatched", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_unused_matchedToBoth = new TH1D("h_eta_real_ls_unused_matchedToBoth", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_unused_matchedToUsedOnly = new TH1D("h_eta_real_ls_unused_matchedToUsedOnly", "", eta_bins, -eta_max, eta_max), *h_eta_real_ls_unused_matchedToUnusedOnly = new TH1D("h_eta_real_ls_unused_matchedToUnusedOnly", "", eta_bins, -eta_max, eta_max), *h_phi_real_ls_unused_unmatched = new TH1D("h_phi_real_ls_unused_unmatched", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_unused_matchedToBoth = new TH1D("h_phi_real_ls_unused_matchedToBoth", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_unused_matchedToUsedOnly = new TH1D("h_phi_real_ls_unused_matchedToUsedOnly", "", phi_bins, -phi_max, phi_max), *h_phi_real_ls_unused_matchedToUnusedOnly = new TH1D("h_phi_real_ls_unused_matchedToUnusedOnly", "", phi_bins, -phi_max, phi_max);
     TH1D *h_pt_fake_pls_used_detailed = new TH1D("h_pt_fake_pls_used_detailed", "", pt_bins, 0, pt_max), *h_pt_fake_pls_unused_detailed = new TH1D("h_pt_fake_pls_unused_detailed", "", pt_bins, 0, pt_max), *h_eta_fake_pls_used_detailed = new TH1D("h_eta_fake_pls_used_detailed", "", eta_bins, -eta_max, eta_max), *h_eta_fake_pls_unused_detailed = new TH1D("h_eta_fake_pls_unused_detailed", "", eta_bins, -eta_max, eta_max), *h_phi_fake_pls_used_detailed = new TH1D("h_phi_fake_pls_used_detailed", "", phi_bins, -phi_max, phi_max), *h_phi_fake_pls_unused_detailed = new TH1D("h_phi_fake_pls_unused_detailed", "", phi_bins, -phi_max, phi_max);
     TH1D *h_pt_real_pls_used_unmatched = new TH1D("h_pt_real_pls_used_unmatched", "", pt_bins, 0, pt_max), *h_pt_real_pls_used_matchedToBoth = new TH1D("h_pt_real_pls_used_matchedToBoth", "", pt_bins, 0, pt_max), *h_pt_real_pls_used_matchedToUsedOnly = new TH1D("h_pt_real_pls_used_matchedToUsedOnly", "", pt_bins, 0, pt_max), *h_pt_real_pls_used_matchedToUnusedOnly = new TH1D("h_pt_real_pls_used_matchedToUnusedOnly", "", pt_bins, 0, pt_max), *h_eta_real_pls_used_unmatched = new TH1D("h_eta_real_pls_used_unmatched", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_used_matchedToBoth = new TH1D("h_eta_real_pls_used_matchedToBoth", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_used_matchedToUsedOnly = new TH1D("h_eta_real_pls_used_matchedToUsedOnly", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_used_matchedToUnusedOnly = new TH1D("h_eta_real_pls_used_matchedToUnusedOnly", "", eta_bins, -eta_max, eta_max), *h_phi_real_pls_used_unmatched = new TH1D("h_phi_real_pls_used_unmatched", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_used_matchedToBoth = new TH1D("h_phi_real_pls_used_matchedToBoth", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_used_matchedToUsedOnly = new TH1D("h_phi_real_pls_used_matchedToUsedOnly", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_used_matchedToUnusedOnly = new TH1D("h_phi_real_pls_used_matchedToUnusedOnly", "", phi_bins, -phi_max, phi_max);
     TH1D *h_pt_real_pls_unused_unmatched = new TH1D("h_pt_real_pls_unused_unmatched", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToBoth = new TH1D("h_pt_real_pls_unused_matchedToBoth", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToUsedOnly = new TH1D("h_pt_real_pls_unused_matchedToUsedOnly", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToUnusedOnly = new TH1D("h_pt_real_pls_unused_matchedToUnusedOnly", "", pt_bins, 0, pt_max), *h_eta_real_pls_unused_unmatched = new TH1D("h_eta_real_pls_unused_unmatched", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToBoth = new TH1D("h_eta_real_pls_unused_matchedToBoth", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToUsedOnly = new TH1D("h_eta_real_pls_unused_matchedToUsedOnly", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToUnusedOnly = new TH1D("h_eta_real_pls_unused_matchedToUnusedOnly", "", eta_bins, -eta_max, eta_max), *h_phi_real_pls_unused_unmatched = new TH1D("h_phi_real_pls_unused_unmatched", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToBoth = new TH1D("h_phi_real_pls_unused_matchedToBoth", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToUsedOnly = new TH1D("h_phi_real_pls_unused_matchedToUsedOnly", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToUnusedOnly = new TH1D("h_phi_real_pls_unused_matchedToUnusedOnly", "", phi_bins, -phi_max, phi_max);
     
-    //Histograms of delta 
+    
     TH1D* h_delta_pt = new TH1D("h_delta_pt", "#Delta p_{T} (LS - PLS);#Delta p_{T} [GeV];pT2 Objects", 180, -5, 5);
     TH1D* h_delta_eta = new TH1D("h_delta_eta", "#Delta #eta (LS - PLS);#Delta #eta;pT2 Objects", 180, -0.7, 0.7);
     TH1D* h_delta_phi = new TH1D("h_delta_phi", "#Delta #phi (LS - PLS);#Delta #phi [rad];pT2 Objects", 180, -1.25, 1.25);
     TH1D* h_delta_R = new TH1D("h_delta_R", "#Delta R (LS - PLS);#Delta R;pT2 Objects", 180, 0, 1);
-    
-    //Histograms for distances
     TH1D* h_extrapolation_dist_3d = new TH1D("h_extrapolation_dist_3d","3D Distance between extrapolated PLS and LS;Distance [cm];Ideal pT2 Pairs", 180, 0, 100.0);
     TH1D* h_extrapolation_delta_z = new TH1D("h_extrapolation_delta_z", "R-Z Extrapolation #Delta r (LS - PLS);#Delta r [cm];Ideal pT2 Pairs", 180, -15.0, 15.0);
+    TH1D* h_extrapolation_dist_3d_0 = new TH1D("h_extrapolation_dist_3d_0","3D Distance between extrapolated PLS and LS;Distance [cm] md0;Ideal pT2 Pairs", 180, 0, 100.0);
+    TH1D* h_extrapolation_dist_3d_1 = new TH1D("h_extrapolation_dist_3d_1", "3D Distance between extrapolated PLS and LS;Distance [cm] md1;Ideal pT2 Pairs", 180, 0, 100.0);
     long long ideal_pt2_count = 0;
+    long long total_real_unused_ls=0;
     TH1D* h_extrapolation_delta_r_reverse_combined = new TH1D("h_extrapolation_delta_r_reverse_combined", "Inclusive R-Z Extrapolation #Delta r (LS -> All PLS Hits);#Delta r [cm];Entries", 180, -10.0, 10.0);
-    
+    long long failed_extrapolations = 0; // <-- ADD THIS
+    long long success_extrapolations = 0; // <-- ADD THIS
     //LS interpolation
     //TH1D* h_extrapolation_delta_r_reverse = new TH1D("h_extrapolation_delta_r_reverse", "R-Z Extrapolation #Delta r (LS -> PLS);#Delta r [cm];Ideal pT2 Pairs", 180, -25.0, 25.0);
     std::vector<TH1D*> h_extrapolation_delta_r_reverse_by_hit;
@@ -150,6 +174,7 @@ void main_analysis() {
     // Use a narrower range, as we expect the result to be precise
        h_extrapolation_delta_r_reverse_by_hit.push_back(new TH1D(name, title, 180, -10.0, 10.0));
 }
+    
 
 
     // --- The Main Event Loop ---
@@ -165,21 +190,23 @@ void main_analysis() {
         std::map<int, LsMatchStatus> simIdx_to_ls_status;
         getLsMatchStatus(simIdx_to_ls_status, *ls_isFake_vec, *ls_simIdx_vec, used_ls_indices);
         
-        //For ls
+        
         for (size_t j = 0; j < ls_pt_vec->size(); ++j) {
             bool is_used = (used_ls_indices.count(j) > 0);
             bool is_fake = (ls_isFake_vec->at(j) != 0);
+            if (!is_fake && !is_used) {
+        total_real_unused_ls++;
+    }
             fillSimpleHistograms(is_used, is_fake, ls_pt_vec->at(j), ls_eta_vec->at(j), ls_phi_vec->at(j), h_pt_real_ls_used, h_pt_fake_ls_used, h_pt_real_ls_unused, h_pt_fake_ls_unused, h_eta_real_ls_used, h_eta_fake_ls_used, h_eta_real_ls_unused, h_eta_fake_ls_unused, h_phi_real_ls_used, h_phi_fake_ls_used, h_phi_real_ls_unused, h_phi_fake_ls_unused);
             fillDetailedLsHistograms(is_used, is_fake, ls_pt_vec->at(j), ls_eta_vec->at(j), ls_phi_vec->at(j), ls_simIdx_vec->at(j), simIdx_to_pls_status, h_pt_fake_ls_used_detailed, h_pt_fake_ls_unused_detailed, h_pt_real_ls_used_unmatched, h_pt_real_ls_used_matchedToBoth, h_pt_real_ls_used_matchedToUsedOnly, h_pt_real_ls_used_matchedToUnusedOnly, h_pt_real_ls_unused_unmatched, h_pt_real_ls_unused_matchedToBoth, h_pt_real_ls_unused_matchedToUsedOnly, h_pt_real_ls_unused_matchedToUnusedOnly, h_eta_fake_ls_used_detailed, h_eta_fake_ls_unused_detailed, h_eta_real_ls_used_unmatched, h_eta_real_ls_used_matchedToBoth, h_eta_real_ls_used_matchedToUsedOnly, h_eta_real_ls_used_matchedToUnusedOnly, h_eta_real_ls_unused_unmatched, h_eta_real_ls_unused_matchedToBoth, h_eta_real_ls_unused_matchedToUsedOnly, h_eta_real_ls_unused_matchedToUnusedOnly, h_phi_fake_ls_used_detailed, h_phi_fake_ls_unused_detailed, h_phi_real_ls_used_unmatched, h_phi_real_ls_used_matchedToBoth, h_phi_real_ls_used_matchedToUsedOnly, h_phi_real_ls_used_matchedToUnusedOnly, h_phi_real_ls_unused_unmatched, h_phi_real_ls_unused_matchedToBoth, h_phi_real_ls_unused_matchedToUsedOnly, h_phi_real_ls_unused_matchedToUnusedOnly);
         }
-        //For pls
         for (size_t j = 0; j < pls_pt_vec->size(); ++j) {
             bool is_used = (used_pls_indices.count(j) > 0);
             bool is_fake = (pls_isFake_vec->at(j) != 0);
             fillSimpleHistograms(is_used, is_fake, pls_pt_vec->at(j), pls_eta_vec->at(j), pls_phi_vec->at(j), h_pt_real_pls_used, h_pt_fake_pls_used, h_pt_real_pls_unused, h_pt_fake_pls_unused, h_eta_real_pls_used, h_eta_fake_pls_used, h_eta_real_pls_unused, h_eta_fake_pls_unused, h_phi_real_pls_used, h_phi_fake_pls_used, h_phi_real_pls_unused, h_phi_fake_pls_unused);
             fillDetailedPlsHistograms(is_used, is_fake, pls_pt_vec->at(j), pls_eta_vec->at(j), pls_phi_vec->at(j), pls_simIdx_vec->at(j), simIdx_to_ls_status, h_pt_fake_pls_used_detailed, h_pt_fake_pls_unused_detailed, h_pt_real_pls_used_unmatched, h_pt_real_pls_used_matchedToBoth, h_pt_real_pls_used_matchedToUsedOnly, h_pt_real_pls_used_matchedToUnusedOnly, h_pt_real_pls_unused_unmatched, h_pt_real_pls_unused_matchedToBoth, h_pt_real_pls_unused_matchedToUsedOnly, h_pt_real_pls_unused_matchedToUnusedOnly, h_eta_fake_pls_used_detailed, h_eta_fake_pls_unused_detailed, h_eta_real_pls_used_unmatched, h_eta_real_pls_used_matchedToBoth, h_eta_real_pls_used_matchedToUsedOnly, h_eta_real_pls_used_matchedToUnusedOnly, h_eta_real_pls_unused_unmatched, h_eta_real_pls_unused_matchedToBoth, h_eta_real_pls_unused_matchedToUsedOnly, h_eta_real_pls_unused_matchedToUnusedOnly, h_phi_fake_pls_used_detailed, h_phi_fake_pls_unused_detailed, h_phi_real_pls_used_unmatched, h_phi_real_pls_used_matchedToBoth, h_phi_real_pls_used_matchedToUsedOnly, h_phi_real_pls_used_matchedToUnusedOnly, h_phi_real_pls_unused_unmatched, h_phi_real_pls_unused_matchedToBoth, h_phi_real_pls_unused_matchedToUsedOnly, h_phi_real_pls_unused_matchedToUnusedOnly);
         }
-        processIdealPT2s(*pls_pt_vec, *pls_eta_vec, *pls_phi_vec, *pls_isFake_vec, *pls_simIdx_vec, *ls_pt_vec, *ls_eta_vec, *ls_phi_vec, *ls_isFake_vec, *ls_simIdx_vec, used_pls_indices, used_ls_indices, h_delta_pt, h_delta_eta, h_delta_phi, h_delta_R, h_extrapolation_dist_3d, h_extrapolation_delta_z, h_delta_r_by_layer, h_extrapolation_delta_r_reverse_by_hit, h_extrapolation_delta_r_reverse_combined, *pls_hit0_x_vec, *pls_hit0_y_vec, *pls_hit0_z_vec, *pls_hit1_x_vec, *pls_hit1_y_vec, *pls_hit1_z_vec, *pls_hit2_x_vec, *pls_hit2_y_vec, *pls_hit2_z_vec, *pls_hit3_x_vec, *pls_hit3_y_vec, *pls_hit3_z_vec, *ls_mdIdx0_vec, *ls_mdIdx1_vec, *md_anchor_x_vec, *md_anchor_y_vec, *md_anchor_z_vec, *md_other_x_vec, *md_other_y_vec, *md_other_z_vec, *md_layer_vec, ideal_pt2_count, *sim_pt_vec, h_dist_3d_by_layer);
+        processIdealPT2s(*pls_pt_vec, *pls_eta_vec, *pls_phi_vec, *pls_isFake_vec, *pls_simIdx_vec, *ls_pt_vec, *ls_eta_vec, *ls_phi_vec, *ls_isFake_vec, *ls_simIdx_vec, used_pls_indices, used_ls_indices, h_delta_pt, h_delta_eta, h_delta_phi, h_delta_R, h_extrapolation_dist_3d, h_extrapolation_dist_3d_0, h_extrapolation_dist_3d_1, h_extrapolation_delta_z, h_delta_r_by_layer, h_extrapolation_delta_r_reverse_by_hit, h_extrapolation_delta_r_reverse_combined, *pls_hit0_x_vec, *pls_hit0_y_vec, *pls_hit0_z_vec, *pls_hit1_x_vec, *pls_hit1_y_vec, *pls_hit1_z_vec, *pls_hit2_x_vec, *pls_hit2_y_vec, *pls_hit2_z_vec, *pls_hit3_x_vec, *pls_hit3_y_vec, *pls_hit3_z_vec, *ls_mdIdx0_vec, *ls_mdIdx1_vec, *md_anchor_x_vec, *md_anchor_y_vec, *md_anchor_z_vec, *md_other_x_vec, *md_other_y_vec, *md_other_z_vec, *md_layer_vec, ideal_pt2_count, failed_extrapolations, success_extrapolations, *sim_pt_vec, h_dist_3d_by_layer, h_dist_3d_by_layer_0, h_dist_3d_by_layer_1);
     }
     std::cout << "Finished processing entries." << std::endl;
     // --- Styling and Plotting ---
@@ -211,13 +238,13 @@ void main_analysis() {
     createAndSaveSimpleStack("c_phi_pls_unused", "Phi of Unused PLS;#phi;PLS Objects", "compare_phi_pls_unused.png", "Unused PLS", h_phi_real_pls_unused, h_phi_fake_pls_unused, "Real, Unused", "Fake, Unused", kAzure-9, kRed-9);
     
     // Detailed LS Plots
-    createAndSaveDetailedStack("c_pt_ls_used_detailed", "pT of Used LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_used_detailed.png", "Used Real LS Matched To PLS:", true, h_pt_fake_ls_used_detailed, h_pt_real_ls_used_unmatched, h_pt_real_ls_used_matchedToUnusedOnly, h_pt_real_ls_used_matchedToBoth, h_pt_real_ls_used_matchedToUsedOnly);
+    createAndSaveDetailedStack("c_pt_ls_used_detailed", "pT of Used LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_used_detailed.png", "Used Real LS Matched To PLS:", false, h_pt_fake_ls_used_detailed, h_pt_real_ls_used_unmatched, h_pt_real_ls_used_matchedToUnusedOnly, h_pt_real_ls_used_matchedToBoth, h_pt_real_ls_used_matchedToUsedOnly);
     
     createAndSaveDetailedStack("c_eta_ls_used_detailed", "Eta of Used LS (Detailed);#eta;LS Objects", "compare_eta_ls_used_detailed.png", "Used Real LS Matched To PLS:", false, h_eta_fake_ls_used_detailed, h_eta_real_ls_used_unmatched, h_eta_real_ls_used_matchedToUnusedOnly, h_eta_real_ls_used_matchedToBoth, h_eta_real_ls_used_matchedToUsedOnly);
     
     createAndSaveDetailedStack("c_phi_ls_used_detailed", "Phi of Used LS (Detailed);#phi;LS Objects", "compare_phi_ls_used_detailed.png", "Used Real LS Matched To PLS:", false, h_phi_fake_ls_used_detailed, h_phi_real_ls_used_unmatched, h_phi_real_ls_used_matchedToUnusedOnly, h_phi_real_ls_used_matchedToBoth, h_phi_real_ls_used_matchedToUsedOnly);
     
-    createAndSaveDetailedStack("c_pt_ls_unused_detailed", "pT of Unused LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", true, h_pt_fake_ls_unused_detailed, h_pt_real_ls_unused_unmatched, h_pt_real_ls_unused_matchedToUnusedOnly, h_pt_real_ls_unused_matchedToBoth, h_pt_real_ls_unused_matchedToUsedOnly);
+    createAndSaveDetailedStack("c_pt_ls_unused_detailed", "pT of Unused LS (Detailed);p_{T} [GeV];LS Objects", "compare_pt_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", false, h_pt_fake_ls_unused_detailed, h_pt_real_ls_unused_unmatched, h_pt_real_ls_unused_matchedToUnusedOnly, h_pt_real_ls_unused_matchedToBoth, h_pt_real_ls_unused_matchedToUsedOnly);
     
     createAndSaveDetailedStack("c_eta_ls_unused_detailed", "Eta of Unused LS (Detailed);#eta;LS Objects", "compare_eta_ls_unused_detailed.png", "Unused Real LS Matched To PLS:", false, h_eta_fake_ls_unused_detailed, h_eta_real_ls_unused_unmatched, h_eta_real_ls_unused_matchedToUnusedOnly, h_eta_real_ls_unused_matchedToBoth, h_eta_real_ls_unused_matchedToUsedOnly);
     
@@ -230,7 +257,7 @@ void main_analysis() {
     
     createAndSaveDetailedStack("c_phi_pls_used_detailed", "Phi of Used PLS (Detailed);#phi;PLS Objects", "compare_phi_pls_used_detailed.png", "Used Real PLS Matched To LS:", false, h_phi_fake_pls_used_detailed, h_phi_real_pls_used_unmatched, h_phi_real_pls_used_matchedToUnusedOnly, h_phi_real_pls_used_matchedToBoth, h_phi_real_pls_used_matchedToUsedOnly);
     
-    createAndSaveDetailedStack("c_pt_pls_unused_detailed", "pT of Unused PLS (Detailed);p_{T} [GeV];PLS Objects", "compare_pt_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", true, h_pt_fake_pls_unused_detailed, h_pt_real_pls_unused_unmatched, h_pt_real_pls_unused_matchedToUnusedOnly, h_pt_real_pls_unused_matchedToBoth, h_pt_real_pls_unused_matchedToUsedOnly);
+    createAndSaveDetailedStack("c_pt_pls_unused_detailed", "pT of Unused PLS (Detailed);p_{T} [GeV];PLS Objects", "compare_pt_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", false, h_pt_fake_pls_unused_detailed, h_pt_real_pls_unused_unmatched, h_pt_real_pls_unused_matchedToUnusedOnly, h_pt_real_pls_unused_matchedToBoth, h_pt_real_pls_unused_matchedToUsedOnly);
     
     createAndSaveDetailedStack("c_eta_pls_unused_detailed", "Eta of Unused PLS (Detailed);#eta;PLS Objects", "compare_eta_pls_unused_detailed.png", "Unused Real PLS Matched To LS:", false, h_eta_fake_pls_unused_detailed, h_eta_real_pls_unused_unmatched, h_eta_real_pls_unused_matchedToUnusedOnly, h_eta_real_pls_unused_matchedToBoth, h_eta_real_pls_unused_matchedToUsedOnly);
     
@@ -244,6 +271,8 @@ void main_analysis() {
     createAndSaveSimplePlot("c_extrapolation_dist_3d", "extrapolation_dist_3d.png", h_extrapolation_dist_3d,"3D Distance between extrapolated PLS and LS", "Distance [cm]", "Ideal pT2 Pairs");
 
     createAndSaveSimplePlot("c_extrapolation_delta_z", "extrapolation_delta_z.png", h_extrapolation_delta_z,"R-Z Extrapolation #Delta r (LS - PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
+    createAndSaveSimplePlot("c_extrapolation_dist_3d_0", "extrapolation_dist_3d_0.png", h_extrapolation_dist_3d_0,"3D Distance between extrapolated PLS and LS md0", "#Delta r [cm]", "Ideal pT2 Pairs");
+    createAndSaveSimplePlot("c_extrapolation_dist_3d_1", "extrapolation_dist_3d_1.png", h_extrapolation_dist_3d_1,"3D Distance between extrapolated PLS and LS md1", "#Delta r [cm]", "Ideal pT2 Pairs");
     //createAndSaveSimplePlot("c_extrapolation_delta_r_reverse", "extrapolation_delta_r_reverse.png", h_extrapolation_delta_r_reverse, "R-Z Extrapolation #Delta r (LS -> PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
     
     std::cout << "Creating reverse delta_r plots for each PLS hit..." << std::endl;
@@ -265,19 +294,51 @@ void main_analysis() {
         }
     }
     
+     for (int i = 0; i < h_dist_3d_by_layer_0.size(); ++i) {
+        if (h_dist_3d_by_layer_0[i]->GetEntries() > 0) {
+            TString canvas_name = TString::Format("c_dist_3d_layer_0_%d", i);
+            TString file_name = TString::Format("extrapolation_dist_3d_layer_0_%d.png", i);
+            TString plot_title = TString::Format("3D Distance (Layer %d) md0", i);
+            createAndSaveSimplePlot(canvas_name.Data(), file_name.Data(), h_dist_3d_by_layer_0[i], plot_title.Data(), "#Delta r [cm]", "Entries");
+        }
+    }
+    
+     for (int i = 0; i < h_dist_3d_by_layer_1.size(); ++i) {
+        if (h_dist_3d_by_layer_1[i]->GetEntries() > 0) {
+            TString canvas_name = TString::Format("c_dist_3d_layer_1_%d", i);
+            TString file_name = TString::Format("extrapolation_dist_3d_layer_1_%d.png", i);
+            TString plot_title = TString::Format("3D Distance (Layer %d) md1", i);
+            createAndSaveSimplePlot(canvas_name.Data(), file_name.Data(), h_dist_3d_by_layer_1[i], plot_title.Data(), "#Delta r [cm]", "Entries");
+        }
+    }
+    
+    
     createAndSaveSimplePlot("c_delta_r_reverse_combined", "extrapolation_delta_r_reverse_combined.png", h_extrapolation_delta_r_reverse_combined, "Inclusive R-Z Extrapolation #Delta r (LS -> All PLS Hits)", "#Delta r [cm]", "Entries");
     
     std::cout << "Finished creating plots!" << std::endl;
     std::cout << "\n--- Entries per Layer in Delta_r Histograms ---" << std::endl;
     long long total_layer_entries = 0;
-    for (size_t i = 0; i < h_delta_r_by_layer.size(); ++i) {
+    for (size_t i = 0; i < h_dist_3d_by_layer.size(); ++i) {
         // Good practice to check if the histogram pointer is valid
         if (h_delta_r_by_layer[i]) {
-            long long current_entries = h_delta_r_by_layer[i]->GetEntries();
+            long long current_entries = h_dist_3d_by_layer[i]->GetEntries();
             std::cout << "Layer " << i << ": " << current_entries << " entries." << std::endl;
             total_layer_entries += current_entries;
         }
     }
+    
+    
+    std::cout << "ls real unused unmatched" << h_pt_real_ls_unused_unmatched->GetEntries() << " entries." << std::endl;
+    std::cout << "ls real unused matched to both" << h_pt_real_ls_unused_matchedToBoth->GetEntries() << " entries." << std::endl;
+    std::cout << "ls real unused matched to used only" << h_pt_real_ls_unused_matchedToUsedOnly->GetEntries() << " entries." << std::endl;
+    std::cout << "ls real unused matched to unused only" << h_pt_real_ls_unused_matchedToUnusedOnly->GetEntries() << " entries." << std::endl;
+    
+    std::cout << "pls real unused unmatched" << h_pt_real_pls_unused_unmatched->GetEntries() << " entries." << std::endl;
+    std::cout << "pls real unused matched to both" << h_pt_real_pls_unused_matchedToBoth->GetEntries() << " entries." << std::endl;
+    std::cout << "pls real unused matched to used only" << h_pt_real_pls_unused_matchedToUsedOnly->GetEntries() << " entries." << std::endl;
+    std::cout << "pls real unused matched to unused only" << h_pt_real_pls_unused_matchedToUnusedOnly->GetEntries() << " entries." << std::endl;
+    
+        
     
     std::cout << "Creating 3D distance plots for each layer..." << std::endl;
     for (int i = 0; i < h_dist_3d_by_layer.size(); ++i) {
@@ -289,15 +350,19 @@ void main_analysis() {
     }
 }
     
-   
+   std::cout << "\n--- FINAL COUNT ---" << std::endl;
+std::cout << "Total ideal pt2 objects found: " << ideal_pt2_count << std::endl;
+std::cout << "  - Successful extrapolations (in histogram): " << h_extrapolation_dist_3d->GetEntries() << std::endl;
+std::cout << "  - Failed extrapolations (rejected): " << failed_extrapolations << std::endl;
+std::cout << "  - succes extrapolations (accepted): " << success_extrapolations << std::endl;
+std::cout << "-------------------\n" << std::endl;
 
-    
-    
-    
     std::cout << "-------------------------------------------------" << std::endl;
-     std::cout << "Total entries across all layers: " << total_layer_entries << std::endl;
-    std::cout << "\n--- FINAL COUNT --- \nTotal ideal pt2 objects found: " << ideal_pt2_count << "\n-------------------\n" << std::endl;
-
+std::cout << "Total entries across all layers: " << total_layer_entries << std::endl;
+std::cout << "\n--- FINAL COUNT ---" << std::endl;
+std::cout << "Total real, unused LS objects found: " << total_real_unused_ls << std::endl; // <-- ADD THIS LINE
+std::cout << "Total ideal pt2 objects found: " << ideal_pt2_count << std::endl;
+std::cout << "-------------------\n" << std::endl;
     // --- Clean up ---
     inputFile->Close();
 }
