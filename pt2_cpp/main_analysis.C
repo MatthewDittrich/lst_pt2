@@ -146,10 +146,15 @@ void main_analysis() {
     TH1D *h_pt_real_pls_unused_unmatched = new TH1D("h_pt_real_pls_unused_unmatched", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToBoth = new TH1D("h_pt_real_pls_unused_matchedToBoth", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToUsedOnly = new TH1D("h_pt_real_pls_unused_matchedToUsedOnly", "", pt_bins, 0, pt_max), *h_pt_real_pls_unused_matchedToUnusedOnly = new TH1D("h_pt_real_pls_unused_matchedToUnusedOnly", "", pt_bins, 0, pt_max), *h_eta_real_pls_unused_unmatched = new TH1D("h_eta_real_pls_unused_unmatched", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToBoth = new TH1D("h_eta_real_pls_unused_matchedToBoth", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToUsedOnly = new TH1D("h_eta_real_pls_unused_matchedToUsedOnly", "", eta_bins, -eta_max, eta_max), *h_eta_real_pls_unused_matchedToUnusedOnly = new TH1D("h_eta_real_pls_unused_matchedToUnusedOnly", "", eta_bins, -eta_max, eta_max), *h_phi_real_pls_unused_unmatched = new TH1D("h_phi_real_pls_unused_unmatched", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToBoth = new TH1D("h_phi_real_pls_unused_matchedToBoth", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToUsedOnly = new TH1D("h_phi_real_pls_unused_matchedToUsedOnly", "", phi_bins, -phi_max, phi_max), *h_phi_real_pls_unused_matchedToUnusedOnly = new TH1D("h_phi_real_pls_unused_matchedToUnusedOnly", "", phi_bins, -phi_max, phi_max);
     
     //Histograms of delta 
-    TH1D* h_delta_pt = new TH1D("h_delta_pt", "#Delta p_{T} (LS - PLS);#Delta p_{T} [GeV];pT2 Objects", 180, -5, 5);
-    TH1D* h_delta_eta = new TH1D("h_delta_eta", "#Delta #eta (LS - PLS);#Delta #eta;pT2 Objects", 180, -0.7, 0.7);
-    TH1D* h_delta_phi = new TH1D("h_delta_phi", "#Delta #phi (LS - PLS);#Delta #phi [rad];pT2 Objects", 180, -1.25, 1.25);
-    TH1D* h_delta_R = new TH1D("h_delta_R", "#Delta R (LS - PLS);#Delta R;pT2 Objects", 180, 0, 1);
+    TH1D* h_delta_pt = new TH1D("h_delta_pt", "#Delta p_{T} (LS - PLS);#Delta p_{T} [GeV];pT2 Objects", 180, -10, 10);
+    TH1D* h_delta_eta = new TH1D("h_delta_eta", "#Delta #eta (LS - PLS);#Delta #eta;pT2 Objects", 180, -1, 1);
+    TH1D* h_delta_phi = new TH1D("h_delta_phi", "#Delta #phi (LS - PLS);#Delta #phi [rad];pT2 Objects", 180, -3, 3);
+    TH1D* h_delta_R = new TH1D("h_delta_R", "#Delta R (LS - PLS);#Delta R;pT2 Objects", 180, 0, 3);
+
+    TH1D* h_delta_pt_cand = new TH1D("h_delta_pt_cand", "#Delta p_{T} (LS - PLS);#Delta p_{T} [GeV];pT2 Objects", 180, -10, 10);
+    TH1D* h_delta_eta_cand = new TH1D("h_delta_eta_cand", "#Delta #eta (LS - PLS);#Delta #eta;pT2 Objects", 180, -1, 1);
+    TH1D* h_delta_phi_cand = new TH1D("h_delta_phi_cand", "#Delta #phi (LS - PLS);#Delta #phi [rad];pT2 Objects", 180, -3, 3);
+    TH1D* h_delta_R_cand = new TH1D("h_delta_R_cand", "#Delta R (LS - PLS);#Delta R;pT2 Objects", 180, 0, 3);
     
     //Histograms for distances
     TH1D* h_extrapolation_dist_3d = new TH1D("h_extrapolation_dist_3d","3D Distance between extrapolated PLS and LS;Distance [cm];Ideal pT2 Pairs", 180, 0, 100.0);
@@ -184,17 +189,13 @@ void main_analysis() {
         getLsMatchStatus(simIdx_to_ls_status, *ls_isFake_vec, *ls_simIdx_vec, used_ls_indices);
 
         // ----- Making pT2s -----
-        // Function to grab the correct z value 
-        std::vector<float> pls_max_z_vec = maxHitZ(*pls_hit3_z_vec, *pls_hit2_z_vec);
+        // Initialize the pT2 candidate index lists
+        std::vector<int> pls_pt2_cand_idx_vec;
+        std::vector<int> ls_pt2_cand_idx_vec;
 
-        // Initialize the pT2 index lists
-        // Here, these lists are indexes of the possible pt2 ls and pls matches
-        std::vector<int> pls_pt2_idx_vec;
-        std::vector<int> ls_pt2_idx_vec;
-        connectPLSandLS(*pls_pt_vec, pls_max_z_vec, *pls_eta_vec, *pls_phi_vec, *ls_mdIdx0_vec, *ls_mdIdx1_vec, *md_detId_vec, pls_pt2_idx_vec, ls_pt2_idx_vec);
-
-
-        std::cout << "Event " << i << ": " << pls_pt2_idx_vec.size() << " potential pT2s." << std::endl;
+        // Function to make potential pt2s
+        connectPLSandLS(*pls_pt_vec, *pls_hit3_z_vec, *pls_hit2_z_vec, *pls_eta_vec, *pls_phi_vec, *ls_mdIdx0_vec, *ls_mdIdx1_vec, *md_detId_vec, pls_pt2_cand_idx_vec, ls_pt2_cand_idx_vec);
+        fillCandHistos(pls_pt2_cand_idx_vec, ls_pt2_cand_idx_vec,*pls_pt_vec, *ls_pt_vec, *pls_eta_vec, *ls_eta_vec, *pls_phi_vec, *ls_phi_vec, h_delta_pt_cand, h_delta_eta_cand, h_delta_phi_cand, h_delta_R_cand); 
 
         //For ls
         for (size_t j = 0; j < ls_pt_vec->size(); ++j) {
@@ -252,6 +253,12 @@ void main_analysis() {
     createAndSaveSimplePlot("c_delta_eta", "delta_eta.png", h_delta_eta, "#Delta #eta (LS - PLS)", "#Delta #eta", "pT2 Objects");
     createAndSaveSimplePlot("c_delta_phi", "delta_phi.png", h_delta_phi, "#Delta #phi (LS - PLS)", "#Delta #phi [rad]", "pT2 Objects");
     createAndSaveSimplePlot("c_delta_R", "delta_R.png", h_delta_R, "#Delta R (LS - PLS)", "#Delta R", "pT2 Objects");
+
+    createAndSaveSimplePlot("c_delta_pt_cand", "delta_pt_cand.png", h_delta_pt_cand, "#Delta p_{T} (LS - PLS)", "#Delta p_{T} [GeV]", "pT2 Objects");
+    createAndSaveSimplePlot("c_delta_eta_cand", "delta_eta_cand.png", h_delta_eta_cand, "#Delta #eta (LS - PLS)", "#Delta #eta", "pT2 Objects");
+    createAndSaveSimplePlot("c_delta_phi_cand", "delta_phi_cand.png", h_delta_phi_cand, "#Delta #phi (LS - PLS)", "#Delta #phi [rad]", "pT2 Objects");
+    createAndSaveSimplePlot("c_delta_R_cand", "delta_R_cand.png", h_delta_R_cand, "#Delta R (LS - PLS)", "#Delta R", "pT2 Objects");
+
     createAndSaveSimplePlot("c_extrapolation_dist_3d", "extrapolation_dist_3d.png", h_extrapolation_dist_3d,"3D Distance between extrapolated PLS and LS", "Distance [cm]", "Ideal pT2 Pairs");
     createAndSaveSimplePlot("c_extrapolation_delta_z", "extrapolation_delta_z.png", h_extrapolation_delta_z,"R-Z Extrapolation #Delta r (LS - PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
     //createAndSaveSimplePlot("c_extrapolation_delta_r_reverse", "extrapolation_delta_r_reverse.png", h_extrapolation_delta_r_reverse, "R-Z Extrapolation #Delta r (LS -> PLS)", "#Delta r [cm]", "Ideal pT2 Pairs");
