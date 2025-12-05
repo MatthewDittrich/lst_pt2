@@ -856,8 +856,8 @@ void createAndSaveSimplePlot(const std::string& canvasName, const std::string& s
     histo->SetLineWidth(2); 
     histo->Draw("HIST");
     
-     double integral = histo->Integral();
-
+    // double integral = histo->Integral();
+    double integral = histo->GetEntries();
     // Create a text box (TPaveText) to display the info
     // The coordinates are in normalized screen space (0 to 1)
     TPaveText *pt = new TPaveText(0.65, 0.82, 0.88, 0.88, "NDC"); // NDC = Normalized Device Coords
