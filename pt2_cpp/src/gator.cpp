@@ -1,8 +1,9 @@
 #include "gator.h"
 #include <iostream>
 
-void print_coding_gator() { // Gator?
-    std::cout << R"(
+void print_creature()
+{
+    const char* art = reinterpret_cast<const char*>(u8R"(
    ⢠⠔⠚⠒⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⢠⠏⠀⠀⠀⣸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⢸⡀⠀⠀⠀⡇⠀⠀⢀⠀⣠⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -17,7 +18,9 @@ void print_coding_gator() { // Gator?
 ⢹⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡼⠃⠀⠀⠀⠀⠀
 ⠀⠙⠲⠞⠓⠢⢤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣹⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⠛⠳⠤⠖⠃⠀⠀⠀⠀
-)" << std::endl; 
+)");
+
+    std::cout << art << std::endl;
 }
 
 void print_gator() {
@@ -35,3 +38,5 @@ void print_gator() {
 
 )";
 }
+
+

@@ -97,6 +97,8 @@ int main(int argc, char** argv) {
         return 1;
     } 
 
+    print_creature();
+
     // Main Looper
     for (Long64_t ievt = 0; ievt < reader.GetEntries(); ++ievt) {
 
