@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     bool makePlots = false;
     bool writeRoot = false;
     bool lowPT = false;
-    std::string inputFile = "/blue/avery/matthew.dittrich/Permanent/LSTNtuple.root";
+    std::string inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
     std::string outputDir = "output";
 
     // Command Line Arguments
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
     // Get the pixelMap loaded
     SuperbinToDetIdMap superbinToDetIds;
-    std::string pixelMapFile = "pLS_map_ElCheapo.txt";
+    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/pLS_map_ElCheapo.txt";
     try {
         loadSuperbinDetIdMap(pixelMapFile, superbinToDetIds);
     } catch (const std::exception& e) {
