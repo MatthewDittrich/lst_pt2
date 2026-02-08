@@ -1,6 +1,3 @@
-# -----------------------------
-# Compiler & flags
-# -----------------------------
 CXX      := g++
 CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
 
@@ -58,4 +55,3 @@ clean:
 	rm -rf $(OBJ_DIR) $(BIN)
 
 .PHONY: all clean
-

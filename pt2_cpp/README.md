@@ -1,11 +1,17 @@
 # C++ PT2 Processor
-After coping this repo do:
+Clone this repo and run the following in any area in Hipergator:
+(Instruction for running on uaf will come soon)
 ```
-mkdir build
-cd /build
+source setup.sh
+make clean
 make
 ```
-When this run correctly you can put LSTNtuple.root inside of build file and then run (inside build file):
+Once correctly compiled, code can be ran as follows:
 ```
-./LSTAnalysis
+./build_pt2
+```
+The full list of run options are as follows:
+```
+-i Input File Path"
+-o Output Directory";
 ```
