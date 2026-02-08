@@ -38,5 +38,3 @@ void print_gator() {
 
 )";
 }
-
-

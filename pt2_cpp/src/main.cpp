@@ -97,12 +97,18 @@ int main(int argc, char** argv) {
         return 1;
     } 
 
+    Long64_t totalEvents = reader.GetEntries();
+
     print_creature();
 
     // Main Looper
     for (Long64_t ievt = 0; ievt < reader.GetEntries(); ++ievt) {
 
         reader.GetEntry(ievt);
+
+        // Update progress bar every 5 events
+        if (ievt % 5 == 0 || ievt == totalEvents - 1)
+            printProgressBar(ievt, totalEvents);
 
         // Clear Variables from the last event
         reader.pls_origin_z.clear();
