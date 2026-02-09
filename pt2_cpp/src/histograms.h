@@ -27,6 +27,12 @@ public:
     TH1F* fake_unused_pt2_deltaPT  = nullptr;
     TH1F* fake_unused_pt2_deltaETA = nullptr;
     TH1F* fake_unused_pt2_deltaPHI = nullptr;
+    //------------extrapolation--------------
+    TH1F* real_pt2_dist3D;
+    TH1F* fake_pt2_dist3D;
+    TH1F* real_unused_pt2_dist3D;
+    TH1F* fake_unused_pt2_dist3D;
+
 };
 
 #endif

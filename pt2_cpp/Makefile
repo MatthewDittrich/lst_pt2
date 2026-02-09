@@ -24,7 +24,8 @@ SOURCES := \
 	$(SRC_DIR)/histograms.cpp \
 	$(SRC_DIR)/plotting.cpp \
 	$(SRC_DIR)/rootReader.cpp \
-	$(SRC_DIR)/gator.cpp
+	$(SRC_DIR)/gator.cpp\
+        $(SRC_DIR)/extrapolation.cpp
 
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

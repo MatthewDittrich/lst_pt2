@@ -74,5 +74,29 @@ void HistogramManager::init() {
         "Fake Unused pT2 #Delta #phi;#Delta #phi;Entries",
         180, -0.25, 0.25
     );
+    //------------Extrapolation--------------------
+    real_pt2_dist3D = new TH1F(
+        "real_pt2_dist3D", 
+         "Real pT2 Distance;Dist [cm];Entries", 
+         100, 0, 15.0
+    );
+    
+    fake_pt2_dist3D = new TH1F(
+        "fake_pt2_dist3D", 
+        "Fake pT2 Distance;Dist [cm];Entries", 
+        100, 0, 15.0
+        );
+
+    real_unused_pt2_dist3D = new TH1F(
+        "real_unused_pt2_dist3D", 
+        "Real Unused pT2 Distance;Dist [cm];Entries", 
+        100, 0, 15.0
+        );
+
+    fake_unused_pt2_dist3D = new TH1F(
+        "fake_unused_pt2_dist3D", 
+        "Fake Unused pT2 Distance;Dist [cm];Entries", 
+        100, 0, 15.0
+        );
 
 }

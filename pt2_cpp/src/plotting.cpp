@@ -45,6 +45,15 @@ void Plotting::plotPt2Histograms(const HistogramManager& hists,
 
         {hists.real_unused_pt2_deltaPHI, hists.fake_unused_pt2_deltaPHI,
          "Delta #phi Unused (Real vs Fake)",  "deltaPHI_case2"},
+        //----------------Extrapolation----------------------
+
+        {hists.real_pt2_dist3D, hists.fake_pt2_dist3D,
+         "Helical Extrapolation Distance (Real vs Fake)", "extrapDist_case1"},
+
+        {hists.real_unused_pt2_dist3D, hists.fake_unused_pt2_dist3D,
+         "Helical Extrapolation Distance Unused (Real vs Fake)", "extrapDist_case2"},
+        
+        //----------------------------------------------------
     };
 
     // Loop over all plots
