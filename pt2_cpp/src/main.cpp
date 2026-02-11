@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
     // Get the pixelMap loaded
     SuperbinToDetIdMap superbinToDetIds;
-    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/pLS_map_ElCheapo.txt";
+    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Standard_0p8GeV_Maps/pLS_map_ElCheapo.txt";
     try {
         loadSuperbinDetIdMap(pixelMapFile, superbinToDetIds);
     } catch (const std::exception& e) {
