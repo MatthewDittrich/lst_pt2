@@ -7,6 +7,7 @@
 #include "gator.h"
 #include "histograms.h"
 #include "plotting.h"
+#include "plot_recipes.h"
 #include "rootReader.h"
 #include "tools.h"
 #include "pt2.h"
@@ -181,7 +182,9 @@ int main(int argc, char** argv) {
         }
     }
 
-    Plotting::plotPt2Histograms(hists, outputDir);
+    auto recipes = getPt2Recipes(hists);
+    Plotting plotter; 
+    plotter.plotRecipes(recipes, outputDir);
 
     return 0;
 }

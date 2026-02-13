@@ -12,21 +12,21 @@ public:
     void write();
 
     // Delta pT2 Hists
-    TH1F* real_pt2_deltaPT  = nullptr;
-    TH1F* real_pt2_deltaETA = nullptr;
-    TH1F* real_pt2_deltaPHI = nullptr;
+    TH1D* real_pt2_deltaPT  = nullptr;
+    TH1D* real_pt2_deltaETA = nullptr;
+    TH1D* real_pt2_deltaPHI = nullptr;
 
-    TH1F* real_unused_pt2_deltaPT  = nullptr;
-    TH1F* real_unused_pt2_deltaETA = nullptr;
-    TH1F* real_unused_pt2_deltaPHI = nullptr;
+    TH1D* real_unused_pt2_deltaPT  = nullptr;
+    TH1D* real_unused_pt2_deltaETA = nullptr;
+    TH1D* real_unused_pt2_deltaPHI = nullptr;
 
-    TH1F* fake_pt2_deltaPT  = nullptr;
-    TH1F* fake_pt2_deltaETA = nullptr;
-    TH1F* fake_pt2_deltaPHI = nullptr;
+    TH1D* fake_pt2_deltaPT  = nullptr;
+    TH1D* fake_pt2_deltaETA = nullptr;
+    TH1D* fake_pt2_deltaPHI = nullptr;
 
-    TH1F* fake_unused_pt2_deltaPT  = nullptr;
-    TH1F* fake_unused_pt2_deltaETA = nullptr;
-    TH1F* fake_unused_pt2_deltaPHI = nullptr;
+    TH1D* fake_unused_pt2_deltaPT  = nullptr;
+    TH1D* fake_unused_pt2_deltaETA = nullptr;
+    TH1D* fake_unused_pt2_deltaPHI = nullptr;
 };
 
 #endif

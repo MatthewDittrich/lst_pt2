@@ -1,5 +1,5 @@
 CXX      := g++
-CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
+CXXFLAGS := -std=c++20 -O2 -Wall -Wextra
 
 # ROOT flags
 ROOTCFLAGS := $(shell root-config --cflags)
@@ -19,6 +19,7 @@ SOURCES := \
 	$(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/tools.cpp \
 	$(SRC_DIR)/histograms.cpp \
+	$(SRC_DIR)/plot_recipes.cpp \
 	$(SRC_DIR)/plotting.cpp \
 	$(SRC_DIR)/rootReader.cpp \
 	$(SRC_DIR)/gator.cpp

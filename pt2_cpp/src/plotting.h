@@ -2,16 +2,17 @@
 #define PLOTTING_H
 
 #include <string>
+#include <vector>
+#include "plot_recipes.h"
 #include "histograms.h"
 
 class Plotting {
 public:
-    Plotting() = default;
-    ~Plotting() = default;
+    void plotRecipes(const std::vector<PlotRecipe>& recipes,
+                     const std::string& outputDir);
 
-    // Plot all pt2 histograms and save to outputDir
-    static void plotPt2Histograms(const HistogramManager& hists, const std::string& outputDir);
+private:
+    void generateHTMLGallery(const std::string& outputDir);
 };
 
 #endif
-
