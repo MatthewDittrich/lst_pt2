@@ -8,6 +8,14 @@
 #include <Math/Vector2D.h>
 #include <Math/Vector3D.h>
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+//#include <Minuit2/Minuit2Minimizer.h>
+#include <Math/Functor.h>
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 #include <cmath>
 #include <iostream>
 
@@ -17,7 +25,15 @@ namespace extrapolation {
     //                            HELPER FUNCTIONS
     // =========================================================================
 
+<<<<<<< Updated upstream
         ROOT::Math::XYVector fitCircleWithFixedRadius(const std::vector<ROOT::Math::XYVector>& hits, double R) {
+=======
+<<<<<<< Updated upstream
+        ROOT::Math::XYVector fitCircleWithFixedRadius(const std::vector<ROOT::Math::XYVector>& hits, double R) {
+=======
+       ROOT::Math::XYVector fitCircleWithFixedRadius(const std::vector<ROOT::Math::XYVector>& hits, double R) {
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         // Geometric solution: Speed over numerical minimization
         if (hits.size() < 2) return {0, 0};
 
@@ -60,7 +76,68 @@ namespace extrapolation {
         return {c1x, c1y};
     }
 
+<<<<<<< Updated upstream
     
+=======
+<<<<<<< Updated upstream
+    
+=======
+   
+  /*     ROOT::Math::XYVector fitCircleWithFixedRadius(const std::vector<ROOT::Math::XYVector>& hits, double fixed_radius) {
+        if (hits.size() < 2) return {0, 0};
+
+        // 1. Define the Chi-Squared function to minimize
+        // p[0] is center_x (h), p[1] is center_y (k)
+        auto chi_squared_func = [&](const double *p) {
+            double h = p[0];
+            double k = p[1];
+            double chi2 = 0.0;
+            for (const auto& hit : hits) {
+                double dx = hit.X() - h;
+                double dy = hit.Y() - k;
+                double r_squared_from_center = dx*dx + dy*dy;
+                double residual = std::sqrt(r_squared_from_center) - fixed_radius;
+                chi2 += residual * residual;
+            }
+            return chi2;
+        };
+
+        // 2. Set up the Minuit2 Minimizer
+        ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
+        min.SetMaxFunctionCalls(10000);
+        min.SetMaxIterations(1000);
+        min.SetTolerance(0.001);
+        min.SetPrintLevel(-1); // Silent mode
+
+        ROOT::Math::Functor f(chi_squared_func, 2);
+        min.SetFunction(f);
+
+        // 3. Set starting point (average position of hits)
+        double avg_x = 0.0, avg_y = 0.0;
+        for (const auto& hit : hits) {
+            avg_x += hit.X();
+            avg_y += hit.Y();
+        }
+        avg_x /= hits.size();
+        avg_y /= hits.size();
+
+        min.SetVariable(0, "h", avg_x, 0.1);
+        min.SetVariable(1, "k", avg_y, 0.1);
+
+        // 4. Minimize
+        min.Minimize();
+
+        if (min.Status() == 0) {
+            const double *result = min.X();
+            return {result[0], result[1]};
+        }
+
+        // Return 0,0 if fit failed
+        return {0, 0};
+    }*/
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_idx, const rootReader& data) {
         const float invalid_hit_val = -999.0f;
         const std::pair<double, double> invalid_return = {-1.0, -1.0};
@@ -154,5 +231,143 @@ namespace extrapolation {
 
         return {get_dist(md0_anchor), get_dist(md1_anchor)};
     }
+<<<<<<< Updated upstream
 
 }
+=======
+<<<<<<< Updated upstream
+
+}
+=======
+std::pair<double, double> extrapolatePlsInRZAndGetDeltaR(int pls_idx, int ls_idx, const rootReader& data) {
+    const float invalid_val = -999.0;
+    const std::pair<double, double> invalid_pair = {-999.0, -999.0};
+
+    // 1. Collect PLS hits and convert to Z-R plane
+    std::vector<double> pls_z, pls_r;
+    auto add_pls_hit = [&](float x, float y, float z) {
+        if (x > invalid_val) {
+            pls_z.push_back(z);
+            pls_r.push_back(std::sqrt(x*x + y*y));
+        }
+    };
+    add_pls_hit(data.pls_hit0_x->at(pls_idx), data.pls_hit0_y->at(pls_idx), data.pls_hit0_z->at(pls_idx));
+    add_pls_hit(data.pls_hit1_x->at(pls_idx), data.pls_hit1_y->at(pls_idx), data.pls_hit1_z->at(pls_idx));
+    add_pls_hit(data.pls_hit2_x->at(pls_idx), data.pls_hit2_y->at(pls_idx), data.pls_hit2_z->at(pls_idx));
+    add_pls_hit(data.pls_hit3_x->at(pls_idx), data.pls_hit3_y->at(pls_idx), data.pls_hit3_z->at(pls_idx));
+
+    if (pls_z.size() < 2) return invalid_pair;
+
+    // 2. Linear Regression on PLS hits: R = slope * Z + intercept
+    double sumZ = 0, sumR = 0, sumZR = 0, sumZ2 = 0;
+    for (size_t i = 0; i < pls_z.size(); ++i) {
+        sumZ += pls_z[i];
+        sumR += pls_r[i];
+        sumZR += pls_z[i] * pls_r[i];
+        sumZ2 += pls_z[i] * pls_z[i];
+    }
+    double n = pls_z.size();
+    double denom = (n * sumZ2 - sumZ * sumZ);
+    if (std::abs(denom) < 1e-12) return invalid_pair;
+
+    double slope = (n * sumZR - sumZ * sumR) / denom;
+    double intercept = (sumR - slope * sumZ) / n;
+
+    // 3. Get LS (Line Segment) Z positions
+    int md0 = data.ls_mdIdx0->at(ls_idx);
+    int md1 = data.ls_mdIdx1->at(ls_idx);
+    if (md0 < 0 || md1 < 0) return invalid_pair;
+
+    double z_ls0 = data.md_anchor_z->at(md0);
+    double r_ls0_act = std::sqrt(std::pow(data.md_anchor_x->at(md0), 2) + std::pow(data.md_anchor_y->at(md0), 2));
+
+    double z_ls1 = data.md_anchor_z->at(md1);
+    double r_ls1_act = std::sqrt(std::pow(data.md_anchor_x->at(md1), 2) + std::pow(data.md_anchor_y->at(md1), 2));
+
+    // 4. Predict R at LS Z positions and get residuals
+    double r_ls0_pred = slope * z_ls0 + intercept;
+    double r_ls1_pred = slope * z_ls1 + intercept;
+
+    return {r_ls0_act - r_ls0_pred, r_ls1_act - r_ls1_pred};
+}
+    
+    std::pair<double, double> extrapolateSimplePointingInRZ(int pls_idx, int ls_idx, const rootReader& data) {
+        const float invalid_val = -999.0;
+        const std::pair<double, double> invalid_pair = {-999.0, -999.0};
+
+    // 1. Find "First" and "Last" valid PLS hits to define the slope
+        double z_first = 0, r_first = 0;
+        double z_last = 0, r_last = 0;
+        bool found_first = false;
+        bool found_last = false;
+
+    // Identify First (Inner) Hit
+        if (data.pls_hit0_x->at(pls_idx) > invalid_val) {
+            z_first = data.pls_hit0_z->at(pls_idx);
+            r_first = std::sqrt(std::pow(data.pls_hit0_x->at(pls_idx), 2) + std::pow(data.pls_hit0_y->at(pls_idx), 2));
+            found_first = true;
+        } else if (data.pls_hit1_x->at(pls_idx) > invalid_val) {
+            z_first = data.pls_hit1_z->at(pls_idx);
+            r_first = std::sqrt(std::pow(data.pls_hit1_x->at(pls_idx), 2) + std::pow(data.pls_hit1_y->at(pls_idx), 2));
+            found_first = true;
+        }
+
+    // Identify Last (Outer) Hit
+        if (data.pls_hit3_x->at(pls_idx) > invalid_val) {
+            z_last = data.pls_hit3_z->at(pls_idx);
+            r_last = std::sqrt(std::pow(data.pls_hit3_x->at(pls_idx), 2) + std::pow(data.pls_hit3_y->at(pls_idx), 2));
+            found_last = true;
+        } else if (data.pls_hit2_x->at(pls_idx) > invalid_val) {
+            z_last = data.pls_hit2_z->at(pls_idx);
+            r_last = std::sqrt(std::pow(data.pls_hit2_x->at(pls_idx), 2) + std::pow(data.pls_hit2_y->at(pls_idx), 2));
+            found_last = true;
+        }
+
+        if (!found_first || !found_last || std::abs(z_last - z_first) < 1e-4) return invalid_pair;
+
+    // 2. Define the line: R = mZ + b
+        double m = (r_last - r_first) / (z_last - z_first);
+        double b = r_first - m * z_first;
+
+    // 3. Get LS hits (MD0 and MD1)
+        int md0 = data.ls_mdIdx0->at(ls_idx);
+        int md1 = data.ls_mdIdx1->at(ls_idx);
+        if (md0 < 0 || md1 < 0) return invalid_pair;
+
+    // Residual for MD0
+        double z0_act = data.md_anchor_z->at(md0);
+        double r0_act = std::sqrt(std::pow(data.md_anchor_x->at(md0), 2) + std::pow(data.md_anchor_y->at(md0), 2));
+        double dr0 = r0_act - (m * z0_act + b);
+
+    // Residual for MD1
+        double z1_act = data.md_anchor_z->at(md1);
+        double r1_act = std::sqrt(std::pow(data.md_anchor_x->at(md1), 2) + std::pow(data.md_anchor_y->at(md1), 2));
+        double dr1 = r1_act - (m * z1_act + b);
+
+        return {dr0, dr1};
+        }
+
+       
+        double calculateDeltaAngle(int pls_idx, int ls_idx, const rootReader& data) {
+            const float inv = -999.0;
+    
+    // 1. Get First PLS Hit (Inner)
+            TVector3 vPixel;
+            if (data.pls_hit0_x->at(pls_idx) > inv) {
+                vPixel.SetXYZ(data.pls_hit0_x->at(pls_idx), data.pls_hit0_y->at(pls_idx), data.pls_hit0_z->at(pls_idx));
+            } else {
+                return -999.0; // Essential hit missing
+            }
+
+    // 2. Get Last LS Hit (MD1 - Outer)
+            int md1_idx = data.ls_mdIdx1->at(ls_idx);
+            if (md1_idx < 0) return -999.0;
+
+            TVector3 vStrip(data.md_anchor_x->at(md1_idx), data.md_anchor_y->at(md1_idx), data.md_anchor_z->at(md1_idx));
+
+    // 3. Return the 3D angle between the two vectors (in radians)
+            return vPixel.Angle(vStrip); 
+        } 
+    }
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
