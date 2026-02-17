@@ -81,7 +81,7 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .printYields = true
         },
 
-        // --- NEW: R-Z Regression Residuals ---
+/*        // --- NEW: R-Z Regression Residuals ---
         {
             .title = "All pT2: R-Z Regression Residual",
             .xAxis = "R_{act} - R_{pred} [cm]",
@@ -102,7 +102,7 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
           //  .normalize = true,
             .printYields = true
         },
-
+*/
         // --- NEW: R-Z Simple Pointing Residuals ---
         {
             .title = "All pT2: R-Z Simple Pointing Residual",

@@ -22,6 +22,7 @@ SOURCES := \
 	$(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/tools.cpp \
 	$(SRC_DIR)/histograms.cpp \
+	$(SRC_DIR)/plot_recipes.cpp \
 	$(SRC_DIR)/plotting.cpp \
 	$(SRC_DIR)/rootReader.cpp \
 	$(SRC_DIR)/gator.cpp\
