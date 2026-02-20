@@ -74,7 +74,9 @@ void HistogramManager::init() {
         "Fake Unused pT2 #Delta #phi;#Delta #phi;Entries",
         180, -1.0, 1.0
     );
+
     //------------Extrapolation--------------------
+
     real_pt2_dist3D = new TH1D(
         "real_pt2_dist3D",
         "Real pT2 Distance;Dist [cm];Entries",
@@ -99,33 +101,6 @@ void HistogramManager::init() {
        100, 0, 15.0
     );
    
-   // 1. Linear Regression
-/*   real_pt2_rz_reg = new TH1D(
-       "real_pt2_rz_reg", 
-       "Regression R-Z Residual;R_{act}-R_{pred} [cm];Entries", 
-       200, -10, 10
-    );
-
-   fake_pt2_rz_reg = new TH1D(
-       "fake_pt2_rz_reg", 
-       "Regression R-Z Residual;R_{act}-R_{pred} [cm];Entries", 
-       200, -10, 10
-    );
-
-   real_unused_pt2_rz_reg = new TH1D(
-       "real_unused_pt2_rz_reg", 
-       "Real Unused Reg R-Z;[cm];Entries", 
-       200, -10, 10
-    );
- 
-    fake_unused_pt2_rz_reg = new TH1D(
-        "fake_unused_pt2_rz_reg", 
-        "Fake Unused Reg R-Z;[cm];Entries", 
-        200, -10, 10
-    );
-*/     
-    // 2. Simple Pointing
-     
     real_pt2_rz_simple = new TH1D(
         "real_pt2_rz_simple", 
         "Simple Pointing R-Z Residual;[cm];Entries", 
@@ -151,6 +126,7 @@ void HistogramManager::init() {
     );
    
     //Delta R
+
     real_pt2_deltaR = new TH1D(
         "real_pt2_deltaR", 
         "Real pT2 #Delta R; #Delta R; Entries", 
@@ -176,6 +152,7 @@ void HistogramManager::init() {
     );
     
     //Delta angle
+
     real_pt2_deltaAngle = new TH1D(
         "real_pt2_deltaAngle", 
         "Real pT2 Directional #Delta#alpha; #Delta#alpha [rad]; Entries", 

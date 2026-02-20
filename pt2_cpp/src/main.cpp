@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
         reader.GetEntry(ievt);
 
         // Update progress bar every 5 events
-        if (ievt % 5 == 0 || ievt == entriesToProcess - 1)
+        if (ievt % 2 == 0 || ievt == entriesToProcess)
             printProgressBar(ievt, entriesToProcess);
 
         // Clear Variables from the last event

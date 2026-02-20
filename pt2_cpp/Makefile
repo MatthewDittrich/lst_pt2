@@ -1,8 +1,5 @@
-# -----------------------------
-# Compiler & flags
-# -----------------------------
 CXX      := g++
-CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
+CXXFLAGS := -std=c++20 -O2 -Wall -Wextra
 
 # ROOT flags
 ROOTCFLAGS := $(shell root-config --cflags)
@@ -60,4 +57,3 @@ clean:
 	rm -rf $(OBJ_DIR) $(BIN)
 
 .PHONY: all clean
-

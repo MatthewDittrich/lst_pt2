@@ -34,12 +34,6 @@ public:
     TH1D* real_unused_pt2_dist3D = nullptr;
     TH1D* fake_unused_pt2_dist3D = nullptr;
 
-/*    TH1D* real_pt2_rz_reg = nullptr;
-    TH1D* fake_pt2_rz_reg = nullptr;
-    TH1D* real_unused_pt2_rz_reg = nullptr;
-    TH1D* fake_unused_pt2_rz_reg = nullptr;
-*/
-    // 2. Simple Pointing Histograms
     TH1D* real_pt2_rz_simple = nullptr;
     TH1D* fake_pt2_rz_simple = nullptr;
     TH1D* real_unused_pt2_rz_simple = nullptr;
