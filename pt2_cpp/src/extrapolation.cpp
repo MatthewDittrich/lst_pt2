@@ -81,34 +81,39 @@ namespace extrapolation {
         if (circle_center.X() == 0 && circle_center.Y() == 0) return invalid_return;
 
         TGraph z_vs_angle_graph;
-        double last_angle = 0;
-        bool first_point = true;
+        double first_angle = 0, first_z = 0;
+        double last_angle = 0, last_z = 0;
+    
         for (size_t i = 0; i < pls_hits_xy.size(); ++i) {
             double angle = TMath::ATan2(pls_hits_xy[i].Y() - circle_center.Y(), pls_hits_xy[i].X() - circle_center.X());
-            if (!first_point) {
+            if (i == 0) {
+                first_angle = angle;
+                first_z = pls_hits_3d[i].Z();
+                last_angle = angle;
+            } else {
+                // Unwrap angle logic to ensure continuity
                 while (angle - last_angle > TMath::Pi()) angle -= 2 * TMath::Pi();
                 while (angle - last_angle < -TMath::Pi()) angle += 2 * TMath::Pi();
+                last_angle = angle;
+                last_z = pls_hits_3d[i].Z();
             }
-            z_vs_angle_graph.SetPoint(z_vs_angle_graph.GetN(), angle, pls_hits_3d[i].Z());
-            last_angle = angle;
-            first_point = false;
         }
 
-        if (z_vs_angle_graph.GetN() < 2) return invalid_return;
-        z_vs_angle_graph.Fit("pol1", "Q");
-        TF1* fit_func = z_vs_angle_graph.GetFunction("pol1");
-        if (!fit_func) return invalid_return;
+        double delta_phi = last_angle - first_angle;
+        if (std::abs(delta_phi) < 1e-9) return invalid_return;
 
-        double b = fit_func->GetParameter(0);
-        double a = fit_func->GetParameter(1); 
+        double a = (last_z - first_z) / delta_phi; // slope dz/dphi
+        double b = first_z - a * first_angle;      // intercept
 
+         // 4. Target Mini-Doublets
         int md_idx0 = data.ls_mdIdx0->at(ls_idx);
         int md_idx1 = data.ls_mdIdx1->at(ls_idx);
         if (md_idx0 < 0 || md_idx1 < 0) return invalid_return;
-
+    
         TVector3 md0_anchor(data.md_anchor_x->at(md_idx0), data.md_anchor_y->at(md_idx0), data.md_anchor_z->at(md_idx0));
         TVector3 md1_anchor(data.md_anchor_x->at(md_idx1), data.md_anchor_y->at(md_idx1), data.md_anchor_z->at(md_idx1));
 
+        // 5. Helical Projection Logic
         auto helixClosestPhiToPoint = [&](double xa, double ya, double za, double xc, double yc, double R, double a_param, double b_param, double phi_init) {
             double phi = phi_init;
             for (int iter = 0; iter < 12; ++iter) {
@@ -125,19 +130,20 @@ namespace extrapolation {
         };
 
         auto get_dist = [&](const TVector3& target) {
-            double phi0 = std::atan2(target.Y() - circle_center.Y(), target.X() - circle_center.X());
-            double phi_last = z_vs_angle_graph.GetX()[z_vs_angle_graph.GetN()-1];
-            while (phi0 - phi_last >  TMath::Pi()) phi0 -= 2*TMath::Pi();
-            while (phi0 - phi_last < -TMath::Pi()) phi0 += 2*TMath::Pi();
+        double phi0 = std::atan2(target.Y() - circle_center.Y(), target.X() - circle_center.X());
+        
+        // FIX: Use last_angle from the loop above instead of accessing the graph
+        while (phi0 - last_angle >  TMath::Pi()) phi0 -= 2*TMath::Pi();
+        while (phi0 - last_angle < -TMath::Pi()) phi0 += 2*TMath::Pi();
 
-            double phi_fine = helixClosestPhiToPoint(target.X(), target.Y(), target.Z(), circle_center.X(), circle_center.Y(), R_pred_cm, a, b, phi0);
-            TVector3 helix_pt(circle_center.X() + R_pred_cm * std::cos(phi_fine),
-                              circle_center.Y() + R_pred_cm * std::sin(phi_fine),
-                              a * phi_fine + b);
-            return (target - helix_pt).Mag();
-        };
+        double phi_fine = helixClosestPhiToPoint(target.X(), target.Y(), target.Z(), circle_center.X(), circle_center.Y(), R_pred_cm, a, b, phi0);
+        TVector3 helix_pt(circle_center.X() + R_pred_cm * std::cos(phi_fine),
+                          circle_center.Y() + R_pred_cm * std::sin(phi_fine),
+                          a * phi_fine + b);
+        return (target - helix_pt).Mag();
+    };
 
-        return {get_dist(md0_anchor), get_dist(md1_anchor)};
+    return {get_dist(md0_anchor), get_dist(md1_anchor)};
     }
 
     std::pair<double, double> extrapolatePlsInRZAndGetDeltaR(int pls_idx, int ls_idx, const rootReader& data) {
