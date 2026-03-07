@@ -53,98 +53,138 @@ namespace extrapolation {
         return {c1x, c1y};
     }
 
-    std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_idx, const rootReader& data) {
-        const float invalid_hit_val = -999.0f;
-        const std::pair<double, double> invalid_return = {-1.0, -1.0};
+std::vector<double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_idx, const rootReader& data) {
+    // Return format: {dXY_MD0, dZ_MD0, dXY_MD1, dZ_MD1}
+    const std::vector<double> invalid_return = {-1.0, -999.0, -1.0, -999.0};
+    const float invalid_hit_val = -900.0f;
 
-        std::vector<ROOT::Math::XYVector> pls_hits_xy;
-        std::vector<TVector3> pls_hits_3d;
-        auto add_hit = [&](float x, float y, float z) {
-            if (x > invalid_hit_val) {
-                pls_hits_xy.emplace_back(x, y);
-                pls_hits_3d.emplace_back(x, y, z);
-            }
-        };
-
-        add_hit(data.pls_hit0_x->at(pls_idx), data.pls_hit0_y->at(pls_idx), data.pls_hit0_z->at(pls_idx));
-        add_hit(data.pls_hit1_x->at(pls_idx), data.pls_hit1_y->at(pls_idx), data.pls_hit1_z->at(pls_idx));
-        add_hit(data.pls_hit2_x->at(pls_idx), data.pls_hit2_y->at(pls_idx), data.pls_hit2_z->at(pls_idx));
-        add_hit(data.pls_hit3_x->at(pls_idx), data.pls_hit3_y->at(pls_idx), data.pls_hit3_z->at(pls_idx));
-
-        if (pls_hits_xy.size() < 3) return invalid_return;
-
-        float reco_pt = data.pls_pt->at(pls_idx);
-        const double B_FIELD_TESLA = 3.8;
-        double R_pred_cm = (reco_pt / (0.3 * B_FIELD_TESLA)) * 100.0;
-
-        ROOT::Math::XYVector circle_center = fitCircleWithFixedRadius(pls_hits_xy, R_pred_cm);
-        if (circle_center.X() == 0 && circle_center.Y() == 0) return invalid_return;
-
-        TGraph z_vs_angle_graph;
-        double first_angle = 0, first_z = 0;
-        double last_angle = 0, last_z = 0;
-    
-        for (size_t i = 0; i < pls_hits_xy.size(); ++i) {
-            double angle = TMath::ATan2(pls_hits_xy[i].Y() - circle_center.Y(), pls_hits_xy[i].X() - circle_center.X());
-            if (i == 0) {
-                first_angle = angle;
-                first_z = pls_hits_3d[i].Z();
-                last_angle = angle;
-            } else {
-                // Unwrap angle logic to ensure continuity
-                while (angle - last_angle > TMath::Pi()) angle -= 2 * TMath::Pi();
-                while (angle - last_angle < -TMath::Pi()) angle += 2 * TMath::Pi();
-                last_angle = angle;
-                last_z = pls_hits_3d[i].Z();
-            }
+    // 1. Collect valid pLS hits to find the helical pitch (Z vs Phi)
+    std::vector<ROOT::Math::XYVector> hits_xy;
+    std::vector<double> hits_z;
+    auto add_hit = [&](float x, float y, float z) {
+        if (x > invalid_hit_val) {
+            hits_xy.emplace_back(x, y);
+            hits_z.push_back(z);
         }
+    };
 
-        double delta_phi = last_angle - first_angle;
-        if (std::abs(delta_phi) < 1e-9) return invalid_return;
+    add_hit(data.pls_hit0_x->at(pls_idx), data.pls_hit0_y->at(pls_idx), data.pls_hit0_z->at(pls_idx));
+    add_hit(data.pls_hit1_x->at(pls_idx), data.pls_hit1_y->at(pls_idx), data.pls_hit1_z->at(pls_idx));
+    add_hit(data.pls_hit2_x->at(pls_idx), data.pls_hit2_y->at(pls_idx), data.pls_hit2_z->at(pls_idx));
+    add_hit(data.pls_hit3_x->at(pls_idx), data.pls_hit3_y->at(pls_idx), data.pls_hit3_z->at(pls_idx));
 
-        double a = (last_z - first_z) / delta_phi; // slope dz/dphi
-        double b = first_z - a * first_angle;      // intercept
+    if (hits_xy.size() < 2) return invalid_return;
 
-         // 4. Target Mini-Doublets
-        int md_idx0 = data.ls_mdIdx0->at(ls_idx);
-        int md_idx1 = data.ls_mdIdx1->at(ls_idx);
-        if (md_idx0 < 0 || md_idx1 < 0) return invalid_return;
+    // 2. Use official Circle Center and calculate Radius from pT
+ //   double centerX = data.pLS_circleCenterX->at(pls_idx);
+//    double centerY = data.pLS_circleCenterY->at(pls_idx);
+//    ROOT::Math::XYVector circle_center(centerX, centerY);
+   
+    float reco_pt = data.pls_pt->at(pls_idx);
+    double R_pred_cm = (reco_pt / (0.3 * 3.8)) * 100.0;
     
-        TVector3 md0_anchor(data.md_anchor_x->at(md_idx0), data.md_anchor_y->at(md_idx0), data.md_anchor_z->at(md_idx0));
-        TVector3 md1_anchor(data.md_anchor_x->at(md_idx1), data.md_anchor_y->at(md_idx1), data.md_anchor_z->at(md_idx1));
+    ROOT::Math::XYVector circle_center = fitCircleWithFixedRadius(hits_xy, R_pred_cm);
+    if (circle_center.X() == 0 && circle_center.Y() == 0) return invalid_return;
 
-        // 5. Helical Projection Logic
-        auto helixClosestPhiToPoint = [&](double xa, double ya, double za, double xc, double yc, double R, double a_param, double b_param, double phi_init) {
-            double phi = phi_init;
-            for (int iter = 0; iter < 12; ++iter) {
-                double c = std::cos(phi), s = std::sin(phi);
-                double dx = xa - xc - R * c;
-                double dy = ya - yc - R * s;
-                double dz = a_param * phi + b_param - za;
-                double f = dx * (R * s) + dy * (-R * c) + a_param * dz;
-                double fp = R*R + R*(dx * c + dy * s) + a_param * a_param;
-                if (std::abs(fp) < 1e-12) break;
-                phi -= f / fp;
-            }
-            return phi;
-        };
+    // 3. Simple Linear Z-Pitch (z = a*phi + b)
+    double first_angle = 0, first_z = 0;
+    double last_angle = 0, last_z = 0;
 
-        auto get_dist = [&](const TVector3& target) {
-        double phi0 = std::atan2(target.Y() - circle_center.Y(), target.X() - circle_center.X());
+    for (size_t i = 0; i < hits_xy.size(); ++i) {
+        double angle = TMath::ATan2(hits_xy[i].Y() - circle_center.Y(), hits_xy[i].X() - circle_center.X());
+        if (i == 0) {
+            first_angle = angle;
+            first_z = hits_z[i];
+            last_angle = angle;
+        } else {
+            // Unwrap angle to ensure the helix doesn't "jump" 2pi
+            while (angle - last_angle > TMath::Pi()) angle -= 2 * TMath::Pi();
+            while (angle - last_angle < -TMath::Pi()) angle += 2 * TMath::Pi();
+            last_angle = angle;
+            last_z = hits_z[i];
+        }
+    }
+
+    double delta_phi_pLS = last_angle - first_angle;
+    if (std::abs(delta_phi_pLS) < 1e-9) return invalid_return;
+
+    double a = (last_z - first_z) / delta_phi_pLS; // dz/dphi
+    double b = first_z - a * first_angle;          // intercept
+
+    // 4. Target Mini-Doublets (LS)
+    int md0 = data.ls_mdIdx0->at(ls_idx);
+    int md1 = data.ls_mdIdx1->at(ls_idx);
+    if (md0 < 0 || md1 < 0) return invalid_return;
+
+    // Helper to project to helix and get separated XY and Z components
+    auto get_components = [&](double tx, double ty, double tz) -> std::pair<double, double> {
+        double phi0 = std::atan2(ty - circle_center.Y(), tx - circle_center.X());
         
-        // FIX: Use last_angle from the loop above instead of accessing the graph
+        // Match the "winding" of the helix to the target
         while (phi0 - last_angle >  TMath::Pi()) phi0 -= 2*TMath::Pi();
         while (phi0 - last_angle < -TMath::Pi()) phi0 += 2*TMath::Pi();
 
-        double phi_fine = helixClosestPhiToPoint(target.X(), target.Y(), target.Z(), circle_center.X(), circle_center.Y(), R_pred_cm, a, b, phi0);
-        TVector3 helix_pt(circle_center.X() + R_pred_cm * std::cos(phi_fine),
-                          circle_center.Y() + R_pred_cm * std::sin(phi_fine),
-                          a * phi_fine + b);
-        return (target - helix_pt).Mag();
-    };
+        // Newton solver to find the exact closest phi on the helix
+        double p_fine = phi0;
+        for (int iter = 0; iter < 5; ++iter) {
+            double c = std::cos(p_fine), s = std::sin(p_fine);
+            // Derivative of 3D distance squared
+            double f = (tx - circle_center.X() - R_pred_cm*c)*(R_pred_cm*s) + 
+                       (ty - circle_center.Y() - R_pred_cm*s)*(-R_pred_cm*c) + 
+                       a*(a*p_fine + b - tz);
+            double fp = R_pred_cm*R_pred_cm + a*a;
+            p_fine -= f / fp;
+        }
 
-    return {get_dist(md0_anchor), get_dist(md1_anchor)};
-    }
+
+        // Helix coordinates at the solved phi
+        double hX = circle_center.X() + R_pred_cm * std::cos(p_fine);
+        double hY = circle_center.Y() + R_pred_cm * std::sin(p_fine);
+        double hZ = a * p_fine + b;
+
+        // Calculate components separately
+        double dXY = std::sqrt(std::pow(tx - hX, 2) + std::pow(ty - hY, 2));
+        double dZ  = std::abs(tz - hZ); 
+
+        return {dXY, dZ};
+    };
+   /* auto get_components = [&](double tx, double ty, double tz) -> std::pair<double, double> {
+
+        // 1. Find the angle on the circle that points exactly at the target's XY position
+        double p_fine = std::atan2(ty - circle_center.Y(), tx - circle_center.X());
+
+        // 2. Match the "winding" of the helix to the target
+        while (p_fine - last_angle >  TMath::Pi()) p_fine -= 2*TMath::Pi();
+        while (p_fine - last_angle < -TMath::Pi()) p_fine += 2*TMath::Pi();
+
+        // DELETE THE NEWTON SOLVER!
+        // We evaluate Z exactly at the point of closest XY approach.
+
+        // 3. Helix coordinates at that specific angle
+        double hX = circle_center.X() + R_pred_cm * std::cos(p_fine);
+        double hY = circle_center.Y() + R_pred_cm * std::sin(p_fine);
+        double hZ = a * p_fine + b;
+
+        // 4. Calculate components separately
+        double dXY = std::sqrt(std::pow(tx - hX, 2) + std::pow(ty - hY, 2));
+        double dZ  = std::abs(tz - hZ);
+
+        return {dXY, dZ};
+    };*/
+
+    // Calculate for MD0
+    auto comp0 = get_components(data.md_anchor_x->at(md0), 
+                                data.md_anchor_y->at(md0), 
+                                data.md_anchor_z->at(md0));
+
+    // Calculate for MD1
+    auto comp1 = get_components(data.md_anchor_x->at(md1), 
+                                data.md_anchor_y->at(md1), 
+                                data.md_anchor_z->at(md1));
+
+    // Return the 4-component vector
+    return {comp0.first, comp0.second, comp1.first, comp1.second};
+}
 
     std::pair<double, double> extrapolatePlsInRZAndGetDeltaR(int pls_idx, int ls_idx, const rootReader& data) {
         const float invalid_val = -999.0;

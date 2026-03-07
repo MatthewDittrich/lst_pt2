@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <getopt.h>
 #include <cmath>
+#include <iomanip>
 
 #include "gator.h"
 #include "histograms.h"
@@ -21,12 +22,15 @@ int main(int argc, char** argv) {
     bool writeRoot = false;
     bool lowPT = false;
     int nEvents = -1;
+    double targetPercent = 90.0; 
+    double myCutZ0 = 10000;  
+    double myCutZ1 = 10000;
     std::string inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
     std::string outputDir = "output";
 
     // Command Line Arguments
     int opt;
-    while ((opt = getopt(argc, argv, "pi:o:r:k:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "pi:o:r:k:n:e:")) != -1) {
         switch (opt) {
             case 'p':
                 makePlots = true;
@@ -46,6 +50,9 @@ int main(int argc, char** argv) {
             case 'n':
                 nEvents = std::stoi(optarg);
                 break;
+            case 'e': 
+                targetPercent = std::stod(optarg); 
+                break; 
             default:
                 std::cerr << "Usage: " << argv[0] << "\n"
                     << "[-p] Make Plots\n"
@@ -53,7 +60,8 @@ int main(int argc, char** argv) {
                     << "[-r] Make Root File \n"
                     << "[-i] Input File Path \n"
                     << "[-o] Output Directory \n"
-                    << "[-n] Number of Events \n";
+                    << "[-n] Number of Events \n"
+                    << "[-e] Percentage of real events \n";
                 return 1;
         }    
     }
@@ -79,15 +87,15 @@ int main(int argc, char** argv) {
     hists.init();
 
     // Options that are not ready
-    if (lowPT || writeRoot) {
+    if (lowPT) {
         throw std::runtime_error(
-            "Error: options --lowPT and --writeRoot are not currently set up."
+            "Error: options --lowPT is not currently set up."
         );
     }
 
     // Get the pixelMap loaded
     SuperbinToDetIdMap superbinToDetIds;
-    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Standard_0p8GeV_Maps/pLS_map_ElCheapo.txt";
+    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p8GeV/pLS_map_ElCheapo.txt";
     try {
         loadSuperbinDetIdMap(pixelMapFile, superbinToDetIds);
     } catch (const std::exception& e) {
@@ -108,7 +116,7 @@ int main(int argc, char** argv) {
 
     Long64_t totalEntries = reader.GetEntries();
     Long64_t entriesToProcess = (nEvents > 0 && nEvents < totalEntries) ? nEvents : totalEntries;
-
+       
     print_creature();
 
     // Main Looper
@@ -169,11 +177,10 @@ int main(int argc, char** argv) {
 
             // New Physics Calculations
             float dR = std::sqrt(pt2.delta_eta * pt2.delta_eta + pt2.delta_phi * pt2.delta_phi);
-            std::pair<double, double> dists = extrapolation::extrapolatePlsHelicallyAndGetDistance(plsIdx, lsIdx, reader);
+            std::vector<double> heli = extrapolation::extrapolatePlsHelicallyAndGetDistance(plsIdx, lsIdx, reader);
             std::pair<double, double> rz_simple = extrapolation::extrapolateSimplePointingInRZ(plsIdx, lsIdx, reader);
             double dAngle = extrapolation::calculateDeltaAngle(plsIdx, lsIdx, reader);
-
-            // Fill some histos
+            if(heli[1] <= myCutZ0  && heli[3] <= myCutZ1 ){
             if (pt2.is_real) {
                 hists.real_pt2_deltaPT->Fill(pt2.delta_pt);
                 hists.real_pt2_deltaETA->Fill(pt2.delta_eta);
@@ -182,14 +189,21 @@ int main(int argc, char** argv) {
 
                 if (dAngle > -1.0) hists.real_pt2_deltaAngle->Fill(dAngle);
 
-                if (rz_simple.first > -900) {
-                    hists.real_pt2_rz_simple->Fill(rz_simple.first);
-                    hists.real_pt2_rz_simple->Fill(rz_simple.second);
+                // Fill Separated 3D components for Real
+                if (heli[0] >= 0) {
+                    hists.real_pt2_MD0_dXY->Fill(heli[0]); 
+                    hists.real_pt2_MD0_dZ->Fill(heli[1]);
+                    hists.real_pt2_MD1_dXY->Fill(heli[2]); 
+                    hists.real_pt2_MD1_dZ->Fill(heli[3]);
+                    //Fill 2d histograms
+                    hists.h2_real_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
+                    hists.h2_real_MD1_dXY_vs_dZ->Fill(std::abs(heli[3]), heli[2]);
+
                 }
 
-                if (dists.first >= 0) {
-                    hists.real_pt2_dist3D->Fill(dists.first);
-                    hists.real_pt2_dist3D->Fill(dists.second);
+                if (rz_simple.first > -900) {
+                    hists.real_pt2_MD0_rz_simple->Fill(rz_simple.first);
+                    hists.real_pt2_MD1_rz_simple->Fill(rz_simple.second);
                 }
 
                 if (!pt2.is_used) {
@@ -197,17 +211,23 @@ int main(int argc, char** argv) {
                     hists.real_unused_pt2_deltaETA->Fill(pt2.delta_eta);
                     hists.real_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
                     hists.real_unused_pt2_deltaR->Fill(dR);
-
                     if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle->Fill(dAngle);
 
-                    if (rz_simple.first > -900) {
-                        hists.real_unused_pt2_rz_simple->Fill(rz_simple.first);
-                        hists.real_unused_pt2_rz_simple->Fill(rz_simple.second);
+                    if (heli[0] >= 0) {
+                        hists.real_unused_pt2_MD0_dXY->Fill(heli[0]); 
+                        hists.real_unused_pt2_MD0_dZ->Fill(heli[1]);
+                        hists.real_unused_pt2_MD1_dXY->Fill(heli[2]); 
+                        hists.real_unused_pt2_MD1_dZ->Fill(heli[3]);
+
+                        //Fill 2d histograms
+                        hists.h2_real_unused_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
+                        hists.h2_real_unused_MD1_dXY_vs_dZ->Fill(std::abs(heli[3]), heli[2]);
+
                     }
 
-                    if (dists.first >= 0) {
-                        hists.real_unused_pt2_dist3D->Fill(dists.first);
-                        hists.real_unused_pt2_dist3D->Fill(dists.second);
+                    if (rz_simple.first > -900) {
+                        hists.real_unused_pt2_MD0_rz_simple->Fill(rz_simple.first);
+                        hists.real_unused_pt2_MD1_rz_simple->Fill(rz_simple.second);
                     }
                 }
             } 
@@ -216,17 +236,24 @@ int main(int argc, char** argv) {
                 hists.fake_pt2_deltaETA->Fill(pt2.delta_eta);
                 hists.fake_pt2_deltaPHI->Fill(pt2.delta_phi);
                 hists.fake_pt2_deltaR->Fill(dR);
-
                 if (dAngle > -1.0) hists.fake_pt2_deltaAngle->Fill(dAngle);
 
-                if (rz_simple.first > -900) {
-                    hists.fake_pt2_rz_simple->Fill(rz_simple.first);
-                    hists.fake_pt2_rz_simple->Fill(rz_simple.second);
+                // Fill Separated 3D components for Fake
+                if (heli[0] >= 0) {
+                    hists.fake_pt2_MD0_dXY->Fill(heli[0]); 
+                    hists.fake_pt2_MD0_dZ->Fill(heli[1]);
+                    hists.fake_pt2_MD1_dXY->Fill(heli[2]); 
+                    hists.fake_pt2_MD1_dZ->Fill(heli[3]);
+
+                    //Fill 2d histograms
+                    hists.h2_fake_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
+                    hists.h2_fake_MD1_dXY_vs_dZ->Fill(std::abs(heli[3]), heli[2]);
+
                 }
 
-                if (dists.first >= 0) {
-                    hists.fake_pt2_dist3D->Fill(dists.first);
-                    hists.fake_pt2_dist3D->Fill(dists.second);
+                if (rz_simple.first > -900) {
+                    hists.fake_pt2_MD0_rz_simple->Fill(rz_simple.first);
+                    hists.fake_pt2_MD1_rz_simple->Fill(rz_simple.second);
                 }
 
                 if (!pt2.is_used) {
@@ -234,26 +261,74 @@ int main(int argc, char** argv) {
                     hists.fake_unused_pt2_deltaETA->Fill(pt2.delta_eta);
                     hists.fake_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
                     hists.fake_unused_pt2_deltaR->Fill(dR);
-
                     if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle->Fill(dAngle);
 
-                    if (rz_simple.first > -900) {
-                        hists.fake_unused_pt2_rz_simple->Fill(rz_simple.first);
-                        hists.fake_unused_pt2_rz_simple->Fill(rz_simple.second);
+                    if (heli[0] >= 0) {
+                        hists.fake_unused_pt2_MD0_dXY->Fill(heli[0]); 
+                        hists.fake_unused_pt2_MD0_dZ->Fill(heli[1]);
+                        hists.fake_unused_pt2_MD1_dXY->Fill(heli[2]); 
+                        hists.fake_unused_pt2_MD1_dZ->Fill(heli[3]);
+                        
+                         //Fill 2d histograms
+                        hists.h2_fake_unused_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
+                        hists.h2_fake_unused_MD1_dXY_vs_dZ->Fill(std::abs(heli[3]), heli[2]);
+      
                     }
 
-                    if (dists.first >= 0) {
-                        hists.fake_unused_pt2_dist3D->Fill(dists.first);
-                        hists.fake_unused_pt2_dist3D->Fill(dists.second);
+                    if (rz_simple.first > -900) {
+                        hists.fake_unused_pt2_MD0_rz_simple->Fill(rz_simple.first);
+                        hists.fake_unused_pt2_MD1_rz_simple->Fill(rz_simple.second);
                     }
                 }
-            }
+            }      
         }
+    } 
+    }
+
+
+    // --- AUTOMATED CUT CALCULATION ---
+    double q[1];
+    double p[1] = { targetPercent / 100.0 }; // e.g., 0.90 or 0.99
+    double idealCut0 = 0, idealCut1 = 0;
+
+    if (hists.real_pt2_MD0_dZ->GetEntries() > 0) {
+        hists.real_pt2_MD0_dZ->GetQuantiles(1, q, p);
+        idealCut0 = q[0];
+
+        hists.real_pt2_MD1_dZ->GetQuantiles(1, q, p);
+        idealCut1 = q[0];
+
+        std::cout << "\n=================================================" << std::endl;
+        std::cout << "Target Efficiency set to: " << targetPercent << "%" << std::endl;
+        std::cout << "IDEAL CUTS TO REACH THIS EFFICIENCY:" << std::endl;
+        std::cout << std::fixed << std::setprecision(4);
+        std::cout << "MD0 dZ Cut: < " << idealCut0 << " cm" << std::endl;
+        std::cout << "MD1 dZ Cut: < " << idealCut1 << " cm" << std::endl;
+        std::cout << "=================================================\n" << std::endl;
     }
 
     auto recipes = getPt2Recipes(hists);
     Plotting plotter; 
     plotter.plotRecipes(recipes, outputDir);
+
+
+    if (writeRoot) {
+    std::string outFileName = outputDir + "/cut_study_hists.root";
+    TFile* outFile = new TFile(outFileName.c_str(), "RECREATE");
+
+    hists.h2_real_MD0_dXY_vs_dZ->Write();
+    hists.h2_fake_MD0_dXY_vs_dZ->Write();
+    hists.h2_real_MD1_dXY_vs_dZ->Write();
+    hists.h2_fake_MD1_dXY_vs_dZ->Write();
+
+    hists.h2_real_unused_MD0_dXY_vs_dZ->Write();
+    hists.h2_fake_unused_MD0_dXY_vs_dZ->Write();
+    hists.h2_real_unused_MD1_dXY_vs_dZ->Write();
+    hists.h2_fake_unused_MD1_dXY_vs_dZ->Write();
+
+    outFile->Close();
+    std::cout << "Saved 2D cut study histograms to: " << outFileName << std::endl;
+    }
 
     return 0;
 }
