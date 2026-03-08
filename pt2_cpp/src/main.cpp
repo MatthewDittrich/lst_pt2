@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <filesystem>
 #include <getopt.h>
+#include <cmath>
 
 #include "gator.h"
 #include "histograms.h"
@@ -11,6 +12,7 @@
 #include "rootReader.h"
 #include "tools.h"
 #include "pt2.h"
+#include "extrapolation.h"
 
 int main(int argc, char** argv) {
 
@@ -18,12 +20,13 @@ int main(int argc, char** argv) {
     bool makePlots = false;
     bool writeRoot = false;
     bool lowPT = false;
+    int nEvents = -1;
     std::string inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
     std::string outputDir = "output";
 
     // Command Line Arguments
     int opt;
-    while ((opt = getopt(argc, argv, "pi:o:r:k")) != -1) {
+    while ((opt = getopt(argc, argv, "pi:o:r:k:n:")) != -1) {
         switch (opt) {
             case 'p':
                 makePlots = true;
@@ -40,13 +43,17 @@ int main(int argc, char** argv) {
             case 'o':
                 outputDir = optarg;
                 break;
+            case 'n':
+                nEvents = std::stoi(optarg);
+                break;
             default:
                 std::cerr << "Usage: " << argv[0] << "\n"
                     << "[-p] Make Plots\n"
                     << "[-k] Run Low pT\n"
                     << "[-r] Make Root File \n"
                     << "[-i] Input File Path \n"
-                    << "[-o] Output Directory \n";
+                    << "[-o] Output Directory \n"
+                    << "[-n] Number of Events \n";
                 return 1;
         }    
     }
@@ -61,6 +68,7 @@ int main(int argc, char** argv) {
     std::cout << "Make plots:        " << (makePlots ? "yes" : "no") << "\n";
     std::cout << "Use Low pT:        " << (lowPT ? "yes" : "no") << "\n";
     std::cout << "Write ROOT file:   " << (writeRoot ? "yes" : "no") << "\n";
+    if (nEvents > 0) std::cout << "Number of events:  " << nEvents << "\n";
     std::cout << "=====================\n\n";
 
     // Create the output directory
@@ -98,18 +106,19 @@ int main(int argc, char** argv) {
         return 1;
     } 
 
-    Long64_t totalEvents = reader.GetEntries();
+    Long64_t totalEntries = reader.GetEntries();
+    Long64_t entriesToProcess = (nEvents > 0 && nEvents < totalEntries) ? nEvents : totalEntries;
 
     print_creature();
 
     // Main Looper
-    for (Long64_t ievt = 0; ievt < reader.GetEntries(); ++ievt) {
+    for (Long64_t ievt = 0; ievt < entriesToProcess; ++ievt) {
 
         reader.GetEntry(ievt);
 
         // Update progress bar every 5 events
-        if (ievt % 5 == 0 || ievt == totalEvents - 1)
-            printProgressBar(ievt, totalEvents);
+        if (ievt % 2 == 0 || ievt == entriesToProcess)
+            printProgressBar(ievt, entriesToProcess);
 
         // Clear Variables from the last event
         reader.pls_origin_z.clear();
@@ -158,25 +167,85 @@ int main(int argc, char** argv) {
             pt2.is_real = pt2TruthFinder(reader, plsIdx, lsIdx);
             pt2.is_used = pt2UsedCalculator(reader, plsIdx, lsIdx);
 
+            // New Physics Calculations
+            float dR = std::sqrt(pt2.delta_eta * pt2.delta_eta + pt2.delta_phi * pt2.delta_phi);
+            std::pair<double, double> dists = extrapolation::extrapolatePlsHelicallyAndGetDistance(plsIdx, lsIdx, reader);
+            std::pair<double, double> rz_simple = extrapolation::extrapolateSimplePointingInRZ(plsIdx, lsIdx, reader);
+            double dAngle = extrapolation::calculateDeltaAngle(plsIdx, lsIdx, reader);
+
             // Fill some histos
             if (pt2.is_real) {
                 hists.real_pt2_deltaPT->Fill(pt2.delta_pt);
                 hists.real_pt2_deltaETA->Fill(pt2.delta_eta);
                 hists.real_pt2_deltaPHI->Fill(pt2.delta_phi);
+                hists.real_pt2_deltaR->Fill(dR);
+
+                if (dAngle > -1.0) hists.real_pt2_deltaAngle->Fill(dAngle);
+
+                if (rz_simple.first > -900) {
+                    hists.real_pt2_rz_simple->Fill(rz_simple.first);
+                    hists.real_pt2_rz_simple->Fill(rz_simple.second);
+                }
+
+                if (dists.first >= 0) {
+                    hists.real_pt2_dist3D->Fill(dists.first);
+                    hists.real_pt2_dist3D->Fill(dists.second);
+                }
+
                 if (!pt2.is_used) {
                     hists.real_unused_pt2_deltaPT->Fill(pt2.delta_pt);
                     hists.real_unused_pt2_deltaETA->Fill(pt2.delta_eta);
                     hists.real_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
+                    hists.real_unused_pt2_deltaR->Fill(dR);
+
+                    if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle->Fill(dAngle);
+
+                    if (rz_simple.first > -900) {
+                        hists.real_unused_pt2_rz_simple->Fill(rz_simple.first);
+                        hists.real_unused_pt2_rz_simple->Fill(rz_simple.second);
+                    }
+
+                    if (dists.first >= 0) {
+                        hists.real_unused_pt2_dist3D->Fill(dists.first);
+                        hists.real_unused_pt2_dist3D->Fill(dists.second);
+                    }
                 }
             } 
             else {
                 hists.fake_pt2_deltaPT->Fill(pt2.delta_pt);
                 hists.fake_pt2_deltaETA->Fill(pt2.delta_eta);
                 hists.fake_pt2_deltaPHI->Fill(pt2.delta_phi);
+                hists.fake_pt2_deltaR->Fill(dR);
+
+                if (dAngle > -1.0) hists.fake_pt2_deltaAngle->Fill(dAngle);
+
+                if (rz_simple.first > -900) {
+                    hists.fake_pt2_rz_simple->Fill(rz_simple.first);
+                    hists.fake_pt2_rz_simple->Fill(rz_simple.second);
+                }
+
+                if (dists.first >= 0) {
+                    hists.fake_pt2_dist3D->Fill(dists.first);
+                    hists.fake_pt2_dist3D->Fill(dists.second);
+                }
+
                 if (!pt2.is_used) {
                     hists.fake_unused_pt2_deltaPT->Fill(pt2.delta_pt);
                     hists.fake_unused_pt2_deltaETA->Fill(pt2.delta_eta);
                     hists.fake_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
+                    hists.fake_unused_pt2_deltaR->Fill(dR);
+
+                    if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle->Fill(dAngle);
+
+                    if (rz_simple.first > -900) {
+                        hists.fake_unused_pt2_rz_simple->Fill(rz_simple.first);
+                        hists.fake_unused_pt2_rz_simple->Fill(rz_simple.second);
+                    }
+
+                    if (dists.first >= 0) {
+                        hists.fake_unused_pt2_dist3D->Fill(dists.first);
+                        hists.fake_unused_pt2_dist3D->Fill(dists.second);
+                    }
                 }
             }
         }
@@ -188,4 +257,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
- 
