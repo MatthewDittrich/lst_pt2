@@ -44,6 +44,7 @@ public:
     std::vector<float> *pls_pt = nullptr;
     std::vector<float> *pls_eta = nullptr;
     std::vector<float> *pls_phi = nullptr;
+    std::vector<int>   *pls_charge = nullptr;
     std::vector<int>   *pls_nhit = nullptr;
     std::vector<int>   *pls_isFake = nullptr;
     std::vector<int>   *pls_simIdx = nullptr; 

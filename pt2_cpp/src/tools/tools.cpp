@@ -16,8 +16,8 @@ constexpr float superbin_etaMin = -2.6f;
 constexpr float superbin_etaMax =  2.6f;
 constexpr float superbin_zMin   = -30.0f;
 constexpr float superbin_zMax   =  30.0f;
-constexpr float superbin_ptBins[2] = {0.8f, 2.0f};
-
+constexpr float superbin_ptBins_norm[2] = {0.8f, 2.0f};
+constexpr float superbin_ptBins_low[2] = {0.6f, 2.0f};
 
 
 float deltaPhi(float phi1, float phi2) {
@@ -60,8 +60,8 @@ std::vector<int> getDetIdsForLS(const rootReader& reader, size_t k) {
     return detIds;
 }
 
-
-void loadSuperbinDetIdMap(const std::string& filename,SuperbinToDetIdMap& superbinToDetIds) {
+static void loadSingleSuperbinDetIdMap(const std::string& filename, SuperbinToDetIdMap& superbinToDetIds)
+{
     superbinToDetIds.clear();
     std::ifstream infile(filename);
     if (!infile.is_open()) {
@@ -77,9 +77,8 @@ void loadSuperbinDetIdMap(const std::string& filename,SuperbinToDetIdMap& superb
         if (!(ss >> superbin >> nDet)) {
             throw std::runtime_error("Failed to read pixelMap at line: " + line);
         }
-        if (nDet == 0) {
+        if (nDet == 0)
             continue;
-        }
         std::vector<int> detIds;
         detIds.reserve(nDet);
         for (int i = 0; i < nDet; ++i) {
@@ -93,14 +92,25 @@ void loadSuperbinDetIdMap(const std::string& filename,SuperbinToDetIdMap& superb
     }
 }
 
+void loadSuperbinDetIdMap(const std::string& dir, SuperbinToDetIdMap& pos, SuperbinToDetIdMap& neg, SuperbinToDetIdMap& non)
+{
+    std::string posFile = dir + "pLS_map_pos_ElCheapo.txt";
+    std::string negFile = dir + "pLS_map_neg_ElCheapo.txt";
+    std::string nonFile = dir + "pLS_map_ElCheapo.txt";
 
-int CalculateSuperbin(const rootReader& reader, size_t j) {
+    loadSingleSuperbinDetIdMap(posFile, pos);
+    loadSingleSuperbinDetIdMap(negFile, neg);
+    loadSingleSuperbinDetIdMap(nonFile, non);
+}
+
+int CalculateSuperbin(const rootReader& reader, size_t j, bool lowPT) {
     float pt = reader.pls_pt->at(j);
     float phi = reader.pls_phi->at(j);
     float eta = reader.pls_eta->at(j);
     float z = reader.pls_origin_z.at(j);
     // pT bin
-    int ipt = (pt < superbin_ptBins[1]) ? 0 : 1;
+    const auto& ptBins = (lowPT ? superbin_ptBins_low : superbin_ptBins_norm);
+    int ipt = (pt < ptBins[1]) ? 0 : 1;
     // eta bin 
     int ieta;
     if (eta < superbin_etaMin) {
@@ -172,10 +182,34 @@ float CalculatePlsZ(const rootReader& reader, size_t j) {
 }
 
 
-void buildPt2sForPLS(size_t pls_idx, const rootReader& reader, const SuperbinToDetIdMap& superbinToDetIds, const DetIdToLSMap& detIdToLS, pT2Collection& pt2s){
+void buildPt2sForPLS(size_t pls_idx, 
+                    const rootReader& reader, 
+                    const SuperbinToDetIdMap& superbinToDetIds_POS, 
+                    const SuperbinToDetIdMap& superbinToDetIds_NEG, 
+                    const SuperbinToDetIdMap& superbinToDetIds_NON, 
+                    const DetIdToLSMap& detIdToLS, 
+                    pT2Collection& pt2s)
+{
     int superbin = reader.pls_superbin[pls_idx];
-    auto itDetIds = superbinToDetIds.find(superbin);
-    if (itDetIds == superbinToDetIds.end()) return;
+    // Determine which SuperbinToDetIdMap to use
+    const SuperbinToDetIdMap* selectedMap = nullptr;
+    float pt = reader.pls_pt->at(pls_idx);
+    int charge = reader.pls_charge->at(pls_idx);
+    if (pt >= 2.0f) {
+        selectedMap = &superbinToDetIds_NON;
+    } 
+    else if (charge > 0) {
+        selectedMap = &superbinToDetIds_POS;
+    } 
+    else if (charge < 0) {
+        selectedMap = &superbinToDetIds_NEG;
+    } 
+    else {
+        throw std::runtime_error("pLS has charge = 0");
+    }
+    // Lookup detIds in the selected map
+    auto itDetIds = selectedMap->find(superbin);
+    if (itDetIds == selectedMap->end()) return;
     const std::vector<int>& detIds = itDetIds->second;
     for (int detId : detIds) {
         auto itLS = detIdToLS.find(detId);
@@ -187,7 +221,6 @@ void buildPt2sForPLS(size_t pls_idx, const rootReader& reader, const SuperbinToD
         }
     }
 }
-
 
 
 bool pt2TruthFinder(const rootReader& reader, size_t plsIdx, size_t lsIdx)

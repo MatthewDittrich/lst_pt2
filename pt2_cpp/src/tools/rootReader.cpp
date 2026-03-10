@@ -27,8 +27,8 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("tc_pt3Idx", &tc_pt3Idx);
     inputTree->SetBranchAddress("tc_t5Idx", &tc_t5Idx);
     // PT5 Branches
-    inputTree->SetBranchAddress("pt5_t5Idx", &pt5_t5Idx);
-    inputTree->SetBranchAddress("pt5_plsIdx", &pt5_plsIdx);
+    inputTree->SetBranchAddress("pT5_t5Idx", &pt5_t5Idx);
+    inputTree->SetBranchAddress("pT5_plsIdx", &pt5_plsIdx);
     // T5 Branches
     inputTree->SetBranchAddress("t5_t3Idx0", &t5_t3Idx0);
     inputTree->SetBranchAddress("t5_t3Idx1", &t5_t3Idx1);
@@ -36,28 +36,29 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("t3_lsIdx0", &t3_lsIdx0);
     inputTree->SetBranchAddress("t3_lsIdx1", &t3_lsIdx1);
     // PT3 Branches
-    inputTree->SetBranchAddress("pt3_t3Idx", &pt3_t3Idx);
-    inputTree->SetBranchAddress("pt3_plsIdx", &pt3_plsIdx);
+    inputTree->SetBranchAddress("pT3_t3Idx", &pt3_t3Idx);
+    inputTree->SetBranchAddress("pT3_plsIdx", &pt3_plsIdx);
     // PLS Branches
-    inputTree->SetBranchAddress("pls_pt", &pls_pt);
-    inputTree->SetBranchAddress("pls_eta", &pls_eta);
-    inputTree->SetBranchAddress("pls_phi", &pls_phi);
-    inputTree->SetBranchAddress("pls_nhit", &pls_nhit);
-    inputTree->SetBranchAddress("pls_simIdxAllFrac", &pls_simIdxAllFrac);
-    inputTree->SetBranchAddress("pls_isFake", &pls_isFake);
-    inputTree->SetBranchAddress("pls_simIdx", &pls_simIdx);
-    inputTree->SetBranchAddress("pls_hit0_x", &pls_hit0_x);
-    inputTree->SetBranchAddress("pls_hit0_y", &pls_hit0_y);
-    inputTree->SetBranchAddress("pls_hit0_z", &pls_hit0_z);
-    inputTree->SetBranchAddress("pls_hit1_x", &pls_hit1_x);
-    inputTree->SetBranchAddress("pls_hit1_y", &pls_hit1_y);
-    inputTree->SetBranchAddress("pls_hit1_z", &pls_hit1_z);
-    inputTree->SetBranchAddress("pls_hit2_x", &pls_hit2_x);
-    inputTree->SetBranchAddress("pls_hit2_y", &pls_hit2_y);
-    inputTree->SetBranchAddress("pls_hit2_z", &pls_hit2_z);
-    inputTree->SetBranchAddress("pls_hit3_x", &pls_hit3_x);
-    inputTree->SetBranchAddress("pls_hit3_y", &pls_hit3_y);
-    inputTree->SetBranchAddress("pls_hit3_z", &pls_hit3_z);
+    inputTree->SetBranchAddress("pLS_pt", &pls_pt);
+    inputTree->SetBranchAddress("pLS_eta", &pls_eta);
+    inputTree->SetBranchAddress("pLS_phi", &pls_phi);
+    inputTree->SetBranchAddress("pLS_charge", &pls_charge);
+    inputTree->SetBranchAddress("pLS_nhit", &pls_nhit);
+    inputTree->SetBranchAddress("pLS_simIdxAllFrac", &pls_simIdxAllFrac);
+    inputTree->SetBranchAddress("pLS_isFake", &pls_isFake);
+    inputTree->SetBranchAddress("pLS_simIdx", &pls_simIdx);
+    inputTree->SetBranchAddress("pLS_hit0_x", &pls_hit0_x);
+    inputTree->SetBranchAddress("pLS_hit0_y", &pls_hit0_y);
+    inputTree->SetBranchAddress("pLS_hit0_z", &pls_hit0_z);
+    inputTree->SetBranchAddress("pLS_hit1_x", &pls_hit1_x);
+    inputTree->SetBranchAddress("pLS_hit1_y", &pls_hit1_y);
+    inputTree->SetBranchAddress("pLS_hit1_z", &pls_hit1_z);
+    inputTree->SetBranchAddress("pLS_hit2_x", &pls_hit2_x);
+    inputTree->SetBranchAddress("pLS_hit2_y", &pls_hit2_y);
+    inputTree->SetBranchAddress("pLS_hit2_z", &pls_hit2_z);
+    inputTree->SetBranchAddress("pLS_hit3_x", &pls_hit3_x);
+    inputTree->SetBranchAddress("pLS_hit3_y", &pls_hit3_y);
+    inputTree->SetBranchAddress("pLS_hit3_z", &pls_hit3_z);
     // Mini Doublet Branches
     inputTree->SetBranchAddress("md_anchor_x", &md_anchor_x);
     inputTree->SetBranchAddress("md_anchor_y", &md_anchor_y);

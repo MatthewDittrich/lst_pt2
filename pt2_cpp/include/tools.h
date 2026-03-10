@@ -16,7 +16,7 @@ float deltaEta(float eta1, float eta2);
 float deltaPt(float pt1, float pt2);
 
 float CalculatePlsZ(const rootReader& reader, size_t j);
-int CalculateSuperbin(const rootReader& reader, size_t j);
+int CalculateSuperbin(const rootReader& reader, size_t j, bool lowPT);
 
 std::vector<int> getDetIdsForLS(const rootReader& reader, size_t k);
 
@@ -27,10 +27,12 @@ struct UsedMask {
 
 UsedMask buildUsedMask(const rootReader& reader);
 
-// superbin -> detID map
+// superbin -> detID maps (POS / NEG / NON)
 void loadSuperbinDetIdMap(
-    const std::string& filename,
-    SuperbinToDetIdMap& superbinToDetIds
+    const std::string& dir,
+    SuperbinToDetIdMap& pos,
+    SuperbinToDetIdMap& neg,
+    SuperbinToDetIdMap& non
 );
 
 bool pt2TruthFinder(const rootReader& reader, size_t plsIdx, size_t lsIdx);
@@ -39,9 +41,11 @@ bool pt2UsedCalculator(const rootReader& reader, size_t plsIdx, size_t lsIdx);
 
 // pt2 builder
 void buildPt2sForPLS(size_t pls_idx,
-                      const rootReader& reader,
-                      const SuperbinToDetIdMap& superbinToDetIds,
-                      const DetIdToLSMap& detIdToLS,
-                      pT2Collection& pt2s);
+                     const rootReader& reader,
+                     const SuperbinToDetIdMap& superbinToDetIds_POS,
+                     const SuperbinToDetIdMap& superbinToDetIds_NEG,
+                     const SuperbinToDetIdMap& superbinToDetIds_NON,
+                     const DetIdToLSMap& detIdToLS,
+                     pT2Collection& pt2s);
 
 #endif
