@@ -21,12 +21,12 @@ int main(int argc, char** argv) {
     bool writeRoot = false;
     bool lowPT = false;
     int nEvents = -1;
-    std::string inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
-    std::string outputDir = "output";
+    std::string inputFile; 
+    std::string outputDir;
 
     // Command Line Arguments
     int opt;
-    while ((opt = getopt(argc, argv, "pi:o:r:k:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "prki:o:n:")) != -1) {
         switch (opt) {
             case 'p':
                 makePlots = true;
@@ -58,6 +58,25 @@ int main(int argc, char** argv) {
         }    
     }
 
+    // Code should do something
+    if ((!makePlots) && (!writeRoot)){
+        std::cerr << "Error: the code should have some sort of output!" << std::endl;
+        return 1;
+    }
+    // Set input and output file paths
+    if (outputDir.empty()){
+        outputDir = "output";
+    }
+    if (inputFile.empty()){ 
+        if (lowPT){
+            inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple_LowPT.root";
+        }
+        else {
+            inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
+        }
+    } 
+
+
     // Print Gator
     print_gator();
 
@@ -79,18 +98,32 @@ int main(int argc, char** argv) {
     hists.init();
 
     // Options that are not ready
-    if (lowPT || writeRoot) {
+    if (writeRoot) {
         throw std::runtime_error(
-            "Error: options --lowPT and --writeRoot are not currently set up."
+            "Error: options --writeRoot is not currently set up."
         );
     }
 
-    // Get the pixelMap loaded
-    SuperbinToDetIdMap superbinToDetIds;
-    std::string pixelMapFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Standard_0p8GeV_Maps/pLS_map_ElCheapo.txt";
+    // Get the Correct Pixel Map Directory
+    std::string pixelMapFileDir;
+    if (lowPT){
+        pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p6GeV/";
+    }
+    else{
+        pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p8GeV/";
+    }
+
+    // Load superbin --> detID
+    SuperbinToDetIdMap superbinToDetIds_POS;
+    SuperbinToDetIdMap superbinToDetIds_NEG;
+    SuperbinToDetIdMap superbinToDetIds_NON;
     try {
-        loadSuperbinDetIdMap(pixelMapFile, superbinToDetIds);
-    } catch (const std::exception& e) {
+        loadSuperbinDetIdMap(pixelMapFileDir, 
+                            superbinToDetIds_POS, 
+                            superbinToDetIds_NEG,
+                            superbinToDetIds_NON);
+    }
+    catch (const std::exception& e) {
         std::cerr << "Error loading superbin map: " << e.what() << std::endl;
         return 1;
     }
@@ -116,7 +149,7 @@ int main(int argc, char** argv) {
 
         reader.GetEntry(ievt);
 
-        // Update progress bar every 5 events
+        // Update progress bar every N events
         if (ievt % 2 == 0 || ievt == entriesToProcess)
             printProgressBar(ievt, entriesToProcess);
 
@@ -152,8 +185,8 @@ int main(int argc, char** argv) {
         // pLS Loop
         for (size_t j = 0; j < nPLS; ++j) {
             reader.pls_origin_z.push_back(CalculatePlsZ(reader, j));
-            reader.pls_superbin.push_back(CalculateSuperbin(reader, j));
-            buildPt2sForPLS(j, reader, superbinToDetIds, detidToLS, pt2s);
+            reader.pls_superbin.push_back(CalculateSuperbin(reader, j, lowPT));
+            buildPt2sForPLS(j, reader, superbinToDetIds_POS, superbinToDetIds_NEG, superbinToDetIds_NON, detidToLS, pt2s);
         }
 
         // pT2 Loop
