@@ -251,7 +251,103 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .hists = { hists.real_unused_pt2_deltaAngle, hists.fake_unused_pt2_deltaAngle },
             .legend = {"Real", "Fake"},
             .printYields = true
+        },
+        // --- NEW: LST dPhi ---
+        {
+            .title = "All pT2: LST #Delta#phi", 
+            .xAxis = "LST #Delta#phi [rad]", 
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTdPhi", 
+            .hists = {hists.real_pt2_LSTdPhi, hists.fake_pt2_LSTdPhi},
+            .legend = {"Real", "Fake"}, 
+            .printYields = true
+        },
+        {
+            .title = "Unused pT2: LST #Delta#phi",
+            .xAxis = "LST #Delta#phi [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTdPhi",
+            .hists = { hists.real_unused_pt2_LSTdPhi, hists.fake_unused_pt2_LSTdPhi },
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        }, 
+        // --- LST dBeta ---
+        {
+            .title = "All pT2: LST #Delta#beta",
+            .xAxis = "LST #Delta#beta [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTdBeta",
+            .hists = {hists.real_pt2_LSTdBeta, hists.fake_pt2_LSTdBeta},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        },
+        {
+            .title = "Unused pT2: LST #Delta#beta",
+            .xAxis = "LST #Delta#beta [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTdBeta",
+            .hists = { hists.real_unused_pt2_LSTdBeta, hists.fake_unused_pt2_LSTdBeta },
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        },
+        // --- LST betaOut ---
+        {
+            .title = "All pT2: LST #beta_{Out}",
+            .xAxis = "LST #beta_{Out} [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTbetaOut",
+            .hists = {hists.real_pt2_LSTbetaOut, hists.fake_pt2_LSTbetaOut},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        },
+        {
+            .title = "Unused pT2: LST #beta_{Out}",
+            .xAxis = "LST #beta_{Out} [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTbetaOut",
+            .hists = { hists.real_unused_pt2_LSTbetaOut, hists.fake_unused_pt2_LSTbetaOut },
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        },
+        // --- LST Z-Residuals ---
+        // --- NEW: LST Z-Residuals ---
+        {
+            .title = "All pT2: LST Geometric Z-Residual (Beamspot Cut)", 
+            .xAxis = "Actual Z - Origin Predicted Z [cm]", 
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTOrgZRes", 
+            .hists = {hists.real_pt2_LSTOrgZRes, hists.fake_pt2_LSTOrgZRes},
+            .legend = {"Real", "Fake"}, 
+            .printYields = true
+        },
+        {
+            .title = "All pT2: LST Kinematic Z-Residual (Momentum Cut)", 
+            .xAxis = "Actual Z - Kinematic Predicted Z [cm]", 
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTKinZRes", 
+            .hists = {hists.real_pt2_LSTKinZRes, hists.fake_pt2_LSTKinZRes},
+            .legend = {"Real", "Fake"}, 
+            .printYields = true
+        },
+        {
+            .title = "Unused pT2: LST Geometric Z-Residual (Beamspot Cut)",
+            .xAxis = "Actual Z - Origin Predicted Z [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTOrgZRes",
+            .hists = {hists.real_unused_pt2_LSTOrgZRes, hists.fake_unused_pt2_LSTOrgZRes},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        },
+        {
+            .title = "Unused pT2: LST Kinematic Z-Residual (Momentum Cut)",
+            .xAxis = "Actual Z - Kinematic Predicted Z [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTKinZRes",
+            .hists = {hists.real_unused_pt2_LSTKinZRes, hists.fake_unused_pt2_LSTKinZRes},
+            .legend = {"Real", "Fake"},
+            .printYields = true
         }
+
     };
 }
 

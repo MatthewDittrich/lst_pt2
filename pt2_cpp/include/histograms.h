@@ -83,6 +83,36 @@ public:
     TH1D* real_unused_pt2_deltaAngle = nullptr;
     TH1D* fake_pt2_deltaAngle = nullptr;
     TH1D* fake_unused_pt2_deltaAngle = nullptr;
+
+    // LST dPhi Variables
+    TH1D* real_pt2_LSTdPhi = nullptr;
+    TH1D* fake_pt2_LSTdPhi = nullptr;
+    TH1D* real_unused_pt2_LSTdPhi = nullptr;
+    TH1D* fake_unused_pt2_LSTdPhi = nullptr;
+
+    // LST dBeta Variables
+    TH1D* real_pt2_LSTdBeta = nullptr;
+    TH1D* fake_pt2_LSTdBeta = nullptr;
+    TH1D* real_unused_pt2_LSTdBeta = nullptr;
+    TH1D* fake_unused_pt2_LSTdBeta = nullptr;
+
+    // LST betaOut Variables
+    TH1D* real_pt2_LSTbetaOut = nullptr;
+    TH1D* fake_pt2_LSTbetaOut = nullptr;
+    TH1D* real_unused_pt2_LSTbetaOut = nullptr;
+    TH1D* fake_unused_pt2_LSTbetaOut = nullptr;
+
+    // LST Kinematic Z-Residual Variables
+    TH1D* real_pt2_LSTKinZRes = nullptr;
+    TH1D* fake_pt2_LSTKinZRes = nullptr;
+    TH1D* real_unused_pt2_LSTKinZRes = nullptr;
+    TH1D* fake_unused_pt2_LSTKinZRes = nullptr;
+
+    // LST Origin Geometric Z-Residual Variables
+    TH1D* real_pt2_LSTOrgZRes = nullptr;
+    TH1D* fake_pt2_LSTOrgZRes = nullptr;
+    TH1D* real_unused_pt2_LSTOrgZRes = nullptr;
+    TH1D* fake_unused_pt2_LSTOrgZRes = nullptr;
 };
 
 #endif

@@ -14,6 +14,7 @@
 #include "tools.h"
 #include "pt2.h"
 #include "extrapolation.h"
+#include "extra_cuts.h"
 
 int main(int argc, char** argv) {
 
@@ -23,14 +24,14 @@ int main(int argc, char** argv) {
     bool lowPT = false;
     int nEvents = -1;
     double targetPercent = 90.0; 
-    double myCutZ0 = 10000;  
-    double myCutZ1 = 10000;
+    double myCutZ0 = 4.4169;  
+    double myCutZ1 = 5.7503;
     std::string inputFile; 
     std::string outputDir;
 
     // Command Line Arguments
     int opt;
-    while ((opt = getopt(argc, argv, "prki:o:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "prki:o:n:e:")) != -1) {
         switch (opt) {
             case 'p':
                 makePlots = true;
@@ -213,7 +214,20 @@ int main(int argc, char** argv) {
             std::vector<double> heli = extrapolation::extrapolatePlsHelicallyAndGetDistance(plsIdx, lsIdx, reader);
             std::pair<double, double> rz_simple = extrapolation::extrapolateSimplePointingInRZ(plsIdx, lsIdx, reader);
             double dAngle = extrapolation::calculateDeltaAngle(plsIdx, lsIdx, reader);
-            if(heli[1] <= myCutZ0  && heli[3] <= myCutZ1 ){
+            
+            double lst_dPhi = extra_cuts::calculateLSTDPhi(plsIdx, lsIdx, reader);
+            std::vector<double> betas = extra_cuts::calculateLSTdBeta(plsIdx, lsIdx, reader);
+            double dBeta = betas[2];
+            double betaOut = betas[1]; 
+            double lst_zResGeo = extra_cuts::calculateLSTOriginZResidual(plsIdx, lsIdx, reader);
+            double lst_zResKin = extra_cuts::calculateLSTKinematicZResidual(plsIdx, lsIdx, reader);
+           
+
+            if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
+           // if(heli[0] > 1.3920 ||  heli[2] > 2.2394 ){continue;}
+            //if(pt2.delta_phi < -0.2991 || pt2.delta_phi > 0.3039){continue;}
+           // if(rz_simple.first < -1.7022  || rz_simple.first > 0.5405 || rz_simple.second < -2.9496 || rz_simple.second > 0.8334){continue;}
+           // if(pt2.delta_pt < -1.2848 || pt2.delta_pt > 0.9443){continue;}
             if (pt2.is_real) {
                 hists.real_pt2_deltaPT->Fill(pt2.delta_pt);
                 hists.real_pt2_deltaETA->Fill(pt2.delta_eta);
@@ -221,6 +235,11 @@ int main(int argc, char** argv) {
                 hists.real_pt2_deltaR->Fill(dR);
 
                 if (dAngle > -1.0) hists.real_pt2_deltaAngle->Fill(dAngle);
+                if (lst_dPhi > -100.0) hists.real_pt2_LSTdPhi->Fill(lst_dPhi);
+                if (dBeta > -100.0) hists.real_pt2_LSTdBeta->Fill(dBeta);
+                if (betaOut > -100.0) hists.real_pt2_LSTbetaOut->Fill(betaOut);
+                if (lst_zResGeo > -100.0) hists.real_pt2_LSTOrgZRes->Fill(lst_zResGeo);
+                if (lst_zResKin > -100.0) hists.real_pt2_LSTKinZRes->Fill(lst_zResKin);
 
                 // Fill Separated 3D components for Real
                 if (heli[0] >= 0) {
@@ -245,6 +264,11 @@ int main(int argc, char** argv) {
                     hists.real_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
                     hists.real_unused_pt2_deltaR->Fill(dR);
                     if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle->Fill(dAngle);
+                    if (lst_dPhi > -100.0) hists.real_unused_pt2_LSTdPhi->Fill(lst_dPhi);
+                    if (dBeta > -100.0) hists.real_unused_pt2_LSTdBeta->Fill(dBeta);
+                    if (betaOut > -100.0) hists.real_unused_pt2_LSTbetaOut->Fill(betaOut);
+                    if (lst_zResGeo > -100.0) hists.real_unused_pt2_LSTOrgZRes->Fill(lst_zResGeo);
+                    if (lst_zResKin > -100.0) hists.real_unused_pt2_LSTKinZRes->Fill(lst_zResKin);
 
                     if (heli[0] >= 0) {
                         hists.real_unused_pt2_MD0_dXY->Fill(heli[0]); 
@@ -269,7 +293,13 @@ int main(int argc, char** argv) {
                 hists.fake_pt2_deltaETA->Fill(pt2.delta_eta);
                 hists.fake_pt2_deltaPHI->Fill(pt2.delta_phi);
                 hists.fake_pt2_deltaR->Fill(dR);
+
                 if (dAngle > -1.0) hists.fake_pt2_deltaAngle->Fill(dAngle);
+                if (lst_dPhi > -100.0) hists.fake_pt2_LSTdPhi->Fill(lst_dPhi);
+                if (dBeta > -100.0) hists.fake_pt2_LSTdBeta->Fill(dBeta);
+                if (betaOut > -100.0) hists.fake_pt2_LSTbetaOut->Fill(betaOut);
+                if (lst_zResGeo > -100.0) hists.fake_pt2_LSTOrgZRes->Fill(lst_zResGeo);
+                if (lst_zResKin > -100.0) hists.fake_pt2_LSTKinZRes->Fill(lst_zResKin);
 
                 // Fill Separated 3D components for Fake
                 if (heli[0] >= 0) {
@@ -294,7 +324,13 @@ int main(int argc, char** argv) {
                     hists.fake_unused_pt2_deltaETA->Fill(pt2.delta_eta);
                     hists.fake_unused_pt2_deltaPHI->Fill(pt2.delta_phi);
                     hists.fake_unused_pt2_deltaR->Fill(dR);
+
                     if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle->Fill(dAngle);
+                    if (lst_dPhi > -100.0) hists.fake_unused_pt2_LSTdPhi->Fill(lst_dPhi);
+                    if (dBeta > -100.0) hists.fake_unused_pt2_LSTdBeta->Fill(dBeta);
+                    if (betaOut > -100.0) hists.fake_unused_pt2_LSTbetaOut->Fill(betaOut);
+                    if (lst_zResGeo > -100.0) hists.fake_unused_pt2_LSTOrgZRes->Fill(lst_zResGeo);
+                    if (lst_zResKin > -100.0) hists.fake_unused_pt2_LSTKinZRes->Fill(lst_zResKin);
 
                     if (heli[0] >= 0) {
                         hists.fake_unused_pt2_MD0_dXY->Fill(heli[0]); 
@@ -314,29 +350,72 @@ int main(int argc, char** argv) {
                     }
                 }
             }      
-        }
-    } 
+        } 
     }
-
 
     // --- AUTOMATED CUT CALCULATION ---
     double q[1];
-    double p[1] = { targetPercent / 100.0 }; // e.g., 0.90 or 0.99
+    double p[1] = { targetPercent / 100.0 }; // e.g., 0.90
     double idealCut0 = 0, idealCut1 = 0;
+    
+    // 2-Sided Bounds Variables
+    double idealCutPhiMin = 0, idealCutPhiMax = 0;
+    double idealCutRZ0Min = 0, idealCutRZ0Max = 0;
+    double idealCutRZ1Min = 0, idealCutRZ1Max = 0;
+    double idealCutPtMin = 0,  idealCutPtMax = 0; // <--- NEW: Delta pT Bounds
+
+    // For 2-sided variables
+    double tail = (1.0 - (targetPercent / 100.0)) / 2.0; 
+    double p_sym[2] = { tail, 1.0 - tail }; 
+    double q_sym[2]; 
 
     if (hists.real_pt2_MD0_dZ->GetEntries() > 0) {
+        
+        // --- 1-Sided Cuts (dZ) ---
         hists.real_pt2_MD0_dZ->GetQuantiles(1, q, p);
         idealCut0 = q[0];
 
         hists.real_pt2_MD1_dZ->GetQuantiles(1, q, p);
         idealCut1 = q[0];
 
+        // --- 2-Sided Cuts (Delta Phi) ---
+        if (hists.real_pt2_deltaPHI->GetEntries() > 0) {
+            hists.real_pt2_deltaPHI->GetQuantiles(2, q_sym, p_sym);
+            idealCutPhiMin = q_sym[0]; 
+            idealCutPhiMax = q_sym[1]; 
+        }
+        
+        // --- 2-Sided Cuts (MD0 R-Z Simple) ---
+        if (hists.real_pt2_MD0_rz_simple->GetEntries() > 0) {
+            hists.real_pt2_MD0_rz_simple->GetQuantiles(2, q_sym, p_sym);
+            idealCutRZ0Min = q_sym[0]; 
+            idealCutRZ0Max = q_sym[1]; 
+        }
+
+        // --- 2-Sided Cuts (MD1 R-Z Simple) ---
+        if (hists.real_pt2_MD1_rz_simple->GetEntries() > 0) {
+            hists.real_pt2_MD1_rz_simple->GetQuantiles(2, q_sym, p_sym);
+            idealCutRZ1Min = q_sym[0]; 
+            idealCutRZ1Max = q_sym[1]; 
+        }
+
+        // --- 2-Sided Cuts (Delta pT) ---
+        if (hists.real_pt2_deltaPT->GetEntries() > 0) {
+            hists.real_pt2_deltaPT->GetQuantiles(2, q_sym, p_sym);
+            idealCutPtMin = q_sym[0]; 
+            idealCutPtMax = q_sym[1]; 
+        }
+
         std::cout << "\n=================================================" << std::endl;
         std::cout << "Target Efficiency set to: " << targetPercent << "%" << std::endl;
         std::cout << "IDEAL CUTS TO REACH THIS EFFICIENCY:" << std::endl;
         std::cout << std::fixed << std::setprecision(4);
-        std::cout << "MD0 dZ Cut: < " << idealCut0 << " cm" << std::endl;
-        std::cout << "MD1 dZ Cut: < " << idealCut1 << " cm" << std::endl;
+        std::cout << "MD0 dZ Cut:    < " << idealCut0 << " cm" << std::endl;
+        std::cout << "MD1 dZ Cut:    < " << idealCut1 << " cm" << std::endl;
+        std::cout << "Delta Phi Cut: " << idealCutPhiMin << "  to  " << idealCutPhiMax << " rad" << std::endl;
+        std::cout << "MD0 R-Z Cut:   " << idealCutRZ0Min << "  to  " << idealCutRZ0Max << " cm" << std::endl;
+        std::cout << "MD1 R-Z Cut:   " << idealCutRZ1Min << "  to  " << idealCutRZ1Max << " cm" << std::endl;
+        std::cout << "Delta pT Cut:  " << idealCutPtMin  << "  to  " << idealCutPtMax  << " GeV" << std::endl;
         std::cout << "=================================================\n" << std::endl;
     }
 

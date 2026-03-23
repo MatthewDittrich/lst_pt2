@@ -116,8 +116,80 @@ std::vector<double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_id
     int md1 = data.ls_mdIdx1->at(ls_idx);
     if (md0 < 0 || md1 < 0) return invalid_return;
 
-    // Helper to project to helix and get separated XY and Z components
+    
     auto get_components = [&](double tx, double ty, double tz) -> std::pair<double, double> {
+    double phi0 = std::atan2(ty - circle_center.Y(), tx - circle_center.X());
+
+    // Match the "winding" of the helix to the target roughly
+    while (phi0 - last_angle >  TMath::Pi()) phi0 -= 2*TMath::Pi();
+    while (phi0 - last_angle < -TMath::Pi()) phi0 += 2*TMath::Pi();
+
+    // Helper lambda to calculate the exact 3D distance squared
+    auto get_dist2 = [&](double p) {
+        double hX = circle_center.X() + R_pred_cm * std::cos(p);
+        double hY = circle_center.Y() + R_pred_cm * std::sin(p);
+        double hZ = a * p + b;
+        return std::pow(tx - hX, 2) + std::pow(ty - hY, 2) + std::pow(tz - hZ, 2);
+    };
+
+    // 1. GLOBAL CHECK: Ensure we are starting on the absolute closest coil
+    // (Fixes cases where the target is physically closer to the coil above/below)
+    double p_fine = phi0;
+    double current_dist2 = get_dist2(p_fine);
+    
+ /*   for (double offset : {-2 * TMath::Pi(), 2 * TMath::Pi()}) {
+        double test_p = phi0 + offset;
+        double test_dist2 = get_dist2(test_p);
+        if (test_dist2 < current_dist2) {
+            current_dist2 = test_dist2;
+            p_fine = test_p;
+        }
+    }*/
+
+    // 2. LOCAL REFINEMENT: Dynamic 'while' loop instead of fixed 'for' loop
+    int iter = 0;
+    int max_iters = 15; // Safety limit to prevent infinite loops
+
+    while (iter < max_iters) {
+        double c = std::cos(p_fine), s = std::sin(p_fine);
+        
+        // Derivative of 3D distance squared
+        double f = (tx - circle_center.X() - R_pred_cm*c)*(R_pred_cm*s) +
+                   (ty - circle_center.Y() - R_pred_cm*s)*(-R_pred_cm*c) +
+                   a*(a*p_fine + b - tz);
+        double fp = R_pred_cm*R_pred_cm + a*a;
+        
+        // Try the new step
+        double next_p = p_fine - (f / fp);
+        double next_dist2 = get_dist2(next_p);
+
+        // STOPPING CONDITION: 
+        // If the step makes the distance bigger, or if the step is microscopic, we hit the minimum!
+        if (next_dist2 >= current_dist2 || std::abs(next_p - p_fine) < 1e-6) {
+            break; 
+        }
+
+        // Otherwise, accept the lower distance and continue
+        p_fine = next_p;
+        current_dist2 = next_dist2;
+        iter++;
+    }
+
+    // Helix coordinates at the solved, verified minimum phi
+        double hX = circle_center.X() + R_pred_cm * std::cos(p_fine);
+        double hY = circle_center.Y() + R_pred_cm * std::sin(p_fine);
+        double hZ = a * p_fine + b;
+
+    // Calculate components separately
+        double dXY = std::sqrt(std::pow(tx - hX, 2) + std::pow(ty - hY, 2));
+        double dZ  = std::abs(tz - hZ);
+    
+        return {dXY, dZ};
+    };
+    
+    
+    // Helper to project to helix and get separated XY and Z components
+   /* auto get_components = [&](double tx, double ty, double tz) -> std::pair<double, double> {
         double phi0 = std::atan2(ty - circle_center.Y(), tx - circle_center.X());
         
         // Match the "winding" of the helix to the target
@@ -145,29 +217,6 @@ std::vector<double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_id
         // Calculate components separately
         double dXY = std::sqrt(std::pow(tx - hX, 2) + std::pow(ty - hY, 2));
         double dZ  = std::abs(tz - hZ); 
-
-        return {dXY, dZ};
-    };
-   /* auto get_components = [&](double tx, double ty, double tz) -> std::pair<double, double> {
-
-        // 1. Find the angle on the circle that points exactly at the target's XY position
-        double p_fine = std::atan2(ty - circle_center.Y(), tx - circle_center.X());
-
-        // 2. Match the "winding" of the helix to the target
-        while (p_fine - last_angle >  TMath::Pi()) p_fine -= 2*TMath::Pi();
-        while (p_fine - last_angle < -TMath::Pi()) p_fine += 2*TMath::Pi();
-
-        // DELETE THE NEWTON SOLVER!
-        // We evaluate Z exactly at the point of closest XY approach.
-
-        // 3. Helix coordinates at that specific angle
-        double hX = circle_center.X() + R_pred_cm * std::cos(p_fine);
-        double hY = circle_center.Y() + R_pred_cm * std::sin(p_fine);
-        double hZ = a * p_fine + b;
-
-        // 4. Calculate components separately
-        double dXY = std::sqrt(std::pow(tx - hX, 2) + std::pow(ty - hY, 2));
-        double dZ  = std::abs(tz - hZ);
 
         return {dXY, dZ};
     };*/

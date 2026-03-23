@@ -356,4 +356,131 @@ void HistogramManager::init() {
         "Fake Unused #Delta#alpha; [rad]; Entries", 
         180, 0, 0.5
     );
+
+    //------------ LST Variables --------------------
+
+    real_pt2_LSTdPhi = new TH1D(
+        "real_pt2_LSTdPhi",
+        "Real pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTdPhi = new TH1D(
+        "fake_pt2_LSTdPhi",
+        "Fake pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTdPhi = new TH1D(
+        "real_unused_pt2_LSTdPhi",
+        "Real Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTdPhi = new TH1D(
+        "fake_unused_pt2_LSTdPhi",
+        "Fake Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+    //------------ LST dBeta --------------------
+
+    real_pt2_LSTdBeta = new TH1D(
+        "real_pt2_LSTdBeta",
+        "Real pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTdBeta = new TH1D(
+        "fake_pt2_LSTdBeta",
+        "Fake pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTdBeta = new TH1D(
+        "real_unused_pt2_LSTdBeta",
+        "Real Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTdBeta = new TH1D(
+        "fake_unused_pt2_LSTdBeta",
+        "Fake Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    //------------ LST betaOut --------------------
+
+    real_pt2_LSTbetaOut = new TH1D(
+        "real_pt2_LSTbetaOut",
+        "Real pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTbetaOut = new TH1D(
+        "fake_pt2_LSTbetaOut",
+        "Fake pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTbetaOut = new TH1D(
+        "real_unused_pt2_LSTbetaOut",
+        "Real Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTbetaOut = new TH1D(
+        "fake_unused_pt2_LSTbetaOut",
+        "Fake Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+    //------------ LST Z-Residuals --------------------
+
+    // 1. Geometric (Loose Cut)
+    real_pt2_LSTOrgZRes = new TH1D(
+        "real_pt2_LSTZResGeometric", 
+        "Real pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    fake_pt2_LSTOrgZRes = new TH1D(
+        "fake_pt2_LSTZResGeometric", 
+        "Fake pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    real_unused_pt2_LSTOrgZRes = new TH1D(
+        "real_unused_pt2_LSTZResGeometric", 
+        "Real Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    fake_unused_pt2_LSTOrgZRes = new TH1D(
+        "fake_unused_pt2_LSTZResGeometric", 
+        "Fake Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+
+    // 2. Kinematic (Tight Cut)
+    real_pt2_LSTKinZRes = new TH1D(
+        "real_pt2_LSTZResKinematic", 
+        "Real pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    fake_pt2_LSTKinZRes = new TH1D(
+        "fake_pt2_LSTZResKinematic", 
+        "Fake pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    
+    real_unused_pt2_LSTKinZRes = new TH1D(
+        "real_unused_pt2_LSTZResKinematic", 
+        "Real Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    
+    fake_unused_pt2_LSTKinZRes = new TH1D(
+        "fake_unused_pt2_LSTZResKinematic", 
+        "Fake Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
 }
