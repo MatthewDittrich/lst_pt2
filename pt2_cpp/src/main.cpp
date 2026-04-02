@@ -208,6 +208,7 @@ int main(int argc, char** argv) {
             pt2.delta_phi = deltaPhi(reader.pls_phi->at(plsIdx), reader.ls_phi->at(lsIdx));
             pt2.is_real = pt2TruthFinder(reader, plsIdx, lsIdx);
             pt2.is_used = pt2UsedCalculator(reader, plsIdx, lsIdx);
+            if((reader.pls_pt->at(plsIdx)) > 0.8){continue;}
 
             // New Physics Calculations
             float dR = std::sqrt(pt2.delta_eta * pt2.delta_eta + pt2.delta_phi * pt2.delta_phi);
@@ -223,7 +224,7 @@ int main(int argc, char** argv) {
             double lst_zResKin = extra_cuts::calculateLSTKinematicZResidual(plsIdx, lsIdx, reader);
            
 
-            if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
+           //if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
            // if(heli[0] > 1.3920 ||  heli[2] > 2.2394 ){continue;}
             //if(pt2.delta_phi < -0.2991 || pt2.delta_phi > 0.3039){continue;}
            // if(rz_simple.first < -1.7022  || rz_simple.first > 0.5405 || rz_simple.second < -2.9496 || rz_simple.second > 0.8334){continue;}
