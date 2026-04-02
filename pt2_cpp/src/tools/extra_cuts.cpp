@@ -5,27 +5,29 @@
 namespace extra_cuts{
 
      int getPt2Category(size_t lsIdx, const rootReader& reader) {
-     if (reader.ls_mdIdx0->empty() || lsIdx >= reader.ls_mdIdx0->size()) return 4;
-     int mdIdx = reader.ls_mdIdx0->at(lsIdx);
-     uint32_t detId = reader.md_detId->at(mdIdx);
+        if (reader.ls_mdIdx0->empty() || lsIdx >= reader.ls_mdIdx0->size()) return 4;
+        int mdIdx = reader.ls_mdIdx0->at(lsIdx);
+        uint32_t detId = reader.md_detId->at(mdIdx);
     
-     int subdet = (detId >> 25) & 0x7;
-     int layer  = (detId >> 20) & 0xF;
-    
-     if (subdet == 4) { // Endcap
-         if (layer == 1) return 5; // Endcap L1
-         if (layer == 2) return 6; // Endcap L2
-         return 7;                 // Endcap L3+
-     }
-     if (subdet == 5) { // Barrel
-         int side  = (detId >> 18) & 0x3; // 1=Z-, 2=Z+, 3=Flat
-         bool isTilted = (side == 1 || side == 2);
+        int subdet = (detId >> 25) & 0x7;
+         
+        if (subdet == 4) { // Endcap
+            int disk = (detId >> 18) & 0x7;
+
+            if (disk == 1) return 5; // Endcap L1
+            if (disk == 2) return 6; // Endcap L2
+            return 7;                 // Endcap L3+
+        }
+        if (subdet == 5) { // Barrel
+            int layer = (detId >> 20) & 0x7;
+            int side  = (detId >> 18) & 0x3; // 1=Z-, 2=Z+, 3=Flat
+            bool isTilted = (side == 1 || side == 2);
         
-         if (layer == 1) return isTilted ? 1 : 0;
-         if (layer == 2) return isTilted ? 3 : 2;
-         return 4; // Barrel L3+
-     }
-     return 4; // Default fallback
+            if (layer == 1) return isTilted ? 1 : 0;
+            if (layer == 2) return isTilted ? 3 : 2;
+            return 4; // Barrel L3+
+        }
+        return 4; // Default fallback
     }
     
     // =========================================================================
