@@ -59,6 +59,8 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("pLS_hit3_x", &pls_hit3_x);
     inputTree->SetBranchAddress("pLS_hit3_y", &pls_hit3_y);
     inputTree->SetBranchAddress("pLS_hit3_z", &pls_hit3_z);
+    inputTree->SetBranchAddress("pLS_circleCenterX", &pLS_circleCenterX);
+    inputTree->SetBranchAddress("pLS_circleCenterY", &pLS_circleCenterY);
     // Mini Doublet Branches
     inputTree->SetBranchAddress("md_anchor_x", &md_anchor_x);
     inputTree->SetBranchAddress("md_anchor_y", &md_anchor_y);

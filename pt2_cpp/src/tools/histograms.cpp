@@ -77,7 +77,7 @@ void HistogramManager::init() {
 
     //------------Extrapolation--------------------
 
-    real_pt2_dist3D = new TH1D(
+   /* real_pt2_dist3D = new TH1D(
         "real_pt2_dist3D",
         "Real pT2 Distance;Dist [cm];Entries",
         100, 0, 15.0
@@ -88,6 +88,7 @@ void HistogramManager::init() {
         "Fake pT2 Distance;Dist [cm];Entries",
         100, 0, 15.0
     );
+
 
     real_unused_pt2_dist3D = new TH1D(
         "real_unused_pt2_dist3D",
@@ -100,55 +101,234 @@ void HistogramManager::init() {
        "Fake Unused pT2 Distance;Dist [cm];Entries",
        100, 0, 15.0
     );
-   
-    real_pt2_rz_simple = new TH1D(
-        "real_pt2_rz_simple", 
-        "Simple Pointing R-Z Residual;[cm];Entries", 
-        200, -10, 10
+   */
+    // =========================================================================
+    // MD0 Helical Components
+    // =========================================================================
+
+    real_pt2_MD0_dXY = new TH1D(
+        "real_pt2_MD0_dXY",
+        "Real MD0 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    real_pt2_MD0_dZ = new TH1D(
+        "real_pt2_MD0_dZ",
+        "Real MD0 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    fake_pt2_MD0_dXY = new TH1D(
+        "fake_pt2_MD0_dXY",
+        "Fake MD0 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    fake_pt2_MD0_dZ = new TH1D(
+        "fake_pt2_MD0_dZ",
+        "Fake MD0 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    real_unused_pt2_MD0_dXY = new TH1D(
+        "real_unused_pt2_MD0_dXY",
+        "Real Unused MD0 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    real_unused_pt2_MD0_dZ = new TH1D(
+        "real_unused_pt2_MD0_dZ",
+        "Real Unused MD0 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    fake_unused_pt2_MD0_dXY = new TH1D(
+        "fake_unused_pt2_MD0_dXY",
+        "Fake Unused MD0 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    fake_unused_pt2_MD0_dZ = new TH1D(
+        "fake_unused_pt2_MD0_dZ",
+        "Fake Unused MD0 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    // =========================================================================
+    // MD1 Helical Components
+    // =========================================================================
+
+    real_pt2_MD1_dXY = new TH1D(
+        "real_pt2_MD1_dXY",
+        "Real MD1 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    real_pt2_MD1_dZ = new TH1D(
+        "real_pt2_MD1_dZ",
+        "Real MD1 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    fake_pt2_MD1_dXY = new TH1D(
+        "fake_pt2_MD1_dXY",
+        "Fake MD1 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    fake_pt2_MD1_dZ = new TH1D(
+        "fake_pt2_MD1_dZ",
+        "Fake MD1 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    real_unused_pt2_MD1_dXY = new TH1D(
+        "real_unused_pt2_MD1_dXY",
+        "Real Unused MD1 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    real_unused_pt2_MD1_dZ = new TH1D(
+        "real_unused_pt2_MD1_dZ",
+        "Real Unused MD1 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    fake_unused_pt2_MD1_dXY = new TH1D(
+        "fake_unused_pt2_MD1_dXY",
+        "Fake Unused MD1 #DeltaXY;#DeltaXY [cm];Entries",
+        180, 0, 5.0
+    );
+
+    fake_unused_pt2_MD1_dZ = new TH1D(
+        "fake_unused_pt2_MD1_dZ",
+        "Fake Unused MD1 #DeltaZ;#DeltaZ [cm];Entries",
+        180, 0, 10.0
+    );
+
+    real_pt2_MD0_rz_simple = new TH1D(
+        "real_pt2_MD0_rz_simple", 
+        "Real MD0 R-Z Residual;[cm];Entries", 
+        180, -10, 10
     );
     
-    fake_pt2_rz_simple = new TH1D(
-        "fake_pt2_rz_simple", 
-        "Simple Pointing R-Z Residual;[cm];Entries", 
-        200, -10, 10
+    real_pt2_MD1_rz_simple = new TH1D(
+        "real_pt2_MD1_rz_simple", 
+        "Real MD1 R-Z Residual;[cm];Entries", 
+        180, -10, 10
     );
-     
-    real_unused_pt2_rz_simple = new TH1D(
-        "real_unused_pt2_rz_simple", 
-        "Real Unused Simple R-Z;[cm];Entries", 
-        200, -10, 10
+    
+    fake_pt2_MD0_rz_simple = new TH1D(
+        "fake_pt2_MD0_rz_simple", 
+        "Fake MD0 R-Z Residual;[cm];Entries", 
+        180, -10, 10
     );
-     
-    fake_unused_pt2_rz_simple = new TH1D(
-        "fake_unused_pt2_rz_simple", 
-        "Fake Unused Simple R-Z;[cm];Entries",
-        200, -10, 10
+    
+    fake_pt2_MD1_rz_simple = new TH1D(
+        "fake_pt2_MD1_rz_simple", 
+        "Fake MD1 R-Z Residual;[cm];Entries", 
+        180, -10, 10
     );
-   
+
+    real_unused_pt2_MD0_rz_simple = new TH1D(
+        "real_unused_pt2_MD0_rz_simple",
+        "Real Unused MD0 R-Z Residual;[cm];Entries",
+        180, -10, 10
+    );
+
+    real_unused_pt2_MD1_rz_simple = new TH1D(
+        "real_unused_pt2_MD1_rz_simple",
+        "Real Unused MD1 R-Z Residual;[cm];Entries",
+        180, -10, 10
+    );
+
+    fake_unused_pt2_MD0_rz_simple = new TH1D(
+        "fake_unused_pt2_MD0_rz_simple",
+        "Fake Unused MD0 R-Z Residual;[cm];Entries",
+        180, -10, 10
+    );
+
+    fake_unused_pt2_MD1_rz_simple = new TH1D(
+        "fake_unused_pt2_MD1_rz_simple",
+        "Fake Unused MD1 R-Z Residual;[cm];Entries",
+        180, -10, 10
+    );
+
+    // Cut Study: dXY distribution for events that pass |dZ| < 2.5 cm
+    // Add this inside HistogramManager::init()
+    
+    h2_real_MD0_dXY_vs_dZ = new TH2D(
+        "h2_real_MD0_dXY_vs_dZ", 
+        "Real MD0; |#DeltaZ| [cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_fake_MD0_dXY_vs_dZ = new TH2D(
+        "h2_fake_MD0_dXY_vs_dZ", 
+        "Fake MD0; |#DeltaZ| [cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_real_MD1_dXY_vs_dZ = new TH2D(
+        "h2_real_MD1_dXY_vs_dZ", 
+        "Real MD1; |#DeltaZ| [cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_fake_MD1_dXY_vs_dZ = new TH2D(
+        "h2_fake_MD1_dXY_vs_dZ", 
+        "Fake MD1; |#DeltaZ|[cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+
+    h2_real_unused_MD0_dXY_vs_dZ = new TH2D(
+        "h2_real_unused_MD0_dXY_vs_dZ", 
+        "Real Unused MD0; |#DeltaZ| [cm]; dXY[cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_fake_unused_MD0_dXY_vs_dZ = new TH2D(
+        "h2_fake_unused_MD0_dXY_vs_dZ", 
+        "Fake Unused MD0; |#DeltaZ| [cm]; dXY [cm]",
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_real_unused_MD1_dXY_vs_dZ = new TH2D(
+        "h2_real_unused_MD1_dXY_vs_dZ", 
+        "Real Unused MD1; |#DeltaZ| [cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+    
+    h2_fake_unused_MD1_dXY_vs_dZ = new TH2D(
+        "h2_fake_unused_MD1_dXY_vs_dZ", 
+        "Fake Unused MD1; |#DeltaZ| [cm]; dXY [cm]", 
+        180, 0, 10.0, 180, 0, 10.0
+    );
+
     //Delta R
 
     real_pt2_deltaR = new TH1D(
         "real_pt2_deltaR", 
         "Real pT2 #Delta R; #Delta R; Entries", 
-        100, 0, 1.0
+        180, 0, 1.0
     );
     
     fake_pt2_deltaR = new TH1D(
         "fake_pt2_deltaR", 
         "Fake pT2 #Delta R; #Delta R; Entries", 
-        100, 0, 1.0
+        180, 0, 1.0
     );
     
     real_unused_pt2_deltaR = new TH1D(
         "real_unused_pt2_deltaR", 
         "Real Unused #Delta R; #Delta R; Entries", 
-        100, 0, 1.0
+        180, 0, 1.0
     );
     
     fake_unused_pt2_deltaR = new TH1D(
         "fake_unused_pt2_deltaR", 
         "Fake Unused #Delta R; #Delta R; Entries", 
-        100, 0, 1.0
+        180, 0, 1.0
     );
     
     //Delta angle
@@ -156,24 +336,151 @@ void HistogramManager::init() {
     real_pt2_deltaAngle = new TH1D(
         "real_pt2_deltaAngle", 
         "Real pT2 Directional #Delta#alpha; #Delta#alpha [rad]; Entries", 
-        100, 0, 0.5
+        180, 0, 0.5
     );
     
     fake_pt2_deltaAngle = new TH1D(
         "fake_pt2_deltaAngle", 
         "Fake pT2 Directional #Delta#alpha; #Delta#alpha [rad]; Entries", 
-        100, 0, 0.5
+        180, 0, 0.5
     );
     
     real_unused_pt2_deltaAngle = new TH1D(
         "real_unused_pt2_deltaAngle", 
         "Real Unused #Delta#alpha; [rad]; Entries", 
-        100, 0, 0.5
+        180, 0, 0.5
     );
     
     fake_unused_pt2_deltaAngle = new TH1D(
         "fake_unused_pt2_deltaAngle", 
         "Fake Unused #Delta#alpha; [rad]; Entries", 
-        100, 0, 0.5
+        180, 0, 0.5
+    );
+
+    //------------ LST Variables --------------------
+
+    real_pt2_LSTdPhi = new TH1D(
+        "real_pt2_LSTdPhi",
+        "Real pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTdPhi = new TH1D(
+        "fake_pt2_LSTdPhi",
+        "Fake pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTdPhi = new TH1D(
+        "real_unused_pt2_LSTdPhi",
+        "Real Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTdPhi = new TH1D(
+        "fake_unused_pt2_LSTdPhi",
+        "Fake Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
+        180, -0.5, 0.5
+    );
+    //------------ LST dBeta --------------------
+
+    real_pt2_LSTdBeta = new TH1D(
+        "real_pt2_LSTdBeta",
+        "Real pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTdBeta = new TH1D(
+        "fake_pt2_LSTdBeta",
+        "Fake pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTdBeta = new TH1D(
+        "real_unused_pt2_LSTdBeta",
+        "Real Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTdBeta = new TH1D(
+        "fake_unused_pt2_LSTdBeta",
+        "Fake Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    //------------ LST betaOut --------------------
+
+    real_pt2_LSTbetaOut = new TH1D(
+        "real_pt2_LSTbetaOut",
+        "Real pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_pt2_LSTbetaOut = new TH1D(
+        "fake_pt2_LSTbetaOut",
+        "Fake pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    real_unused_pt2_LSTbetaOut = new TH1D(
+        "real_unused_pt2_LSTbetaOut",
+        "Real Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+
+    fake_unused_pt2_LSTbetaOut = new TH1D(
+        "fake_unused_pt2_LSTbetaOut",
+        "Fake Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
+        180, -0.5, 0.5
+    );
+    //------------ LST Z-Residuals --------------------
+
+    // 1. Geometric (Loose Cut)
+    real_pt2_LSTOrgZRes = new TH1D(
+        "real_pt2_LSTZResGeometric", 
+        "Real pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    fake_pt2_LSTOrgZRes = new TH1D(
+        "fake_pt2_LSTZResGeometric", 
+        "Fake pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    real_unused_pt2_LSTOrgZRes = new TH1D(
+        "real_unused_pt2_LSTZResGeometric", 
+        "Real Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+    
+    fake_unused_pt2_LSTOrgZRes = new TH1D(
+        "fake_unused_pt2_LSTZResGeometric", 
+        "Fake Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
+        180, -25.0, 25.0
+    );
+
+    // 2. Kinematic (Tight Cut)
+    real_pt2_LSTKinZRes = new TH1D(
+        "real_pt2_LSTZResKinematic", 
+        "Real pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    fake_pt2_LSTKinZRes = new TH1D(
+        "fake_pt2_LSTZResKinematic", 
+        "Fake pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    
+    real_unused_pt2_LSTKinZRes = new TH1D(
+        "real_unused_pt2_LSTZResKinematic", 
+        "Real Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
+    );
+    
+    fake_unused_pt2_LSTKinZRes = new TH1D(
+        "fake_unused_pt2_LSTZResKinematic", 
+        "Fake Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
+        180, -5.0, 5.0
     );
 }
