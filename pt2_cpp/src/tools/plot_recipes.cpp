@@ -1,353 +1,261 @@
 #include "plot_recipes.h"
 #include "histograms.h"
-
 #include <vector>
+#include <string>
 
 std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
-    return {
-        {
-            .title = "All pT2: Delta p_{T}",
-            .xAxis = "#Delta p_{T}",
-            .yAxis = "Entries",
-            .filename = "pt2_all_deltaPT",
-            .hists = { hists.real_pt2_deltaPT, hists.fake_pt2_deltaPT },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "All pT2: Delta #eta",
-            .xAxis = "#Delta #eta",
-            .yAxis = "Entries",
-            .filename = "pt2_all_deltaETA",
-            .hists = { hists.real_pt2_deltaETA, hists.fake_pt2_deltaETA },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "All pT2: Delta #phi",
-            .xAxis = "#Delta #phi",
-            .yAxis = "Entries",
-            .filename = "pt2_all_deltaPHI",
-            .hists = { hists.real_pt2_deltaPHI, hists.fake_pt2_deltaPHI },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: Delta p_{T}",
-            .xAxis = "#Delta p_{T}",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_deltaPT",
-            .hists = { hists.real_unused_pt2_deltaPT, hists.fake_unused_pt2_deltaPT },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: Delta #eta",
-            .xAxis = "#Delta #eta",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_deltaETA",
-            .hists = { hists.real_unused_pt2_deltaETA, hists.fake_unused_pt2_deltaETA },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: Delta #phi",
-            .xAxis = "#Delta #phi",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_deltaPHI",
-            .hists = { hists.real_unused_pt2_deltaPHI, hists.fake_unused_pt2_deltaPHI },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
+    std::vector<PlotRecipe> recipes;
 
-        // --- NEW: 3D Helical Distance ---
+    for (int i = 0; i < 8; ++i) {
+        std::string sfx = "_" + hists.catNames[i];
+        std::string ttl = " (" + hists.catTitles[i] + ")";
 
-     /*   {
-            .title = "All pT2: 3D Extrapolation Distance",
-            .xAxis = "Distance [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_dist3D",
-            .hists = { hists.real_pt2_dist3D, hists.fake_pt2_dist3D },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: 3D Extrapolation Distance",
-            .xAxis = "Distance [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_dist3D",
-            .hists = { hists.real_unused_pt2_dist3D, hists.fake_unused_pt2_dist3D },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-*/
-        // =========================================================================
-        // MD0 Helical Components (All)
-        // =========================================================================
-        {
-            .title = "All pT2: MD0 Transverse Distance (dXY)",
-            .xAxis = "dXY [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_md0_dxy",
-            .hists = { hists.real_pt2_MD0_dXY, hists.fake_pt2_MD0_dXY },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "All pT2: MD0 Longitudinal Distance (dZ)",
-            .xAxis = "dZ [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_md0_dz",
-            .hists = { hists.real_pt2_MD0_dZ, hists.fake_pt2_MD0_dZ },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
+        // =====================================================================
+        // ALL pT2s - KINEMATICS & LST VARIABLES
+        // =====================================================================
 
-        // =========================================================================
-        // MD0 Helical Components (Unused)
-        // =========================================================================
-        {
-            .title = "Unused pT2: MD0 Transverse Distance (dXY)",
-            .xAxis = "dXY [cm]",
+        recipes.push_back({
+            .title = "pT2 Delta p_{T}" + ttl,
+            .xAxis = "#Delta p_{T} [GeV]",
             .yAxis = "Entries",
-            .filename = "pt2_unused_md0_dxy",
-            .hists = { hists.real_unused_pt2_MD0_dXY, hists.fake_unused_pt2_MD0_dXY },
+            .filename = "pt2_all_deltaPT" + sfx,
+            .hists = {hists.real_pt2_deltaPT[i], hists.fake_pt2_deltaPT[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
-        },
-        {
-            .title = "Unused pT2: MD0 Longitudinal Distance (dZ)",
-            .xAxis = "dZ [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_md0_dz",
-            .hists = { hists.real_unused_pt2_MD0_dZ, hists.fake_unused_pt2_MD0_dZ },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
+        });
 
-        // =========================================================================
-        // MD1 Helical Components (All)
-        // =========================================================================
-        {
-            .title = "All pT2: MD1 Transverse Distance (dXY)",
-            .xAxis = "dXY [cm]",
+        recipes.push_back({
+            .title = "pT2 Delta #phi" + ttl,
+            .xAxis = "#Delta #phi [rad]",
             .yAxis = "Entries",
-            .filename = "pt2_all_md1_dxy",
-            .hists = { hists.real_pt2_MD1_dXY, hists.fake_pt2_MD1_dXY },
+            .filename = "pt2_all_deltaPHI" + sfx,
+            .hists = {hists.real_pt2_deltaPHI[i], hists.fake_pt2_deltaPHI[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
-        },
-        {
-            .title = "All pT2: MD1 Longitudinal Distance (dZ)",
-            .xAxis = "dZ [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_md1_dz",
-            .hists = { hists.real_pt2_MD1_dZ, hists.fake_pt2_MD1_dZ },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
+        });
 
-        // =========================================================================
-        // MD1 Helical Components (Unused)
-        // =========================================================================
-        {
-            .title = "Unused pT2: MD1 Transverse Distance (dXY)",
-            .xAxis = "dXY [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_md1_dxy",
-            .hists = { hists.real_unused_pt2_MD1_dXY, hists.fake_unused_pt2_MD1_dXY },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: MD1 Longitudinal Distance (dZ)",
-            .xAxis = "dZ [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_md1_dz",
-            .hists = { hists.real_unused_pt2_MD1_dZ, hists.fake_unused_pt2_MD1_dZ },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        // =========================================================================
-        // R-Z Simple Pointing (Separated by MD0 and MD1)
-        // =========================================================================
-
-        // MD0 - All
-        {
-            .title = "All pT2: MD0 R-Z Simple Residual",
-            .xAxis = "R_{act} - R_{pred} [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_md0_rz_simple",
-            .hists = { hists.real_pt2_MD0_rz_simple, hists.fake_pt2_MD0_rz_simple },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-
-        // MD1 - All
-        {
-            .title = "All pT2: MD1 R-Z Simple Residual",
-            .xAxis = "R_{act} - R_{pred} [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_md1_rz_simple",
-            .hists = { hists.real_pt2_MD1_rz_simple, hists.fake_pt2_MD1_rz_simple },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-
-        // MD0 - Unused Only
-        {
-            .title = "Unused pT2: MD0 R-Z Simple Residual",
-            .xAxis = "R_{act} - R_{pred} [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_md0_rz_simple",
-            .hists = { hists.real_unused_pt2_MD0_rz_simple, hists.fake_unused_pt2_MD0_rz_simple },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-
-        // MD1 - Unused Only
-        {
-            .title = "Unused pT2: MD1 R-Z Simple Residual",
-            .xAxis = "R_{act} - R_{pred} [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_md1_rz_simple",
-            .hists = { hists.real_unused_pt2_MD1_rz_simple, hists.fake_unused_pt2_MD1_rz_simple },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-              
-        {          
-            .title = "pT2 Delta R", 
-            .xAxis = "#Delta R", 
-            .yAxis = "Entries",
-            .filename = "pt2_all_deltaR", 
-            .hists = {hists.real_pt2_deltaR, hists.fake_pt2_deltaR},
-            .legend = {"Real", "Fake"}, 
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: Delta R",
+        recipes.push_back({
+            .title = "pT2 Delta R" + ttl,
             .xAxis = "#Delta R",
             .yAxis = "Entries",
-            .filename = "pt2_unused_deltaR",
-            .hists = { hists.real_unused_pt2_deltaR, hists.fake_unused_pt2_deltaR },
+            .filename = "pt2_all_deltaR" + sfx,
+            .hists = {hists.real_pt2_deltaR[i], hists.fake_pt2_deltaR[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
-        },
-        {
-            .title = "pT2 Directional Delta Angle", 
-            .xAxis = "#Delta#alpha [rad]", 
-            .yAxis = "Entries",
-            .filename = "pt2_all_deltaAngle", 
-            .hists = {hists.real_pt2_deltaAngle, hists.fake_pt2_deltaAngle},
-            .legend = {"Real", "Fake"}, 
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: Directional Delta Angle",
-            .xAxis = "#Delta#alpha [rad]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_deltaAngle",
-            .hists = { hists.real_unused_pt2_deltaAngle, hists.fake_unused_pt2_deltaAngle },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        // --- NEW: LST dPhi ---
-        {
-            .title = "All pT2: LST #Delta#phi", 
-            .xAxis = "LST #Delta#phi [rad]", 
-            .yAxis = "Entries",
-            .filename = "pt2_all_LSTdPhi", 
-            .hists = {hists.real_pt2_LSTdPhi, hists.fake_pt2_LSTdPhi},
-            .legend = {"Real", "Fake"}, 
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: LST #Delta#phi",
-            .xAxis = "LST #Delta#phi [rad]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_LSTdPhi",
-            .hists = { hists.real_unused_pt2_LSTdPhi, hists.fake_unused_pt2_LSTdPhi },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        }, 
-        // --- LST dBeta ---
-        {
-            .title = "All pT2: LST #Delta#beta",
+        });
+
+        recipes.push_back({
+            .title = "LST Delta Beta" + ttl,
             .xAxis = "LST #Delta#beta [rad]",
             .yAxis = "Entries",
-            .filename = "pt2_all_LSTdBeta",
-            .hists = {hists.real_pt2_LSTdBeta, hists.fake_pt2_LSTdBeta},
+            .filename = "pt2_all_LSTdBeta" + sfx,
+            .hists = {hists.real_pt2_LSTdBeta[i], hists.fake_pt2_LSTdBeta[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
-        },
-        {
-            .title = "Unused pT2: LST #Delta#beta",
-            .xAxis = "LST #Delta#beta [rad]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_LSTdBeta",
-            .hists = { hists.real_unused_pt2_LSTdBeta, hists.fake_unused_pt2_LSTdBeta },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        // --- LST betaOut ---
-        {
-            .title = "All pT2: LST #beta_{Out}",
-            .xAxis = "LST #beta_{Out} [rad]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_LSTbetaOut",
-            .hists = {hists.real_pt2_LSTbetaOut, hists.fake_pt2_LSTbetaOut},
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: LST #beta_{Out}",
-            .xAxis = "LST #beta_{Out} [rad]",
-            .yAxis = "Entries",
-            .filename = "pt2_unused_LSTbetaOut",
-            .hists = { hists.real_unused_pt2_LSTbetaOut, hists.fake_unused_pt2_LSTbetaOut },
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        // --- LST Z-Residuals ---
-        // --- NEW: LST Z-Residuals ---
-        {
-            .title = "All pT2: LST Geometric Z-Residual (Beamspot Cut)", 
-            .xAxis = "Actual Z - Origin Predicted Z [cm]", 
-            .yAxis = "Entries",
-            .filename = "pt2_all_LSTOrgZRes", 
-            .hists = {hists.real_pt2_LSTOrgZRes, hists.fake_pt2_LSTOrgZRes},
-            .legend = {"Real", "Fake"}, 
-            .printYields = true
-        },
-        {
-            .title = "All pT2: LST Kinematic Z-Residual (Momentum Cut)", 
-            .xAxis = "Actual Z - Kinematic Predicted Z [cm]", 
-            .yAxis = "Entries",
-            .filename = "pt2_all_LSTKinZRes", 
-            .hists = {hists.real_pt2_LSTKinZRes, hists.fake_pt2_LSTKinZRes},
-            .legend = {"Real", "Fake"}, 
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: LST Geometric Z-Residual (Beamspot Cut)",
-            .xAxis = "Actual Z - Origin Predicted Z [cm]",
-            .yAxis = "Entries",
-            .filename = "pt2_all_LSTOrgZRes",
-            .hists = {hists.real_unused_pt2_LSTOrgZRes, hists.fake_unused_pt2_LSTOrgZRes},
-            .legend = {"Real", "Fake"},
-            .printYields = true
-        },
-        {
-            .title = "Unused pT2: LST Kinematic Z-Residual (Momentum Cut)",
+        });
+
+        recipes.push_back({
+            .title = "LST Kinematic Z-Residual" + ttl,
             .xAxis = "Actual Z - Kinematic Predicted Z [cm]",
             .yAxis = "Entries",
-            .filename = "pt2_all_LSTKinZRes",
-            .hists = {hists.real_unused_pt2_LSTKinZRes, hists.fake_unused_pt2_LSTKinZRes},
+            .filename = "pt2_all_LSTKinZRes" + sfx,
+            .hists = {hists.real_pt2_LSTKinZRes[i], hists.fake_pt2_LSTKinZRes[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
-        }
+        });
 
-    };
+        recipes.push_back({
+            .title = "LST Geometric Z-Residual" + ttl,
+            .xAxis = "Actual Z - Origin Predicted Z [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTOrgZRes" + sfx,
+            .hists = {hists.real_pt2_LSTOrgZRes[i], hists.fake_pt2_LSTOrgZRes[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        // =====================================================================
+        // ALL pT2s - MD COMPONENTS
+        // =====================================================================
+
+        recipes.push_back({
+            .title = "MD0 Transverse Distance (dXY)" + ttl,
+            .xAxis = "dXY [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md0_dxy" + sfx,
+            .hists = {hists.real_pt2_MD0_dXY[i], hists.fake_pt2_MD0_dXY[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "MD0 Longitudinal Distance (dZ)" + ttl,
+            .xAxis = "dZ [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md0_dz" + sfx,
+            .hists = {hists.real_pt2_MD0_dZ[i], hists.fake_pt2_MD0_dZ[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "MD1 Transverse Distance (dXY)" + ttl,
+            .xAxis = "dXY [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md1_dxy" + sfx,
+            .hists = {hists.real_pt2_MD1_dXY[i], hists.fake_pt2_MD1_dXY[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "MD1 Longitudinal Distance (dZ)" + ttl,
+            .xAxis = "dZ [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md1_dz" + sfx,
+            .hists = {hists.real_pt2_MD1_dZ[i], hists.fake_pt2_MD1_dZ[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "MD0 R-Z Simple Residual" + ttl,
+            .xAxis = "R_{act} - R_{pred} [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md0_rz_simple" + sfx,
+            .hists = {hists.real_pt2_MD0_rz_simple[i], hists.fake_pt2_MD0_rz_simple[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "MD1 R-Z Simple Residual" + ttl,
+            .xAxis = "R_{act} - R_{pred} [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_md1_rz_simple" + sfx,
+            .hists = {hists.real_pt2_MD1_rz_simple[i], hists.fake_pt2_MD1_rz_simple[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        // =====================================================================
+        // UNUSED pT2s - KINEMATICS & LST VARIABLES
+        // =====================================================================
+
+        recipes.push_back({
+            .title = "Unused pT2 Delta p_{T}" + ttl,
+            .xAxis = "#Delta p_{T} [GeV]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_deltaPT" + sfx,
+            .hists = {hists.real_unused_pt2_deltaPT[i], hists.fake_unused_pt2_deltaPT[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused pT2 Delta #phi" + ttl,
+            .xAxis = "#Delta #phi [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_deltaPHI" + sfx,
+            .hists = {hists.real_unused_pt2_deltaPHI[i], hists.fake_unused_pt2_deltaPHI[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused LST Delta Beta" + ttl,
+            .xAxis = "LST #Delta#beta [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTdBeta" + sfx,
+            .hists = {hists.real_unused_pt2_LSTdBeta[i], hists.fake_unused_pt2_LSTdBeta[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused LST Kinematic Z-Residual" + ttl,
+            .xAxis = "Actual Z - Kinematic Predicted Z [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTKinZRes" + sfx,
+            .hists = {hists.real_unused_pt2_LSTKinZRes[i], hists.fake_unused_pt2_LSTKinZRes[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused LST Geometric Z-Residual" + ttl,
+            .xAxis = "Actual Z - Origin Predicted Z [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTOrgZRes" + sfx,
+            .hists = {hists.real_unused_pt2_LSTOrgZRes[i], hists.fake_unused_pt2_LSTOrgZRes[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        // =====================================================================
+        // UNUSED pT2s - MD COMPONENTS
+        // =====================================================================
+
+        recipes.push_back({
+            .title = "Unused MD0 Transverse Distance (dXY)" + ttl,
+            .xAxis = "dXY [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md0_dxy" + sfx,
+            .hists = {hists.real_unused_pt2_MD0_dXY[i], hists.fake_unused_pt2_MD0_dXY[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused MD0 Longitudinal Distance (dZ)" + ttl,
+            .xAxis = "dZ [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md0_dz" + sfx,
+            .hists = {hists.real_unused_pt2_MD0_dZ[i], hists.fake_unused_pt2_MD0_dZ[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused MD1 Transverse Distance (dXY)" + ttl,
+            .xAxis = "dXY [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md1_dxy" + sfx,
+            .hists = {hists.real_unused_pt2_MD1_dXY[i], hists.fake_unused_pt2_MD1_dXY[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused MD1 Longitudinal Distance (dZ)" + ttl,
+            .xAxis = "dZ [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md1_dz" + sfx,
+            .hists = {hists.real_unused_pt2_MD1_dZ[i], hists.fake_unused_pt2_MD1_dZ[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused MD0 R-Z Simple Residual" + ttl,
+            .xAxis = "R_{act} - R_{pred} [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md0_rz_simple" + sfx,
+            .hists = {hists.real_unused_pt2_MD0_rz_simple[i], hists.fake_unused_pt2_MD0_rz_simple[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused MD1 R-Z Simple Residual" + ttl,
+            .xAxis = "R_{act} - R_{pred} [cm]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_md1_rz_simple" + sfx,
+            .hists = {hists.real_unused_pt2_MD1_rz_simple[i], hists.fake_unused_pt2_MD1_rz_simple[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+    }
+
+    return recipes;
 }
-

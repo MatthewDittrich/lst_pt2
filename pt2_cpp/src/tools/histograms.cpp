@@ -1,486 +1,405 @@
 #include "histograms.h"
-#include <cmath>
+#include <string>
 
 void HistogramManager::init() {
+    for (int i = 0; i < 8; ++i) {
+        std::string sfx = "_" + catNames[i];
+        std::string ttl = " (" + catTitles[i] + ")";
 
-    real_pt2_deltaPT = new TH1D(
-        "real_pt2_deltaPT",
-        "Real pT2 #Delta pT;#Delta pT;Entries",
-        180, -10.0, 10.0
-    );
+        // =====================================================================
+        // KINEMATICS
+        // =====================================================================
 
-    real_pt2_deltaETA = new TH1D(
-        "real_pt2_deltaETA",
-        "Real pT2 #Delta #eta;#Delta #eta;Entries",
-        180, -1.0, 1.0
-    );
+        real_pt2_deltaPT[i] = new TH1D(
+            ("real_pt2_deltaPT" + sfx).c_str(),
+            ("Real pT2 #Delta pT" + ttl + "; #Delta pT [GeV]; Entries").c_str(),
+            180, -10.0, 10.0
+        );
 
-    real_pt2_deltaPHI = new TH1D(
-        "real_pt2_deltaPHI",
-        "Real pT2 #Delta #phi;#Delta #phi;Entries",
-        180, -1.0, 1.0
-    );
+        fake_pt2_deltaPT[i] = new TH1D(
+            ("fake_pt2_deltaPT" + sfx).c_str(),
+            ("Fake pT2 #Delta pT" + ttl + "; #Delta pT [GeV]; Entries").c_str(),
+            180, -10.0, 10.0
+        );
 
-    real_unused_pt2_deltaPT = new TH1D(
-        "real_unused_pt2_deltaPT",
-        "Real Unused pT2 #Delta pT;#Delta pT;Entries",
-        180, -10.0, 10.0
-    );
+        real_unused_pt2_deltaPT[i] = new TH1D(
+            ("real_unused_pt2_deltaPT" + sfx).c_str(),
+            ("Real Unused pT2 #Delta pT" + ttl + "; #Delta pT [GeV]; Entries").c_str(),
+            180, -10.0, 10.0
+        );
 
-    real_unused_pt2_deltaETA = new TH1D(
-        "real_unused_pt2_deltaETA",
-        "Real Unused pT2 #Delta #eta;#Delta #eta;Entries",
-        180, -1.0, 1.0
-    );
+        fake_unused_pt2_deltaPT[i] = new TH1D(
+            ("fake_unused_pt2_deltaPT" + sfx).c_str(),
+            ("Fake Unused pT2 #Delta pT" + ttl + "; #Delta pT [GeV]; Entries").c_str(),
+            180, -10.0, 10.0
+        );
 
-    real_unused_pt2_deltaPHI = new TH1D(
-        "real_unused_pt2_deltaPHI",
-        "Real Unused pT2 #Delta #phi;#Delta #phi;Entries",
-        180, -1.0, 1.0
-    );
+        real_pt2_deltaETA[i] = new TH1D(
+            ("real_pt2_deltaETA" + sfx).c_str(),
+            ("Real pT2 #Delta #eta" + ttl + "; #Delta #eta; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_pt2_deltaPT = new TH1D(
-        "fake_pt2_deltaPT",
-        "Fake pT2 #Delta pT;#Delta pT;Entries",
-        180, -10.0, 10.0
-    );
+        fake_pt2_deltaETA[i] = new TH1D(
+            ("fake_pt2_deltaETA" + sfx).c_str(),
+            ("Fake pT2 #Delta #eta" + ttl + "; #Delta #eta; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_pt2_deltaETA = new TH1D(
-        "fake_pt2_deltaETA",
-        "Fake pT2 #Delta #eta;#Delta #eta;Entries",
-        180, -1.0, 1.0
-    );
+        real_unused_pt2_deltaETA[i] = new TH1D(
+            ("real_unused_pt2_deltaETA" + sfx).c_str(),
+            ("Real Unused pT2 #Delta #eta" + ttl + "; #Delta #eta; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_pt2_deltaPHI = new TH1D(
-        "fake_pt2_deltaPHI",
-        "Fake pT2 #Delta #phi;#Delta #phi;Entries",
-        180, -1.0, 1.0
-    );
+        fake_unused_pt2_deltaETA[i] = new TH1D(
+            ("fake_unused_pt2_deltaETA" + sfx).c_str(),
+            ("Fake Unused pT2 #Delta #eta" + ttl + "; #Delta #eta; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_unused_pt2_deltaPT = new TH1D(
-        "fake_unused_pt2_deltaPT",
-        "Fake Unused pT2 #Delta pT;#Delta pT;Entries",
-        180, -10.0, 10.0
-    );
+        real_pt2_deltaPHI[i] = new TH1D(
+            ("real_pt2_deltaPHI" + sfx).c_str(),
+            ("Real pT2 #Delta #phi" + ttl + "; #Delta #phi [rad]; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_unused_pt2_deltaETA = new TH1D(
-        "fake_unused_pt2_deltaETA",
-        "Fake Unused pT2 #Delta #eta;#Delta #eta;Entries",
-        180, -1.0, 1.0
-    );
+        fake_pt2_deltaPHI[i] = new TH1D(
+            ("fake_pt2_deltaPHI" + sfx).c_str(),
+            ("Fake pT2 #Delta #phi" + ttl + "; #Delta #phi [rad]; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    fake_unused_pt2_deltaPHI = new TH1D(
-        "fake_unused_pt2_deltaPHI",
-        "Fake Unused pT2 #Delta #phi;#Delta #phi;Entries",
-        180, -1.0, 1.0
-    );
+        real_unused_pt2_deltaPHI[i] = new TH1D(
+            ("real_unused_pt2_deltaPHI" + sfx).c_str(),
+            ("Real Unused pT2 #Delta #phi" + ttl + "; #Delta #phi [rad]; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-    //------------Extrapolation--------------------
+        fake_unused_pt2_deltaPHI[i] = new TH1D(
+            ("fake_unused_pt2_deltaPHI" + sfx).c_str(),
+            ("Fake Unused pT2 #Delta #phi" + ttl + "; #Delta #phi [rad]; Entries").c_str(),
+            180, -1.0, 1.0
+        );
 
-   /* real_pt2_dist3D = new TH1D(
-        "real_pt2_dist3D",
-        "Real pT2 Distance;Dist [cm];Entries",
-        100, 0, 15.0
-    );
+        real_pt2_deltaR[i] = new TH1D(
+            ("real_pt2_deltaR" + sfx).c_str(),
+            ("Real pT2 #Delta R" + ttl + "; #Delta R; Entries").c_str(),
+            180, 0, 1.0
+        );
 
-    fake_pt2_dist3D = new TH1D(
-        "fake_pt2_dist3D",
-        "Fake pT2 Distance;Dist [cm];Entries",
-        100, 0, 15.0
-    );
+        fake_pt2_deltaR[i] = new TH1D(
+            ("fake_pt2_deltaR" + sfx).c_str(),
+            ("Fake pT2 #Delta R" + ttl + "; #Delta R; Entries").c_str(),
+            180, 0, 1.0
+        );
 
+        real_unused_pt2_deltaR[i] = new TH1D(
+            ("real_unused_pt2_deltaR" + sfx).c_str(),
+            ("Real Unused pT2 #Delta R" + ttl + "; #Delta R; Entries").c_str(),
+            180, 0, 1.0
+        );
 
-    real_unused_pt2_dist3D = new TH1D(
-        "real_unused_pt2_dist3D",
-        "Real Unused pT2 Distance;Dist [cm];Entries",
-        100, 0, 15.0
-    );
+        fake_unused_pt2_deltaR[i] = new TH1D(
+            ("fake_unused_pt2_deltaR" + sfx).c_str(),
+            ("Fake Unused pT2 #Delta R" + ttl + "; #Delta R; Entries").c_str(),
+            180, 0, 1.0
+        );
 
-   fake_unused_pt2_dist3D = new TH1D(
-       "fake_unused_pt2_dist3D",
-       "Fake Unused pT2 Distance;Dist [cm];Entries",
-       100, 0, 15.0
-    );
-   */
-    // =========================================================================
-    // MD0 Helical Components
-    // =========================================================================
+        real_pt2_deltaAngle[i] = new TH1D(
+            ("real_pt2_deltaAngle" + sfx).c_str(),
+            ("Real pT2 Directional #Delta#alpha" + ttl + "; #Delta#alpha [rad]; Entries").c_str(),
+            180, 0, 0.5
+        );
 
-    real_pt2_MD0_dXY = new TH1D(
-        "real_pt2_MD0_dXY",
-        "Real MD0 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_pt2_deltaAngle[i] = new TH1D(
+            ("fake_pt2_deltaAngle" + sfx).c_str(),
+            ("Fake pT2 Directional #Delta#alpha" + ttl + "; #Delta#alpha [rad]; Entries").c_str(),
+            180, 0, 0.5
+        );
 
-    real_pt2_MD0_dZ = new TH1D(
-        "real_pt2_MD0_dZ",
-        "Real MD0 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        real_unused_pt2_deltaAngle[i] = new TH1D(
+            ("real_unused_pt2_deltaAngle" + sfx).c_str(),
+            ("Real Unused pT2 #Delta#alpha" + ttl + "; #Delta#alpha [rad]; Entries").c_str(),
+            180, 0, 0.5
+        );
 
-    fake_pt2_MD0_dXY = new TH1D(
-        "fake_pt2_MD0_dXY",
-        "Fake MD0 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_unused_pt2_deltaAngle[i] = new TH1D(
+            ("fake_unused_pt2_deltaAngle" + sfx).c_str(),
+            ("Fake Unused pT2 #Delta#alpha" + ttl + "; #Delta#alpha [rad]; Entries").c_str(),
+            180, 0, 0.5
+        );
 
-    fake_pt2_MD0_dZ = new TH1D(
-        "fake_pt2_MD0_dZ",
-        "Fake MD0 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        // =====================================================================
+        // LST VARIABLES
+        // =====================================================================
 
-    real_unused_pt2_MD0_dXY = new TH1D(
-        "real_unused_pt2_MD0_dXY",
-        "Real Unused MD0 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        real_pt2_LSTdPhi[i] = new TH1D(
+            ("real_pt2_LSTdPhi" + sfx).c_str(),
+            ("Real pT2 LST #Delta#phi" + ttl + "; LST #Delta#phi [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    real_unused_pt2_MD0_dZ = new TH1D(
-        "real_unused_pt2_MD0_dZ",
-        "Real Unused MD0 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        fake_pt2_LSTdPhi[i] = new TH1D(
+            ("fake_pt2_LSTdPhi" + sfx).c_str(),
+            ("Fake pT2 LST #Delta#phi" + ttl + "; LST #Delta#phi [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_unused_pt2_MD0_dXY = new TH1D(
-        "fake_unused_pt2_MD0_dXY",
-        "Fake Unused MD0 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        real_unused_pt2_LSTdPhi[i] = new TH1D(
+            ("real_unused_pt2_LSTdPhi" + sfx).c_str(),
+            ("Real Unused LST #Delta#phi" + ttl + "; LST #Delta#phi [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_unused_pt2_MD0_dZ = new TH1D(
-        "fake_unused_pt2_MD0_dZ",
-        "Fake Unused MD0 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        fake_unused_pt2_LSTdPhi[i] = new TH1D(
+            ("fake_unused_pt2_LSTdPhi" + sfx).c_str(),
+            ("Fake Unused LST #Delta#phi" + ttl + "; LST #Delta#phi [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    // =========================================================================
-    // MD1 Helical Components
-    // =========================================================================
+        real_pt2_LSTdBeta[i] = new TH1D(
+            ("real_pt2_LSTdBeta" + sfx).c_str(),
+            ("Real pT2 LST #Delta#beta" + ttl + "; LST #Delta#beta [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    real_pt2_MD1_dXY = new TH1D(
-        "real_pt2_MD1_dXY",
-        "Real MD1 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_pt2_LSTdBeta[i] = new TH1D(
+            ("fake_pt2_LSTdBeta" + sfx).c_str(),
+            ("Fake pT2 LST #Delta#beta" + ttl + "; LST #Delta#beta [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    real_pt2_MD1_dZ = new TH1D(
-        "real_pt2_MD1_dZ",
-        "Real MD1 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        real_unused_pt2_LSTdBeta[i] = new TH1D(
+            ("real_unused_pt2_LSTdBeta" + sfx).c_str(),
+            ("Real Unused LST #Delta#beta" + ttl + "; LST #Delta#beta [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_pt2_MD1_dXY = new TH1D(
-        "fake_pt2_MD1_dXY",
-        "Fake MD1 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_unused_pt2_LSTdBeta[i] = new TH1D(
+            ("fake_unused_pt2_LSTdBeta" + sfx).c_str(),
+            ("Fake Unused LST #Delta#beta" + ttl + "; LST #Delta#beta [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_pt2_MD1_dZ = new TH1D(
-        "fake_pt2_MD1_dZ",
-        "Fake MD1 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        real_pt2_LSTbetaOut[i] = new TH1D(
+            ("real_pt2_LSTbetaOut" + sfx).c_str(),
+            ("Real pT2 LST #beta_{Out}" + ttl + "; LST #beta_{Out} [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    real_unused_pt2_MD1_dXY = new TH1D(
-        "real_unused_pt2_MD1_dXY",
-        "Real Unused MD1 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_pt2_LSTbetaOut[i] = new TH1D(
+            ("fake_pt2_LSTbetaOut" + sfx).c_str(),
+            ("Fake pT2 LST #beta_{Out}" + ttl + "; LST #beta_{Out} [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    real_unused_pt2_MD1_dZ = new TH1D(
-        "real_unused_pt2_MD1_dZ",
-        "Real Unused MD1 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        real_unused_pt2_LSTbetaOut[i] = new TH1D(
+            ("real_unused_pt2_LSTbetaOut" + sfx).c_str(),
+            ("Real Unused LST #beta_{Out}" + ttl + "; LST #beta_{Out} [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_unused_pt2_MD1_dXY = new TH1D(
-        "fake_unused_pt2_MD1_dXY",
-        "Fake Unused MD1 #DeltaXY;#DeltaXY [cm];Entries",
-        180, 0, 5.0
-    );
+        fake_unused_pt2_LSTbetaOut[i] = new TH1D(
+            ("fake_unused_pt2_LSTbetaOut" + sfx).c_str(),
+            ("Fake Unused LST #beta_{Out}" + ttl + "; LST #beta_{Out} [rad]; Entries").c_str(),
+            180, -0.5, 0.5
+        );
 
-    fake_unused_pt2_MD1_dZ = new TH1D(
-        "fake_unused_pt2_MD1_dZ",
-        "Fake Unused MD1 #DeltaZ;#DeltaZ [cm];Entries",
-        180, 0, 10.0
-    );
+        real_pt2_LSTKinZRes[i] = new TH1D(
+            ("real_pt2_LSTKinZRes" + sfx).c_str(),
+            ("Real pT2 Kinematic Z-Res" + ttl + "; Z_{act} - Z_{pred} [cm]; Entries").c_str(),
+            180, -5.0, 5.0
+        );
 
-    real_pt2_MD0_rz_simple = new TH1D(
-        "real_pt2_MD0_rz_simple", 
-        "Real MD0 R-Z Residual;[cm];Entries", 
-        180, -10, 10
-    );
-    
-    real_pt2_MD1_rz_simple = new TH1D(
-        "real_pt2_MD1_rz_simple", 
-        "Real MD1 R-Z Residual;[cm];Entries", 
-        180, -10, 10
-    );
-    
-    fake_pt2_MD0_rz_simple = new TH1D(
-        "fake_pt2_MD0_rz_simple", 
-        "Fake MD0 R-Z Residual;[cm];Entries", 
-        180, -10, 10
-    );
-    
-    fake_pt2_MD1_rz_simple = new TH1D(
-        "fake_pt2_MD1_rz_simple", 
-        "Fake MD1 R-Z Residual;[cm];Entries", 
-        180, -10, 10
-    );
+        fake_pt2_LSTKinZRes[i] = new TH1D(
+            ("fake_pt2_LSTKinZRes" + sfx).c_str(),
+            ("Fake pT2 Kinematic Z-Res" + ttl + "; Z_{act} - Z_{pred} [cm]; Entries").c_str(),
+            180, -5.0, 5.0
+        );
 
-    real_unused_pt2_MD0_rz_simple = new TH1D(
-        "real_unused_pt2_MD0_rz_simple",
-        "Real Unused MD0 R-Z Residual;[cm];Entries",
-        180, -10, 10
-    );
+        real_unused_pt2_LSTKinZRes[i] = new TH1D(
+            ("real_unused_pt2_LSTKinZRes" + sfx).c_str(),
+            ("Real Unused Kinematic Z-Res" + ttl + "; Z_{act} - Z_{pred} [cm]; Entries").c_str(),
+            180, -5.0, 5.0
+        );
 
-    real_unused_pt2_MD1_rz_simple = new TH1D(
-        "real_unused_pt2_MD1_rz_simple",
-        "Real Unused MD1 R-Z Residual;[cm];Entries",
-        180, -10, 10
-    );
+        fake_unused_pt2_LSTKinZRes[i] = new TH1D(
+            ("fake_unused_pt2_LSTKinZRes" + sfx).c_str(),
+            ("Fake Unused Kinematic Z-Res" + ttl + "; Z_{act} - Z_{pred} [cm]; Entries").c_str(),
+            180, -5.0, 5.0
+        );
 
-    fake_unused_pt2_MD0_rz_simple = new TH1D(
-        "fake_unused_pt2_MD0_rz_simple",
-        "Fake Unused MD0 R-Z Residual;[cm];Entries",
-        180, -10, 10
-    );
+        real_pt2_LSTOrgZRes[i] = new TH1D(
+            ("real_pt2_LSTOrgZRes" + sfx).c_str(),
+            ("Real pT2 Geometric Z-Res" + ttl + "; Z_{act} - Z_{org} [cm]; Entries").c_str(),
+            180, -25.0, 25.0
+        );
 
-    fake_unused_pt2_MD1_rz_simple = new TH1D(
-        "fake_unused_pt2_MD1_rz_simple",
-        "Fake Unused MD1 R-Z Residual;[cm];Entries",
-        180, -10, 10
-    );
+        fake_pt2_LSTOrgZRes[i] = new TH1D(
+            ("fake_pt2_LSTOrgZRes" + sfx).c_str(),
+            ("Fake pT2 Geometric Z-Res" + ttl + "; Z_{act} - Z_{org} [cm]; Entries").c_str(),
+            180, -25.0, 25.0
+        );
 
-    // Cut Study: dXY distribution for events that pass |dZ| < 2.5 cm
-    // Add this inside HistogramManager::init()
-    
-    h2_real_MD0_dXY_vs_dZ = new TH2D(
-        "h2_real_MD0_dXY_vs_dZ", 
-        "Real MD0; |#DeltaZ| [cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_fake_MD0_dXY_vs_dZ = new TH2D(
-        "h2_fake_MD0_dXY_vs_dZ", 
-        "Fake MD0; |#DeltaZ| [cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_real_MD1_dXY_vs_dZ = new TH2D(
-        "h2_real_MD1_dXY_vs_dZ", 
-        "Real MD1; |#DeltaZ| [cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_fake_MD1_dXY_vs_dZ = new TH2D(
-        "h2_fake_MD1_dXY_vs_dZ", 
-        "Fake MD1; |#DeltaZ|[cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
+        real_unused_pt2_LSTOrgZRes[i] = new TH1D(
+            ("real_unused_pt2_LSTOrgZRes" + sfx).c_str(),
+            ("Real Unused Geometric Z-Res" + ttl + "; Z_{act} - Z_{org} [cm]; Entries").c_str(),
+            180, -25.0, 25.0
+        );
 
-    h2_real_unused_MD0_dXY_vs_dZ = new TH2D(
-        "h2_real_unused_MD0_dXY_vs_dZ", 
-        "Real Unused MD0; |#DeltaZ| [cm]; dXY[cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_fake_unused_MD0_dXY_vs_dZ = new TH2D(
-        "h2_fake_unused_MD0_dXY_vs_dZ", 
-        "Fake Unused MD0; |#DeltaZ| [cm]; dXY [cm]",
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_real_unused_MD1_dXY_vs_dZ = new TH2D(
-        "h2_real_unused_MD1_dXY_vs_dZ", 
-        "Real Unused MD1; |#DeltaZ| [cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
-    
-    h2_fake_unused_MD1_dXY_vs_dZ = new TH2D(
-        "h2_fake_unused_MD1_dXY_vs_dZ", 
-        "Fake Unused MD1; |#DeltaZ| [cm]; dXY [cm]", 
-        180, 0, 10.0, 180, 0, 10.0
-    );
+        fake_unused_pt2_LSTOrgZRes[i] = new TH1D(
+            ("fake_unused_pt2_LSTOrgZRes" + sfx).c_str(),
+            ("Fake Unused Geometric Z-Res" + ttl + "; Z_{act} - Z_{org} [cm]; Entries").c_str(),
+            180, -25.0, 25.0
+        );
 
-    //Delta R
+        // =====================================================================
+        // MD COMPONENTS (dXY, dZ, RZ)
+        // =====================================================================
 
-    real_pt2_deltaR = new TH1D(
-        "real_pt2_deltaR", 
-        "Real pT2 #Delta R; #Delta R; Entries", 
-        180, 0, 1.0
-    );
-    
-    fake_pt2_deltaR = new TH1D(
-        "fake_pt2_deltaR", 
-        "Fake pT2 #Delta R; #Delta R; Entries", 
-        180, 0, 1.0
-    );
-    
-    real_unused_pt2_deltaR = new TH1D(
-        "real_unused_pt2_deltaR", 
-        "Real Unused #Delta R; #Delta R; Entries", 
-        180, 0, 1.0
-    );
-    
-    fake_unused_pt2_deltaR = new TH1D(
-        "fake_unused_pt2_deltaR", 
-        "Fake Unused #Delta R; #Delta R; Entries", 
-        180, 0, 1.0
-    );
-    
-    //Delta angle
+        real_pt2_MD0_dXY[i] = new TH1D(
+            ("real_pt2_MD0_dXY" + sfx).c_str(),
+            ("Real MD0 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    real_pt2_deltaAngle = new TH1D(
-        "real_pt2_deltaAngle", 
-        "Real pT2 Directional #Delta#alpha; #Delta#alpha [rad]; Entries", 
-        180, 0, 0.5
-    );
-    
-    fake_pt2_deltaAngle = new TH1D(
-        "fake_pt2_deltaAngle", 
-        "Fake pT2 Directional #Delta#alpha; #Delta#alpha [rad]; Entries", 
-        180, 0, 0.5
-    );
-    
-    real_unused_pt2_deltaAngle = new TH1D(
-        "real_unused_pt2_deltaAngle", 
-        "Real Unused #Delta#alpha; [rad]; Entries", 
-        180, 0, 0.5
-    );
-    
-    fake_unused_pt2_deltaAngle = new TH1D(
-        "fake_unused_pt2_deltaAngle", 
-        "Fake Unused #Delta#alpha; [rad]; Entries", 
-        180, 0, 0.5
-    );
+        fake_pt2_MD0_dXY[i] = new TH1D(
+            ("fake_pt2_MD0_dXY" + sfx).c_str(),
+            ("Fake MD0 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    //------------ LST Variables --------------------
+        real_unused_pt2_MD0_dXY[i] = new TH1D(
+            ("real_unused_pt2_MD0_dXY" + sfx).c_str(),
+            ("Real Unused MD0 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    real_pt2_LSTdPhi = new TH1D(
-        "real_pt2_LSTdPhi",
-        "Real pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        fake_unused_pt2_MD0_dXY[i] = new TH1D(
+            ("fake_unused_pt2_MD0_dXY" + sfx).c_str(),
+            ("Fake Unused MD0 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    fake_pt2_LSTdPhi = new TH1D(
-        "fake_pt2_LSTdPhi",
-        "Fake pT2 LST #Delta#phi; LST #Delta#phi [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        real_pt2_MD0_dZ[i] = new TH1D(
+            ("real_pt2_MD0_dZ" + sfx).c_str(),
+            ("Real MD0 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    real_unused_pt2_LSTdPhi = new TH1D(
-        "real_unused_pt2_LSTdPhi",
-        "Real Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        fake_pt2_MD0_dZ[i] = new TH1D(
+            ("fake_pt2_MD0_dZ" + sfx).c_str(),
+            ("Fake MD0 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    fake_unused_pt2_LSTdPhi = new TH1D(
-        "fake_unused_pt2_LSTdPhi",
-        "Fake Unused LST #Delta#phi; LST #Delta#phi [rad]; Entries",
-        180, -0.5, 0.5
-    );
-    //------------ LST dBeta --------------------
+        real_unused_pt2_MD0_dZ[i] = new TH1D(
+            ("real_unused_pt2_MD0_dZ" + sfx).c_str(),
+            ("Real Unused MD0 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    real_pt2_LSTdBeta = new TH1D(
-        "real_pt2_LSTdBeta",
-        "Real pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        fake_unused_pt2_MD0_dZ[i] = new TH1D(
+            ("fake_unused_pt2_MD0_dZ" + sfx).c_str(),
+            ("Fake Unused MD0 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    fake_pt2_LSTdBeta = new TH1D(
-        "fake_pt2_LSTdBeta",
-        "Fake pT2 LST #Delta#beta; LST #Delta#beta [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        real_pt2_MD1_dXY[i] = new TH1D(
+            ("real_pt2_MD1_dXY" + sfx).c_str(),
+            ("Real MD1 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    real_unused_pt2_LSTdBeta = new TH1D(
-        "real_unused_pt2_LSTdBeta",
-        "Real Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        fake_pt2_MD1_dXY[i] = new TH1D(
+            ("fake_pt2_MD1_dXY" + sfx).c_str(),
+            ("Fake MD1 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    fake_unused_pt2_LSTdBeta = new TH1D(
-        "fake_unused_pt2_LSTdBeta",
-        "Fake Unused LST #Delta#beta; LST #Delta#beta [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        real_unused_pt2_MD1_dXY[i] = new TH1D(
+            ("real_unused_pt2_MD1_dXY" + sfx).c_str(),
+            ("Real Unused MD1 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    //------------ LST betaOut --------------------
+        fake_unused_pt2_MD1_dXY[i] = new TH1D(
+            ("fake_unused_pt2_MD1_dXY" + sfx).c_str(),
+            ("Fake Unused MD1 #DeltaXY" + ttl + "; #DeltaXY [cm]; Entries").c_str(),
+            180, 0, 5.0
+        );
 
-    real_pt2_LSTbetaOut = new TH1D(
-        "real_pt2_LSTbetaOut",
-        "Real pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        real_pt2_MD1_dZ[i] = new TH1D(
+            ("real_pt2_MD1_dZ" + sfx).c_str(),
+            ("Real MD1 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    fake_pt2_LSTbetaOut = new TH1D(
-        "fake_pt2_LSTbetaOut",
-        "Fake pT2 LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        fake_pt2_MD1_dZ[i] = new TH1D(
+            ("fake_pt2_MD1_dZ" + sfx).c_str(),
+            ("Fake MD1 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    real_unused_pt2_LSTbetaOut = new TH1D(
-        "real_unused_pt2_LSTbetaOut",
-        "Real Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
-        180, -0.5, 0.5
-    );
+        real_unused_pt2_MD1_dZ[i] = new TH1D(
+            ("real_unused_pt2_MD1_dZ" + sfx).c_str(),
+            ("Real Unused MD1 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    fake_unused_pt2_LSTbetaOut = new TH1D(
-        "fake_unused_pt2_LSTbetaOut",
-        "Fake Unused LST #beta_{Out}; LST #beta_{Out} [rad]; Entries",
-        180, -0.5, 0.5
-    );
-    //------------ LST Z-Residuals --------------------
+        fake_unused_pt2_MD1_dZ[i] = new TH1D(
+            ("fake_unused_pt2_MD1_dZ" + sfx).c_str(),
+            ("Fake Unused MD1 #DeltaZ" + ttl + "; #DeltaZ [cm]; Entries").c_str(),
+            180, 0, 10.0
+        );
 
-    // 1. Geometric (Loose Cut)
-    real_pt2_LSTOrgZRes = new TH1D(
-        "real_pt2_LSTZResGeometric", 
-        "Real pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
-        180, -25.0, 25.0
-    );
-    
-    fake_pt2_LSTOrgZRes = new TH1D(
-        "fake_pt2_LSTZResGeometric", 
-        "Fake pT2 Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
-        180, -25.0, 25.0
-    );
-    
-    real_unused_pt2_LSTOrgZRes = new TH1D(
-        "real_unused_pt2_LSTZResGeometric", 
-        "Real Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
-        180, -25.0, 25.0
-    );
-    
-    fake_unused_pt2_LSTOrgZRes = new TH1D(
-        "fake_unused_pt2_LSTZResGeometric", 
-        "Fake Unused Geometric Z-Res; Z_{act} - Z_{origin} [cm]; Entries", 
-        180, -25.0, 25.0
-    );
+        real_pt2_MD0_rz_simple[i] = new TH1D(
+            ("real_pt2_MD0_rz_simple" + sfx).c_str(),
+            ("Real MD0 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
 
-    // 2. Kinematic (Tight Cut)
-    real_pt2_LSTKinZRes = new TH1D(
-        "real_pt2_LSTZResKinematic", 
-        "Real pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
-        180, -5.0, 5.0
-    );
-    fake_pt2_LSTKinZRes = new TH1D(
-        "fake_pt2_LSTZResKinematic", 
-        "Fake pT2 Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
-        180, -5.0, 5.0
-    );
-    
-    real_unused_pt2_LSTKinZRes = new TH1D(
-        "real_unused_pt2_LSTZResKinematic", 
-        "Real Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
-        180, -5.0, 5.0
-    );
-    
-    fake_unused_pt2_LSTKinZRes = new TH1D(
-        "fake_unused_pt2_LSTZResKinematic", 
-        "Fake Unused Kinematic Z-Res; Z_{act} - Z_{pred} [cm]; Entries", 
-        180, -5.0, 5.0
-    );
+        fake_pt2_MD0_rz_simple[i] = new TH1D(
+            ("fake_pt2_MD0_rz_simple" + sfx).c_str(),
+            ("Fake MD0 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        real_unused_pt2_MD0_rz_simple[i] = new TH1D(
+            ("real_unused_pt2_MD0_rz_simple" + sfx).c_str(),
+            ("Real Unused MD0 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        fake_unused_pt2_MD0_rz_simple[i] = new TH1D(
+            ("fake_unused_pt2_MD0_rz_simple" + sfx).c_str(),
+            ("Fake Unused MD0 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        real_pt2_MD1_rz_simple[i] = new TH1D(
+            ("real_pt2_MD1_rz_simple" + sfx).c_str(),
+            ("Real MD1 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        fake_pt2_MD1_rz_simple[i] = new TH1D(
+            ("fake_pt2_MD1_rz_simple" + sfx).c_str(),
+            ("Fake MD1 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        real_unused_pt2_MD1_rz_simple[i] = new TH1D(
+            ("real_unused_pt2_MD1_rz_simple" + sfx).c_str(),
+            ("Real Unused MD1 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+
+        fake_unused_pt2_MD1_rz_simple[i] = new TH1D(
+            ("fake_unused_pt2_MD1_rz_simple" + sfx).c_str(),
+            ("Fake Unused MD1 R-Z Residual" + ttl + "; [cm]; Entries").c_str(),
+            180, -10, 10
+        );
+    }
 }
