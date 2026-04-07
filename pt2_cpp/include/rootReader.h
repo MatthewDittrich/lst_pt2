@@ -64,6 +64,9 @@ public:
     std::vector<float>* pLS_circleCenterX = nullptr;
     std::vector<float>* pLS_circleCenterY = nullptr;
     // Mini-Doublet Variables
+    std::vector<float> *md_pt = nullptr;
+    std::vector<float> *md_eta = nullptr;
+    std::vector<float> *md_phi = nullptr;
     std::vector<int>   *md_layer = nullptr;
     std::vector<int>   *md_detId = nullptr;
     std::vector<float> *md_anchor_x = nullptr;
