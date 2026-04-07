@@ -2,7 +2,7 @@
 #include <string>
 
 void HistogramManager::init() {
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 11; ++i) {
         std::string sfx = "_" + catNames[i];
         std::string ttl = " (" + catTitles[i] + ")";
 

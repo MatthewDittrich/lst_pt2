@@ -16,6 +16,7 @@
 #include "extrapolation.h"
 #include "extra_cuts.h"
 
+
 int main(int argc, char** argv) {
 
     // Default Arguments
@@ -165,10 +166,12 @@ int main(int argc, char** argv) {
     int b_is_real;
     double b_heli_dXY0, b_heli_dZ0, b_heli_dXY1, b_heli_dZ1;
     double b_rz_simple0, b_rz_simple1;
-    int b_event_id, b_category;
+    int b_event_id;
+    int b_md0_cat, b_md1_cat;
     
     bdtTree->Branch("event_id", &b_event_id);
-    bdtTree->Branch("category", &b_category);
+    bdtTree->Branch("md0_cat", &b_md0_cat); 
+    bdtTree->Branch("md1_cat", &b_md1_cat); 
     // Create the branches (columns) in the TTree
     bdtTree->Branch("lst_dPhi", &b_lst_dPhi);
     bdtTree->Branch("betaIn", &b_betaIn);
@@ -189,7 +192,6 @@ int main(int argc, char** argv) {
     
     // The "Target" variable: 1 for Real, 0 for Fake
     bdtTree->Branch("is_real", &b_is_real);
-    
     
     print_creature();
 
@@ -242,7 +244,17 @@ int main(int argc, char** argv) {
         for (auto& pt2 : pt2s) {
             size_t plsIdx = pt2.pls_idx;
             size_t lsIdx = pt2.ls_idx;
+           
+            // --- CATEGORIZE MD0 and MD1 ---
+            int md0_idx = reader.ls_mdIdx0->at(lsIdx);
+            int md1_idx = reader.ls_mdIdx1->at(lsIdx);
+            uint32_t detId0 = reader.md_detId->at(md0_idx);
+            uint32_t detId1 = reader.md_detId->at(md1_idx);
             
+            int cat0 = extra_cuts::getCategoryFromDetId(detId0);
+            int cat1 = extra_cuts::getCategoryFromDetId(detId1);
+            int comboIdx = extra_cuts::getConnectionIndex(cat0, cat1); 
+
             pt2.delta_pt  = deltaPt(reader.pls_pt->at(plsIdx), reader.ls_pt->at(lsIdx));
             pt2.delta_eta = deltaEta(reader.pls_eta->at(plsIdx), reader.ls_eta->at(lsIdx));
             pt2.delta_phi = deltaPhi(reader.pls_phi->at(plsIdx), reader.ls_phi->at(lsIdx));
@@ -264,7 +276,6 @@ int main(int argc, char** argv) {
             double lst_zResGeo = extra_cuts::calculateLSTOriginZResidual(plsIdx, lsIdx, reader);
             double lst_zResKin = extra_cuts::calculateLSTKinematicZResidual(plsIdx, lsIdx, reader);
             
-            int cat = extra_cuts::getPt2Category(lsIdx, reader);
 
             //---FILLING ROOT FILE FOR BDT -------
             if (lst_dPhi > -100.0 && dBeta > -100.0) {
@@ -284,37 +295,39 @@ int main(int argc, char** argv) {
                 b_rz_simple0 = rz_simple.first;
                 b_rz_simple1 = rz_simple.second;
                 b_event_id = ievt;
-                b_category = cat;
                 // The Machine Learning label!
-                b_is_real   = pt2.is_real ? 1 : 0; 
+                b_is_real   = pt2.is_real ? 1 : 0;
+                b_md0_cat   = cat0; // Save categories to Python!
+                b_md1_cat   = cat1; 
                 bdtTree->Fill(); 
             }
-            if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
+            //if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
             //if(heli[0] > 2.3896 ||  heli[2] > 3.4234 ){continue;}
             //if(pt2.delta_phi < -0.3493 || pt2.delta_phi > 0.3457){continue;}
             //if(rz_simple.first < -2.8875  || rz_simple.first > 1.2586 || rz_simple.second < -4.7368 || rz_simple.second > 1.8688){continue;}
             //if(pt2.delta_pt < -0.6123 || pt2.delta_pt > 0.1846){continue;}
             //if(dBeta < -0.0445 || dBeta > 0.0393){continue;}
             //if(lst_zResKin < -3.5895 || lst_zResKin > 3.7145){continue;}
+            if (comboIdx >= 0) {
             if (pt2.is_real) {
-                hists.real_pt2_deltaPT[cat]->Fill(pt2.delta_pt);
-                hists.real_pt2_deltaETA[cat]->Fill(pt2.delta_eta);
-                hists.real_pt2_deltaPHI[cat]->Fill(pt2.delta_phi);
-                hists.real_pt2_deltaR[cat]->Fill(dR);
+                hists.real_pt2_deltaPT[comboIdx]->Fill(pt2.delta_pt);
+                hists.real_pt2_deltaETA[comboIdx]->Fill(pt2.delta_eta);
+                hists.real_pt2_deltaPHI[comboIdx]->Fill(pt2.delta_phi);
+                hists.real_pt2_deltaR[comboIdx]->Fill(dR);
 
-                if (dAngle > -1.0) hists.real_pt2_deltaAngle[cat]->Fill(dAngle);
-                if (lst_dPhi > -100.0) hists.real_pt2_LSTdPhi[cat]->Fill(lst_dPhi);
-                if (dBeta > -100.0) hists.real_pt2_LSTdBeta[cat]->Fill(dBeta);
-                if (betaOut > -100.0) hists.real_pt2_LSTbetaOut[cat]->Fill(betaOut);
-                if (lst_zResGeo > -100.0) hists.real_pt2_LSTOrgZRes[cat]->Fill(lst_zResGeo);
-                if (lst_zResKin > -100.0) hists.real_pt2_LSTKinZRes[cat]->Fill(lst_zResKin);
+                if (dAngle > -1.0) hists.real_pt2_deltaAngle[comboIdx]->Fill(dAngle);
+                if (lst_dPhi > -100.0) hists.real_pt2_LSTdPhi[comboIdx]->Fill(lst_dPhi);
+                if (dBeta > -100.0) hists.real_pt2_LSTdBeta[comboIdx]->Fill(dBeta);
+                if (betaOut > -100.0) hists.real_pt2_LSTbetaOut[comboIdx]->Fill(betaOut);
+                if (lst_zResGeo > -100.0) hists.real_pt2_LSTOrgZRes[comboIdx]->Fill(lst_zResGeo);
+                if (lst_zResKin > -100.0) hists.real_pt2_LSTKinZRes[comboIdx]->Fill(lst_zResKin);
 
                 // Fill Separated 3D components for Real
                 if (heli[0] >= 0) {
-                    hists.real_pt2_MD0_dXY[cat]->Fill(heli[0]); 
-                    hists.real_pt2_MD0_dZ[cat]->Fill(heli[1]);
-                    hists.real_pt2_MD1_dXY[cat]->Fill(heli[2]); 
-                    hists.real_pt2_MD1_dZ[cat]->Fill(heli[3]);
+                    hists.real_pt2_MD0_dXY[comboIdx]->Fill(heli[0]); 
+                    hists.real_pt2_MD0_dZ[comboIdx]->Fill(heli[1]);
+                    hists.real_pt2_MD1_dXY[comboIdx]->Fill(heli[2]); 
+                    hists.real_pt2_MD1_dZ[comboIdx]->Fill(heli[3]);
                     //Fill 2d histograms
                     //hists.h2_real_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
                     //hists.h2_real_MD1_dXY_vs_dZ->Fill(std::abs(heli[3]), heli[2]);
@@ -322,27 +335,27 @@ int main(int argc, char** argv) {
                 }
 
                 if (rz_simple.first > -900) {
-                    hists.real_pt2_MD0_rz_simple[cat]->Fill(rz_simple.first);
-                    hists.real_pt2_MD1_rz_simple[cat]->Fill(rz_simple.second);
+                    hists.real_pt2_MD0_rz_simple[comboIdx]->Fill(rz_simple.first);
+                    hists.real_pt2_MD1_rz_simple[comboIdx]->Fill(rz_simple.second);
                 }
 
                 if (!pt2.is_used) {
-                    hists.real_unused_pt2_deltaPT[cat]->Fill(pt2.delta_pt);
-                    hists.real_unused_pt2_deltaETA[cat]->Fill(pt2.delta_eta);
-                    hists.real_unused_pt2_deltaPHI[cat]->Fill(pt2.delta_phi);
-                    hists.real_unused_pt2_deltaR[cat]->Fill(dR);
-                    if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle[cat]->Fill(dAngle);
-                    if (lst_dPhi > -100.0) hists.real_unused_pt2_LSTdPhi[cat]->Fill(lst_dPhi);
-                    if (dBeta > -100.0) hists.real_unused_pt2_LSTdBeta[cat]->Fill(dBeta);
-                    if (betaOut > -100.0) hists.real_unused_pt2_LSTbetaOut[cat]->Fill(betaOut);
-                    if (lst_zResGeo > -100.0) hists.real_unused_pt2_LSTOrgZRes[cat]->Fill(lst_zResGeo);
-                    if (lst_zResKin > -100.0) hists.real_unused_pt2_LSTKinZRes[cat]->Fill(lst_zResKin);
+                    hists.real_unused_pt2_deltaPT[comboIdx]->Fill(pt2.delta_pt);
+                    hists.real_unused_pt2_deltaETA[comboIdx]->Fill(pt2.delta_eta);
+                    hists.real_unused_pt2_deltaPHI[comboIdx]->Fill(pt2.delta_phi);
+                    hists.real_unused_pt2_deltaR[comboIdx]->Fill(dR);
+                    if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle[comboIdx]->Fill(dAngle);
+                    if (lst_dPhi > -100.0) hists.real_unused_pt2_LSTdPhi[comboIdx]->Fill(lst_dPhi);
+                    if (dBeta > -100.0) hists.real_unused_pt2_LSTdBeta[comboIdx]->Fill(dBeta);
+                    if (betaOut > -100.0) hists.real_unused_pt2_LSTbetaOut[comboIdx]->Fill(betaOut);
+                    if (lst_zResGeo > -100.0) hists.real_unused_pt2_LSTOrgZRes[comboIdx]->Fill(lst_zResGeo);
+                    if (lst_zResKin > -100.0) hists.real_unused_pt2_LSTKinZRes[comboIdx]->Fill(lst_zResKin);
 
                     if (heli[0] >= 0) {
-                        hists.real_unused_pt2_MD0_dXY[cat]->Fill(heli[0]); 
-                        hists.real_unused_pt2_MD0_dZ[cat]->Fill(heli[1]);
-                        hists.real_unused_pt2_MD1_dXY[cat]->Fill(heli[2]); 
-                        hists.real_unused_pt2_MD1_dZ[cat]->Fill(heli[3]);
+                        hists.real_unused_pt2_MD0_dXY[comboIdx]->Fill(heli[0]); 
+                        hists.real_unused_pt2_MD0_dZ[comboIdx]->Fill(heli[1]);
+                        hists.real_unused_pt2_MD1_dXY[comboIdx]->Fill(heli[2]); 
+                        hists.real_unused_pt2_MD1_dZ[comboIdx]->Fill(heli[3]);
 
                         //Fill 2d histograms
                         //hists.h2_real_unused_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
@@ -351,30 +364,30 @@ int main(int argc, char** argv) {
                     }
 
                     if (rz_simple.first > -900) {
-                        hists.real_unused_pt2_MD0_rz_simple[cat]->Fill(rz_simple.first);
-                        hists.real_unused_pt2_MD1_rz_simple[cat]->Fill(rz_simple.second);
+                        hists.real_unused_pt2_MD0_rz_simple[comboIdx]->Fill(rz_simple.first);
+                        hists.real_unused_pt2_MD1_rz_simple[comboIdx]->Fill(rz_simple.second);
                     }
                 }
             } 
             else {
-                hists.fake_pt2_deltaPT[cat]->Fill(pt2.delta_pt);
-                hists.fake_pt2_deltaETA[cat]->Fill(pt2.delta_eta);
-                hists.fake_pt2_deltaPHI[cat]->Fill(pt2.delta_phi);
-                hists.fake_pt2_deltaR[cat]->Fill(dR);
+                hists.fake_pt2_deltaPT[comboIdx]->Fill(pt2.delta_pt);
+                hists.fake_pt2_deltaETA[comboIdx]->Fill(pt2.delta_eta);
+                hists.fake_pt2_deltaPHI[comboIdx]->Fill(pt2.delta_phi);
+                hists.fake_pt2_deltaR[comboIdx]->Fill(dR);
 
-                if (dAngle > -1.0) hists.fake_pt2_deltaAngle[cat]->Fill(dAngle);
-                if (lst_dPhi > -100.0) hists.fake_pt2_LSTdPhi[cat]->Fill(lst_dPhi);
-                if (dBeta > -100.0) hists.fake_pt2_LSTdBeta[cat]->Fill(dBeta);
-                if (betaOut > -100.0) hists.fake_pt2_LSTbetaOut[cat]->Fill(betaOut);
-                if (lst_zResGeo > -100.0) hists.fake_pt2_LSTOrgZRes[cat]->Fill(lst_zResGeo);
-                if (lst_zResKin > -100.0) hists.fake_pt2_LSTKinZRes[cat]->Fill(lst_zResKin);
+                if (dAngle > -1.0) hists.fake_pt2_deltaAngle[comboIdx]->Fill(dAngle);
+                if (lst_dPhi > -100.0) hists.fake_pt2_LSTdPhi[comboIdx]->Fill(lst_dPhi);
+                if (dBeta > -100.0) hists.fake_pt2_LSTdBeta[comboIdx]->Fill(dBeta);
+                if (betaOut > -100.0) hists.fake_pt2_LSTbetaOut[comboIdx]->Fill(betaOut);
+                if (lst_zResGeo > -100.0) hists.fake_pt2_LSTOrgZRes[comboIdx]->Fill(lst_zResGeo);
+                if (lst_zResKin > -100.0) hists.fake_pt2_LSTKinZRes[comboIdx]->Fill(lst_zResKin);
 
                 // Fill Separated 3D components for Fake
                 if (heli[0] >= 0) {
-                    hists.fake_pt2_MD0_dXY[cat]->Fill(heli[0]); 
-                    hists.fake_pt2_MD0_dZ[cat]->Fill(heli[1]);
-                    hists.fake_pt2_MD1_dXY[cat]->Fill(heli[2]); 
-                    hists.fake_pt2_MD1_dZ[cat]->Fill(heli[3]);
+                    hists.fake_pt2_MD0_dXY[comboIdx]->Fill(heli[0]); 
+                    hists.fake_pt2_MD0_dZ[comboIdx]->Fill(heli[1]);
+                    hists.fake_pt2_MD1_dXY[comboIdx]->Fill(heli[2]); 
+                    hists.fake_pt2_MD1_dZ[comboIdx]->Fill(heli[3]);
 
                     //Fill 2d histograms
                     //hists.h2_fake_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
@@ -383,28 +396,28 @@ int main(int argc, char** argv) {
                 }
 
                 if (rz_simple.first > -900) {
-                    hists.fake_pt2_MD0_rz_simple[cat]->Fill(rz_simple.first);
-                    hists.fake_pt2_MD1_rz_simple[cat]->Fill(rz_simple.second);
+                    hists.fake_pt2_MD0_rz_simple[comboIdx]->Fill(rz_simple.first);
+                    hists.fake_pt2_MD1_rz_simple[comboIdx]->Fill(rz_simple.second);
                 }
 
                 if (!pt2.is_used) {
-                    hists.fake_unused_pt2_deltaPT[cat]->Fill(pt2.delta_pt);
-                    hists.fake_unused_pt2_deltaETA[cat]->Fill(pt2.delta_eta);
-                    hists.fake_unused_pt2_deltaPHI[cat]->Fill(pt2.delta_phi);
-                    hists.fake_unused_pt2_deltaR[cat]->Fill(dR);
+                    hists.fake_unused_pt2_deltaPT[comboIdx]->Fill(pt2.delta_pt);
+                    hists.fake_unused_pt2_deltaETA[comboIdx]->Fill(pt2.delta_eta);
+                    hists.fake_unused_pt2_deltaPHI[comboIdx]->Fill(pt2.delta_phi);
+                    hists.fake_unused_pt2_deltaR[comboIdx]->Fill(dR);
 
-                    if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle[cat]->Fill(dAngle);
-                    if (lst_dPhi > -100.0) hists.fake_unused_pt2_LSTdPhi[cat]->Fill(lst_dPhi);
-                    if (dBeta > -100.0) hists.fake_unused_pt2_LSTdBeta[cat]->Fill(dBeta);
-                    if (betaOut > -100.0) hists.fake_unused_pt2_LSTbetaOut[cat]->Fill(betaOut);
-                    if (lst_zResGeo > -100.0) hists.fake_unused_pt2_LSTOrgZRes[cat]->Fill(lst_zResGeo);
-                    if (lst_zResKin > -100.0) hists.fake_unused_pt2_LSTKinZRes[cat]->Fill(lst_zResKin);
+                    if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle[comboIdx]->Fill(dAngle);
+                    if (lst_dPhi > -100.0) hists.fake_unused_pt2_LSTdPhi[comboIdx]->Fill(lst_dPhi);
+                    if (dBeta > -100.0) hists.fake_unused_pt2_LSTdBeta[comboIdx]->Fill(dBeta);
+                    if (betaOut > -100.0) hists.fake_unused_pt2_LSTbetaOut[comboIdx]->Fill(betaOut);
+                    if (lst_zResGeo > -100.0) hists.fake_unused_pt2_LSTOrgZRes[comboIdx]->Fill(lst_zResGeo);
+                    if (lst_zResKin > -100.0) hists.fake_unused_pt2_LSTKinZRes[comboIdx]->Fill(lst_zResKin);
 
                     if (heli[0] >= 0) {
-                        hists.fake_unused_pt2_MD0_dXY[cat]->Fill(heli[0]); 
-                        hists.fake_unused_pt2_MD0_dZ[cat]->Fill(heli[1]);
-                        hists.fake_unused_pt2_MD1_dXY[cat]->Fill(heli[2]); 
-                        hists.fake_unused_pt2_MD1_dZ[cat]->Fill(heli[3]);
+                        hists.fake_unused_pt2_MD0_dXY[comboIdx]->Fill(heli[0]); 
+                        hists.fake_unused_pt2_MD0_dZ[comboIdx]->Fill(heli[1]);
+                        hists.fake_unused_pt2_MD1_dXY[comboIdx]->Fill(heli[2]); 
+                        hists.fake_unused_pt2_MD1_dZ[comboIdx]->Fill(heli[3]);
                         
                          //Fill 2d histograms
                        // hists.h2_fake_unused_MD0_dXY_vs_dZ->Fill(std::abs(heli[1]), heli[0]);
@@ -413,20 +426,20 @@ int main(int argc, char** argv) {
                     }
 
                     if (rz_simple.first > -900) {
-                        hists.fake_unused_pt2_MD0_rz_simple[cat]->Fill(rz_simple.first);
-                        hists.fake_unused_pt2_MD1_rz_simple[cat]->Fill(rz_simple.second);
+                        hists.fake_unused_pt2_MD0_rz_simple[comboIdx]->Fill(rz_simple.first);
+                        hists.fake_unused_pt2_MD1_rz_simple[comboIdx]->Fill(rz_simple.second);
                     }
                 }
             }      
         } 
     }
-
+    }
     // --- AUTOMATED CUT CALCULATION ---
     std::cout << "\n" << std::string(80, '=') << std::endl;
     std::cout << "IDEAL CUTS PER CATEGORY (Target Efficiency: " << targetPercent << "%)" << std::endl;
     std::cout << std::string(80, '=') << std::endl;
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 11; ++i) {
         // Skip category if it has no entries to avoid division by zero / ROOT errors
         if (hists.real_pt2_deltaPT[i]->GetEntries() == 0) continue;
 
@@ -540,6 +553,7 @@ int main(int argc, char** argv) {
         std::cout << "    LST Kinematic Z-Res:   " << std::setw(8) << cut_LSTKinZMin << " to " << cut_LSTKinZMax << " cm" << std::endl;
     }
     std::cout << "\n" << std::string(80, '=') << "\n" << std::endl;
+
 
     auto recipes = getPt2Recipes(hists);
     Plotting plotter; 

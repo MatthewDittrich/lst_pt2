@@ -72,6 +72,15 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("md_detId", &md_detId);
     // Sim Track Branches
     inputTree->SetBranchAddress("sim_pt", &sim_pt);
+    inputTree->SetBranchAddress("sim_eta", &sim_eta);
+    inputTree->SetBranchAddress("sim_phi", &sim_phi);
+    inputTree->SetBranchAddress("sim_vx", &sim_vx);
+    inputTree->SetBranchAddress("sim_vy", &sim_vy);
+    inputTree->SetBranchAddress("sim_vz", &sim_vz);
+    inputTree->SetBranchAddress("sim_pdgId", &sim_pdgId);
+    inputTree->SetBranchAddress("sim_simHitX", &sim_simHitX);
+    inputTree->SetBranchAddress("sim_simHitY", &sim_simHitY);
+    inputTree->SetBranchAddress("sim_simHitZ", &sim_simHitZ);
     return true;
 }
 

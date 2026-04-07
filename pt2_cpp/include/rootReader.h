@@ -74,6 +74,15 @@ public:
     std::vector<float> *md_other_z = nullptr;
     // Sim Variables
     std::vector<float> *sim_pt = nullptr;    
+    std::vector<float>* sim_eta = nullptr;
+    std::vector<float>* sim_phi = nullptr;
+    std::vector<float>* sim_vx = nullptr;
+    std::vector<float>* sim_vy = nullptr;
+    std::vector<float>* sim_vz = nullptr;
+    std::vector<int>* sim_pdgId = nullptr;
+    std::vector<std::vector<float>>* sim_simHitX = nullptr;
+    std::vector<std::vector<float>>* sim_simHitY = nullptr;
+    std::vector<std::vector<float>>* sim_simHitZ = nullptr;
 
     // Computed Variables
     std::vector<float> pls_origin_z;

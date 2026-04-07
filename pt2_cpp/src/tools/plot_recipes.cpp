@@ -6,7 +6,7 @@
 std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
     std::vector<PlotRecipe> recipes;
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 11; ++i) {
         std::string sfx = "_" + hists.catNames[i];
         std::string ttl = " (" + hists.catTitles[i] + ")";
 
@@ -30,6 +30,16 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .yAxis = "Entries",
             .filename = "pt2_all_deltaPHI" + sfx,
             .hists = {hists.real_pt2_deltaPHI[i], hists.fake_pt2_deltaPHI[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "pT2 Delta #eta" + ttl,
+            .xAxis = "#eta",
+            .yAxis = "Entries",
+            .filename = "pt2_all_ETA" + sfx,
+            .hists = {hists.real_pt2_deltaETA[i], hists.fake_pt2_deltaETA[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
         });
@@ -73,6 +83,17 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .legend = {"Real", "Fake"},
             .printYields = true
         });
+
+        recipes.push_back({
+            .title = "LST #Delta#phi" + ttl,
+            .xAxis = "LST #Delta#phi [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_all_LSTdPhi" + sfx,
+            .hists = {hists.real_pt2_LSTdPhi[i], hists.fake_pt2_LSTdPhi[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+         });
+
 
         // =====================================================================
         // ALL pT2s - MD COMPONENTS
@@ -163,6 +184,27 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
         });
 
         recipes.push_back({
+            .title = "Unused pT2 Absolute #eta" + ttl,
+            .xAxis = "#eta",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_deltaETA" + sfx,
+            .hists = {hists.real_unused_pt2_deltaETA[i], hists.fake_unused_pt2_deltaETA[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused pT2 Delta R" + ttl,
+            .xAxis = "#Delta R",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_deltaR" + sfx,
+            .hists = {hists.real_unused_pt2_deltaR[i], hists.fake_unused_pt2_deltaR[i]},
+            .legend = {"Real", "Fake"},
+           .printYields = true
+        });
+
+
+        recipes.push_back({
             .title = "Unused LST Delta Beta" + ttl,
             .xAxis = "LST #Delta#beta [rad]",
             .yAxis = "Entries",
@@ -188,6 +230,16 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .yAxis = "Entries",
             .filename = "pt2_unused_LSTOrgZRes" + sfx,
             .hists = {hists.real_unused_pt2_LSTOrgZRes[i], hists.fake_unused_pt2_LSTOrgZRes[i]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused LST #Delta#phi" + ttl,
+            .xAxis = "LST #Delta#phi [rad]",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_LSTdPhi" + sfx,
+            .hists = {hists.real_unused_pt2_LSTdPhi[i], hists.fake_unused_pt2_LSTdPhi[i]},
             .legend = {"Real", "Fake"},
             .printYields = true
         });

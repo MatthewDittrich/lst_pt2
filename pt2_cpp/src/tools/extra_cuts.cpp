@@ -29,6 +29,40 @@ namespace extra_cuts{
         }
         return 4; // Default fallback
     }
+     
+     int getCategoryFromDetId(uint32_t detId) {
+        int subdet = (detId >> 25) & 0x7;
+        if (subdet == 4) { // Endcap
+            int disk = (detId >> 18) & 0x7;
+            if (disk == 1) return 5;
+            if (disk == 2) return 6;
+            return 7;
+        }
+        if (subdet == 5) { // Barrel
+            int layer = (detId >> 20) & 0xF;
+            int side  = (detId >> 18) & 0x3;
+            bool isTilted = (side == 1 || side == 2);
+            if (layer == 1) return isTilted ? 1 : 0;
+            if (layer == 2) return isTilted ? 3 : 2;
+            return 4;
+        }
+        return 4; // Fallback
+    }
+
+    int getConnectionIndex(int c0, int c1) {
+        if (c0 == 0 && c1 == 2) return 0;  // L1F -> L2F
+        if (c0 == 0 && c1 == 3) return 1;  // L1F -> L2T
+        if (c0 == 1 && c1 == 2) return 2;  // L1T -> L2F
+        if (c0 == 1 && c1 == 3) return 3;  // L1T -> L2T
+        if (c0 == 1 && c1 == 5) return 4;  // L1T -> E1
+        if (c0 == 2 && c1 == 4) return 5;  // L2F -> L3P
+        if (c0 == 3 && c1 == 4) return 6;  // L2T -> L3P
+        if (c0 == 3 && c1 == 5) return 7;  // L2T -> E1
+        if (c0 == 4 && c1 == 5) return 8;  // L3P -> E1
+        if (c0 == 5 && c1 == 6) return 9;  // E1  -> E2
+        if (c0 == 6 && c1 == 7) return 10; // E2  -> E3P
+        return -1; // Invalid connection
+    }
     
     // =========================================================================
     //                        ALPAKA MATH REPLICAS

@@ -17,6 +17,8 @@ namespace extra_cuts {
     double calculateLSTKinematicZResidual(int pls_idx, int ls_idx, const rootReader& data);
     double calculateLSTOriginZResidual(int pls_idx, int ls_idx, const rootReader& data);
     int getPt2Category(size_t lsIdx, const rootReader& reader);
+    int getCategoryFromDetId(uint32_t detId);
+    int getConnectionIndex(int c0, int c1);
 
     }
 
