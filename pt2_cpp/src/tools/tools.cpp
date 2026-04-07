@@ -47,15 +47,8 @@ std::vector<int> getDetIdsForLS(const rootReader& reader, size_t k) {
     if (k >= reader.ls_mdIdx0->size())
         throw std::out_of_range("LS index out of range");
     int mdIdx0 = reader.ls_mdIdx0->at(k);
-    int mdIdx1 = reader.ls_mdIdx1->at(k);
     if (mdIdx0 >= 0 && mdIdx0 < (int)reader.md_detId->size()) {
         detIds.push_back(reader.md_detId->at(mdIdx0));
-    }
-    if (mdIdx1 >= 0 && mdIdx1 < (int)reader.md_detId->size()) {
-        int detId1 = reader.md_detId->at(mdIdx1);
-        // avoid duplicate if both MDs map to same detId
-        if (detIds.empty() || detIds[0] != detId1)
-            detIds.push_back(detId1);
     }
     return detIds;
 }
