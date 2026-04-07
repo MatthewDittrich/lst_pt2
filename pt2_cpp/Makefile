@@ -13,7 +13,7 @@ ROOTLIBS   := $(shell root-config --libs)
 # ===============================
 # ONNX Runtime
 # ===============================
-ONNX_DIR := /blue/avery/matthew.dittrich/PT2_Studies/lst_pt2/pt2_cpp/onnxruntime-linux-x64-1.17.0
+ONNX_DIR := /cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ENV_FILES/onnxruntime-linux-x64-1.17.0
 ONNX_INC := -I$(ONNX_DIR)/include
 ONNX_LIB := -L$(ONNX_DIR)/lib -lonnxruntime
 
@@ -40,7 +40,7 @@ all: $(BIN)
 
 # Link
 $(BIN): $(OBJECTS) | $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(ROOTLIBS) $(ONNX_LIB) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(ROOTLIBS) $(ONNX_LIB) -Wl,-rpath,$(ONNX_DIR)/lib $^ -o $@
 
 # Compile main src files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
