@@ -13,103 +13,106 @@ public:
     void init();
     void write();
 
-    // --- The 11 Valid Connections ---
+    // --- The 13 Valid Connections ---
     std::vector<std::string> catNames = {
-        "L1F_to_L2F", "L1F_to_L2T", "L1T_to_L2F", "L1T_to_L2T", "L1T_to_E1",
-        "L2F_to_L3P", "L2T_to_L3P", "L2T_to_E1",  "L3P_to_E1",  "E1_to_E2", "E2_to_E3P"
+        "L1F_to_L2F", "L1F_to_L2T", "L1T_to_L2F", "L1T_to_L2T", "L1T_to_E1PS",
+        "L2F_to_L3Fp", "L2F_to_L3Tp", "L2T_to_L3Fp", "L2T_to_L3Tp", "L2T_to_E1PS",
+        "E1PS_to_E2PS", "E1PS_to_E22S", "E2PS_to_E3PSp"
     };
     std::vector<std::string> catTitles = {
-        "Bar L1 Flat -> Bar L2 Flat", "Bar L1 Flat -> Bar L2 Tilt", 
-        "Bar L1 Tilt -> Bar L2 Flat", "Bar L1 Tilt -> Bar L2 Tilt", "Bar L1 Tilt -> Endcap L1",
-        "Bar L2 Flat -> Bar L3+",     "Bar L2 Tilt -> Bar L3+",     "Bar L2 Tilt -> Endcap L1", 
-        "Bar L3+ -> Endcap L1",       "Endcap L1 -> Endcap L2",     "Endcap L2 -> Endcap L3+"
+        "Bar L1F -> Bar L2F", "Bar L1F -> Bar L2T", "Bar L1T -> Bar L2F", "Bar L1T -> Bar L2T", "Bar L1T -> Enc D1(PS)",
+        "Bar L2F -> Bar L3F+", "Bar L2F -> Bar L3T+", "Bar L2T -> Bar L3F+", "Bar L2T -> Bar L3T+", "Bar L2T -> Enc D1(PS)",
+        "Enc D1(PS) -> Enc D2(PS)", "Enc D1(PS) -> Enc D2(2S)", "Enc D2(PS) -> Enc D3+(PS)"
     };
 
+    std::vector<std::string> chargeNames = {"Pos", "Neg"};
+    std::vector<std::string> chargeTitles = {"Positive", "Negative"};
+
     // =========================================================================
-    // GENERAL VARIABLES (Change all of these to [11])
+    // GENERAL VARIABLES (Change all of these to [13])
     // =========================================================================
-    TH1D* real_pt2_deltaPT[11];
-    TH1D* real_pt2_deltaETA[11];
-    TH1D* real_pt2_deltaPHI[11];
-    TH1D* real_pt2_deltaR[11];
-    TH1D* real_pt2_deltaAngle[11];
+    TH1D* real_pt2_deltaPT[13][2];
+    TH1D* real_pt2_deltaETA[13][2];
+    TH1D* real_pt2_deltaPHI[13][2];
+    TH1D* real_pt2_deltaR[13][2];
+    TH1D* real_pt2_deltaAngle[13][2];
 
-    TH1D* fake_pt2_deltaPT[11];
-    TH1D* fake_pt2_deltaETA[11];
-    TH1D* fake_pt2_deltaPHI[11];
-    TH1D* fake_pt2_deltaR[11];
-    TH1D* fake_pt2_deltaAngle[11];
+    TH1D* fake_pt2_deltaPT[13][2];
+    TH1D* fake_pt2_deltaETA[13][2];
+    TH1D* fake_pt2_deltaPHI[13][2];
+    TH1D* fake_pt2_deltaR[13][2];
+    TH1D* fake_pt2_deltaAngle[13][2];
 
-    TH1D* real_unused_pt2_deltaPT[11];
-    TH1D* real_unused_pt2_deltaETA[11];
-    TH1D* real_unused_pt2_deltaPHI[11];
-    TH1D* real_unused_pt2_deltaR[11];
-    TH1D* real_unused_pt2_deltaAngle[11];
+    TH1D* real_unused_pt2_deltaPT[13][2];
+    TH1D* real_unused_pt2_deltaETA[13][2];
+    TH1D* real_unused_pt2_deltaPHI[13][2];
+    TH1D* real_unused_pt2_deltaR[13][2];
+    TH1D* real_unused_pt2_deltaAngle[13][2];
 
-    TH1D* fake_unused_pt2_deltaPT[11];
-    TH1D* fake_unused_pt2_deltaETA[11];
-    TH1D* fake_unused_pt2_deltaPHI[11];
-    TH1D* fake_unused_pt2_deltaR[11];
-    TH1D* fake_unused_pt2_deltaAngle[11];
+    TH1D* fake_unused_pt2_deltaPT[13][2];
+    TH1D* fake_unused_pt2_deltaETA[13][2];
+    TH1D* fake_unused_pt2_deltaPHI[13][2];
+    TH1D* fake_unused_pt2_deltaR[13][2];
+    TH1D* fake_unused_pt2_deltaAngle[13][2];
 
     // LST specific variables
-    TH1D* real_pt2_LSTdPhi[11];
-    TH1D* fake_pt2_LSTdPhi[11];
-    TH1D* real_unused_pt2_LSTdPhi[11];
-    TH1D* fake_unused_pt2_LSTdPhi[11];
+    TH1D* real_pt2_LSTdPhi[13][2];
+    TH1D* fake_pt2_LSTdPhi[13][2];
+    TH1D* real_unused_pt2_LSTdPhi[13][2];
+    TH1D* fake_unused_pt2_LSTdPhi[13][2];
 
-    TH1D* real_pt2_LSTdBeta[11];
-    TH1D* fake_pt2_LSTdBeta[11];
-    TH1D* real_unused_pt2_LSTdBeta[11];
-    TH1D* fake_unused_pt2_LSTdBeta[11];
+    TH1D* real_pt2_LSTdBeta[13][2];
+    TH1D* fake_pt2_LSTdBeta[13][2];
+    TH1D* real_unused_pt2_LSTdBeta[13][2];
+    TH1D* fake_unused_pt2_LSTdBeta[13][2];
 
-    TH1D* real_pt2_LSTbetaOut[11];
-    TH1D* fake_pt2_LSTbetaOut[11];
-    TH1D* real_unused_pt2_LSTbetaOut[11];
-    TH1D* fake_unused_pt2_LSTbetaOut[11];
+    TH1D* real_pt2_LSTbetaOut[13][2];
+    TH1D* fake_pt2_LSTbetaOut[13][2];
+    TH1D* real_unused_pt2_LSTbetaOut[13][2];
+    TH1D* fake_unused_pt2_LSTbetaOut[13][2];
 
-    TH1D* real_pt2_LSTKinZRes[11];
-    TH1D* fake_pt2_LSTKinZRes[11];
-    TH1D* real_unused_pt2_LSTKinZRes[11];
-    TH1D* fake_unused_pt2_LSTKinZRes[11];
+    TH1D* real_pt2_LSTKinZRes[13][2];
+    TH1D* fake_pt2_LSTKinZRes[13][2];
+    TH1D* real_unused_pt2_LSTKinZRes[13][2];
+    TH1D* fake_unused_pt2_LSTKinZRes[13][2];
 
-    TH1D* real_pt2_LSTOrgZRes[11];
-    TH1D* fake_pt2_LSTOrgZRes[11];
-    TH1D* real_unused_pt2_LSTOrgZRes[11];
-    TH1D* fake_unused_pt2_LSTOrgZRes[11];
+    TH1D* real_pt2_LSTOrgZRes[13][2];
+    TH1D* fake_pt2_LSTOrgZRes[13][2];
+    TH1D* real_unused_pt2_LSTOrgZRes[13][2];
+    TH1D* fake_unused_pt2_LSTOrgZRes[13][2];
 
     // MD0 Components
-    TH1D* real_pt2_MD0_dXY[11];
-    TH1D* real_pt2_MD0_dZ[11];
-    TH1D* fake_pt2_MD0_dXY[11];
-    TH1D* fake_pt2_MD0_dZ[11];
+    TH1D* real_pt2_MD0_dXY[13][2];
+    TH1D* real_pt2_MD0_dZ[13][2];
+    TH1D* fake_pt2_MD0_dXY[13][2];
+    TH1D* fake_pt2_MD0_dZ[13][2];
 
-    TH1D* real_unused_pt2_MD0_dXY[11];
-    TH1D* real_unused_pt2_MD0_dZ[11];
-    TH1D* fake_unused_pt2_MD0_dXY[11];
-    TH1D* fake_unused_pt2_MD0_dZ[11];
+    TH1D* real_unused_pt2_MD0_dXY[13][2];
+    TH1D* real_unused_pt2_MD0_dZ[13][2];
+    TH1D* fake_unused_pt2_MD0_dXY[13][2];
+    TH1D* fake_unused_pt2_MD0_dZ[13][2];
 
     // MD1 Components
-    TH1D* real_pt2_MD1_dXY[11];
-    TH1D* real_pt2_MD1_dZ[11];
-    TH1D* fake_pt2_MD1_dXY[11];
-    TH1D* fake_pt2_MD1_dZ[11];
+    TH1D* real_pt2_MD1_dXY[13][2];
+    TH1D* real_pt2_MD1_dZ[13][2];
+    TH1D* fake_pt2_MD1_dXY[13][2];
+    TH1D* fake_pt2_MD1_dZ[13][2];
 
-    TH1D* real_unused_pt2_MD1_dXY[11];
-    TH1D* real_unused_pt2_MD1_dZ[11];
-    TH1D* fake_unused_pt2_MD1_dXY[11];
-    TH1D* fake_unused_pt2_MD1_dZ[11];
+    TH1D* real_unused_pt2_MD1_dXY[13][2];
+    TH1D* real_unused_pt2_MD1_dZ[13][2];
+    TH1D* fake_unused_pt2_MD1_dXY[13][2];
+    TH1D* fake_unused_pt2_MD1_dZ[13][2];
 
     // Separated R-Z Simple Pointing
-    TH1D* real_pt2_MD0_rz_simple[11];
-    TH1D* real_pt2_MD1_rz_simple[11];
-    TH1D* fake_pt2_MD0_rz_simple[11];
-    TH1D* fake_pt2_MD1_rz_simple[11];
+    TH1D* real_pt2_MD0_rz_simple[13][2];
+    TH1D* real_pt2_MD1_rz_simple[13][2];
+    TH1D* fake_pt2_MD0_rz_simple[13][2];
+    TH1D* fake_pt2_MD1_rz_simple[13][2];
     
-    TH1D* real_unused_pt2_MD0_rz_simple[11];
-    TH1D* real_unused_pt2_MD1_rz_simple[11];
-    TH1D* fake_unused_pt2_MD0_rz_simple[11];
-    TH1D* fake_unused_pt2_MD1_rz_simple[11];
+    TH1D* real_unused_pt2_MD0_rz_simple[13][2];
+    TH1D* real_unused_pt2_MD1_rz_simple[13][2];
+    TH1D* fake_unused_pt2_MD0_rz_simple[13][2];
+    TH1D* fake_unused_pt2_MD1_rz_simple[13][2];
 };
 
 #endif

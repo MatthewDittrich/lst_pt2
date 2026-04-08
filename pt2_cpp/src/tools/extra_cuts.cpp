@@ -3,64 +3,48 @@
 #include <cmath>
 
 namespace extra_cuts{
-
-     int getPt2Category(size_t lsIdx, const rootReader& reader) {
-        if (reader.ls_mdIdx0->empty() || lsIdx >= reader.ls_mdIdx0->size()) return 4;
-        int mdIdx = reader.ls_mdIdx0->at(lsIdx);
-        uint32_t detId = reader.md_detId->at(mdIdx);
-    
-        int subdet = (detId >> 25) & 0x7;
-         
-        if (subdet == 4) { // Endcap
-            int disk = (detId >> 18) & 0x7;
-
-            if (disk == 1) return 5; // Endcap L1
-            if (disk == 2) return 6; // Endcap L2
-            return 7;                 // Endcap L3+
-        }
-        if (subdet == 5) { // Barrel
-            int layer = (detId >> 20) & 0x7;
-            int side  = (detId >> 18) & 0x3; // 1=Z-, 2=Z+, 3=Flat
-            bool isTilted = (side == 1 || side == 2);
-        
-            if (layer == 1) return isTilted ? 1 : 0;
-            if (layer == 2) return isTilted ? 3 : 2;
-            return 4; // Barrel L3+
-        }
-        return 4; // Default fallback
-    }
      
      int getCategoryFromDetId(uint32_t detId) {
         int subdet = (detId >> 25) & 0x7;
-        if (subdet == 4) { // Endcap
-            int disk = (detId >> 18) & 0x7;
-            if (disk == 1) return 5;
-            if (disk == 2) return 6;
-            return 7;
+        
+        if (subdet == 4) { // ENDCAP
+            int disk = (detId >> 18) & 0x7; 
+            int ring = (detId >> 12) & 0xF;  // Extract the Ring number!
+            bool isPS = (ring <= 10);        // Rings 1-10 are PS, 11-15 are 2S
+            
+            if (disk == 1) return isPS ? 7 : 8;
+            if (disk == 2) return isPS ? 9 : 10;
+            return isPS ? 11 : 12;           // Disk 3+ PS and 2S
         }
-        if (subdet == 5) { // Barrel
-            int layer = (detId >> 20) & 0xF;
-            int side  = (detId >> 18) & 0x3;
+        if (subdet == 5) { // BARREL
+            int layer = (detId >> 20) & 0x7; 
+            int side  = (detId >> 18) & 0x3; 
             bool isTilted = (side == 1 || side == 2);
-            if (layer == 1) return isTilted ? 1 : 0;
-            if (layer == 2) return isTilted ? 3 : 2;
-            return 4;
+            
+            if (layer == 1) return isTilted ? 1 : 0; // 0: L1 Flat, 1: L1 Tilted
+            if (layer == 2) return isTilted ? 3 : 2; // 2: L2 Flat, 3: L2 Tilted
+            if (layer == 3) return isTilted ? 5 : 4; // 4: L3 Flat, 5: L3 Tilted
+            return 6; // Layers 4, 5, 6 (These are all 2S Flat)
         }
-        return 4; // Fallback
+        return 6; // Fallback
     }
 
     int getConnectionIndex(int c0, int c1) {
-        if (c0 == 0 && c1 == 2) return 0;  // L1F -> L2F
-        if (c0 == 0 && c1 == 3) return 1;  // L1F -> L2T
-        if (c0 == 1 && c1 == 2) return 2;  // L1T -> L2F
-        if (c0 == 1 && c1 == 3) return 3;  // L1T -> L2T
-        if (c0 == 1 && c1 == 5) return 4;  // L1T -> E1
-        if (c0 == 2 && c1 == 4) return 5;  // L2F -> L3P
-        if (c0 == 3 && c1 == 4) return 6;  // L2T -> L3P
-        if (c0 == 3 && c1 == 5) return 7;  // L2T -> E1
-        if (c0 == 4 && c1 == 5) return 8;  // L3P -> E1
-        if (c0 == 5 && c1 == 6) return 9;  // E1  -> E2
-        if (c0 == 6 && c1 == 7) return 10; // E2  -> E3P
+        if (c0 == 0 && c1 == 2) return 0;   // Bar_L1_F -> Bar_L2_F
+        if (c0 == 0 && c1 == 3) return 1;   // Bar_L1_F -> Bar_L2_T
+        if (c0 == 1 && c1 == 2) return 2;   // Bar_L1_T -> Bar_L2_F
+        if (c0 == 1 && c1 == 3) return 3;   // Bar_L1_T -> Bar_L2_T
+        if (c0 == 1 && c1 == 7) return 4;   // Bar_L1_T -> Enc_D1_PS
+
+        if (c0 == 2 && c1 == 4) return 5;   // Bar_L2_F -> Bar_L3_F
+        if (c0 == 2 && c1 == 5) return 6;   // Bar_L2_F -> Bar_L3_T
+        if (c0 == 3 && c1 == 4) return 7;   // Bar_L2_T -> Bar_L3_F
+        if (c0 == 3 && c1 == 5) return 8;   // Bar_L2_T -> Bar_L3_T
+        if (c0 == 3 && c1 == 7) return 9;   // Bar_L2_T -> Enc_D1_PS
+
+        if (c0 == 7 && c1 == 9) return 10;  // Enc_D1_PS -> Enc_D2_PS
+        if (c0 == 7 && c1 == 10) return 11; // Enc_D1_PS -> Enc_D2_2S
+        if (c0 == 9 && c1 == 11) return 12; // Enc_D2_PS -> Enc_D3p_PS
         return -1; // Invalid connection
     }
     
