@@ -13,7 +13,7 @@ namespace extrapolation {
 
     // Main extrapolation function
     // Returns a pair representing the 3D distance to MD0 and MD1 respectively
-    std::pair<double, double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_idx, const rootReader& data);
+    std::vector<double> extrapolatePlsHelicallyAndGetDistance(int pls_idx, int ls_idx, const rootReader& data);
     std::pair<double, double> extrapolatePlsInRZAndGetDeltaR(int pls_idx, int ls_idx, const rootReader& data);
     std::pair<double, double> extrapolateSimplePointingInRZ(int pls_idx, int ls_idx, const rootReader& data);
     double calculateDeltaAngle(int pls_idx, int ls_idx, const rootReader& data);

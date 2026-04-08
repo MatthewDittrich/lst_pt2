@@ -28,7 +28,7 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
 
     gStyle->SetOptStat(0);
 
-    int colors[] = {kAzure-9, kOrange-2, kGreen-6, kMagenta-7, kRed-4, kCyan-6};
+    int colors[] = {kSpring+10, kRed-7, kGreen-6, kMagenta-7, kRed-4, kCyan-6};
 
     for (const auto& recipe : recipes)
     {
@@ -63,7 +63,7 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
                 // MAIN PAD (top 75%)
                 mainPad = new TPad("mainPad","",0,0.25,1,1);
                 mainPad->SetTopMargin(0.08);
-                mainPad->SetBottomMargin(0.12);
+                mainPad->SetBottomMargin(0.15);
                 mainPad->SetLeftMargin(0.12);
                 mainPad->SetRightMargin(0.05);
                 mainPad->Draw();
@@ -71,7 +71,7 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
                 // YIELD PAD (bottom 25%)
                 yieldPad = new TPad("yieldPad","",0,0,1,0.25);
                 yieldPad->SetTopMargin(0.08);
-                yieldPad->SetBottomMargin(0.25);
+                yieldPad->SetBottomMargin(0.28);
                 yieldPad->SetLeftMargin(0.12);
                 yieldPad->SetRightMargin(0.05);
                 yieldPad->Draw();
@@ -80,7 +80,7 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
             {
                 mainPad = &canvas;
                 mainPad->SetTopMargin(0.08);
-                mainPad->SetBottomMargin(0.14);
+                mainPad->SetBottomMargin(0.17);
                 mainPad->SetLeftMargin(0.12);
                 mainPad->SetRightMargin(0.05);
             }
@@ -130,7 +130,7 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
                 for (size_t i = 0; i < hists.size(); ++i)
                 {
                     TH1D* h = hists[i];
-                    h->SetMaximum(useLogY ? ymax*10.0 : ymax*1.25);
+                    h->SetMaximum(useLogY ? ymax*20.0 : ymax*1.35);
 
                     if (i == 0) h->Draw("HIST");
                     else h->Draw("HIST SAME");
@@ -138,12 +138,12 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
                     h->GetXaxis()->SetTitle(recipe.xAxis.c_str());
                     h->GetXaxis()->SetTitleSize(0.06);
                     h->GetXaxis()->SetLabelSize(0.05);
-                    h->GetXaxis()->SetTitleOffset(1.1);
+                    h->GetXaxis()->SetTitleOffset(1.0);
 
                     h->GetYaxis()->SetTitle(recipe.yAxis.c_str());
                     h->GetYaxis()->SetTitleSize(0.06);
                     h->GetYaxis()->SetLabelSize(0.05);
-                    h->GetYaxis()->SetTitleOffset(1.0);
+                    h->GetYaxis()->SetTitleOffset(0.9);
                 }
             }
             else
@@ -152,7 +152,8 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
                 for (auto* h : hists) stack->Add(h);
 
                 stack->Draw("HIST");
-                stack->SetMaximum(useLogY ? ymax*10.0 : ymax*1.25);
+                double stackMax = stack->GetMaximum();
+                stack->SetMaximum(useLogY ? stackMax*5.0 : stackMax*1.25);
                 if (useLogY) stack->SetMinimum(0.001);
 
                 stack->GetXaxis()->SetTitle(recipe.xAxis.c_str());
@@ -172,8 +173,8 @@ void Plotting::plotRecipes(const std::vector<PlotRecipe>& recipes,
             if (useLegend)
             {
                 TLegend* legend = new TLegend(0.68, 0.72, 0.90, 0.90);
-                legend->SetBorderSize(0);
-                legend->SetFillStyle(0);
+               // legend->SetBorderSize(0);
+               // legend->SetFillStyle(0);
                 legend->SetTextSize(0.045);
 
                 for (size_t i = 0; i < hists.size(); ++i)
