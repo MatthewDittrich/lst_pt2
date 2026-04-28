@@ -16,6 +16,8 @@
 #include "extrapolation.h"
 #include "extra_cuts.h"
 
+#include "TFile.h"
+#include "TTree.h"
 
 int main(int argc, char** argv) {
 
@@ -24,6 +26,7 @@ int main(int argc, char** argv) {
     bool writeRoot = false;
     bool lowPT = false;
     int nEvents = -1;
+    double targetPercent = 90;
     double myCutZ0 = 0.4896;  
     double myCutZ1 = 0.9304;
     std::string inputFile; 
@@ -31,7 +34,7 @@ int main(int argc, char** argv) {
 
     // Command Line Arguments
     int opt;
-    while ((opt = getopt(argc, argv, "prki:o:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "prki:o:n:e:")) != -1) {
         switch (opt) {
             case 'p':
                 makePlots = true;
@@ -51,6 +54,9 @@ int main(int argc, char** argv) {
             case 'n':
                 nEvents = std::stoi(optarg);
                 break; 
+            case 'e':
+                targetPercent = std::stod(optarg);
+                break;
             default:
                 std::cerr << "Usage: " << argv[0] << "\n"
                     << "[-p] Make Plots\n"
@@ -58,7 +64,8 @@ int main(int argc, char** argv) {
                     << "[-r] Make Root File \n"
                     << "[-i] Input File Path \n"
                     << "[-o] Output Directory \n"
-                    << "[-n] Number of Events \n";
+                    << "[-n] Number of Events \n"
+                    << "[-e] Target percent \n";
            return 1;
         }    
     }
@@ -103,11 +110,11 @@ int main(int argc, char** argv) {
     hists.init();
 
     // Options that are not ready
-    if (writeRoot) {
+   /* if (writeRoot) {
         throw std::runtime_error(
             "Error: options --writeRoot is not currently set up."
         );
-    }
+    }*/
 
     // Get the Correct Pixel Map Directory
     std::string pixelMapFileDir;
@@ -146,8 +153,93 @@ int main(int argc, char** argv) {
 
     Long64_t totalEntries = reader.GetEntries();
     Long64_t entriesToProcess = (nEvents > 0 && nEvents < totalEntries) ? nEvents : totalEntries;
+
+    // =========================================================================
+    //                        SETUP BDT OUTPUT TREE
+    // =========================================================================
+   /* std::string bdtFileName = outputDir + "/bdt_training_data.root";
+    TFile* bdtFile = new TFile(bdtFileName.c_str(), "RECREATE");
+    TTree* bdtTree = new TTree("pt2_features", "LST Variables for BDT Training");
+
+    // Variables to hold the data for each row
+    double b_lst_dPhi, b_betaIn, b_betaOut, b_dBeta;
+    double b_zResGeo, b_zResKin;
+    double b_delta_pt, b_delta_eta, b_delta_phi;
+    int b_is_real, b_is_used;
+    double b_heli_dXY0, b_heli_dZ0, b_heli_dXY1, b_heli_dZ1;
+    double b_rz_simple0, b_rz_simple1;
+    int b_event_id;
+
+    // The Categorization Variables for Python Slicing!
+    int b_combo_idx;
+    int b_charge_idx;
+
+    bdtTree->Branch("event_id", &b_event_id);
+    bdtTree->Branch("combo_idx", &b_combo_idx);
+    bdtTree->Branch("charge_idx", &b_charge_idx);
+
+    bdtTree->Branch("lst_dPhi", &b_lst_dPhi);
+    bdtTree->Branch("betaIn", &b_betaIn);
+    bdtTree->Branch("betaOut", &b_betaOut);
+    bdtTree->Branch("dBeta", &b_dBeta);
+    bdtTree->Branch("zResGeo", &b_zResGeo);
+    bdtTree->Branch("zResKin", &b_zResKin);
+    bdtTree->Branch("delta_pt", &b_delta_pt);
+    bdtTree->Branch("delta_eta", &b_delta_eta);
+    bdtTree->Branch("delta_phi", &b_delta_phi);
+    bdtTree->Branch("heli_dXY0", &b_heli_dXY0);
+    bdtTree->Branch("heli_dZ0", &b_heli_dZ0);
+    bdtTree->Branch("heli_dXY1", &b_heli_dXY1);
+    bdtTree->Branch("heli_dZ1", &b_heli_dZ1);
+    bdtTree->Branch("rz_simple0", &b_rz_simple0);
+    bdtTree->Branch("rz_simple1", &b_rz_simple1);
+
+    bdtTree->Branch("is_real", &b_is_real);
+    bdtTree->Branch("is_used", &b_is_used);
        
+    */
     
+    // === NEW: Output ROOT File Setup ===
+    TFile* outRootFile = nullptr;
+    TTree* outTree = nullptr;
+
+    // Vectors to hold our new pT2 Branches
+    std::vector<float> pT2_pt, pT2_eta, pT2_phi;
+    std::vector<int>   pT2_plsIdx, pT2_lsIdx;
+    std::vector<int>   pT2_isFake, pT2_isUsed, pT2_isDuplicate;
+    std::vector<float> pT2_delta_pt, pT2_delta_eta, pT2_delta_phi;
+    std::vector<float> pT2_dR;
+    std::vector<std::vector<int>> pT2_matched_simIdx; 
+    std::vector<int>   sim_pT2_matched;
+    // You can also add vector<vector<int>> for pT2_simIdxAll here if you calculate it!
+
+    if (writeRoot) {
+        std::string outRootName = outputDir + "/LSTNtuple_with_pT2.root";
+        outRootFile = new TFile(outRootName.c_str(), "RECREATE");
+
+        // Clone the input tree structure. '0' means copy branches but not entries yet.
+        // NOTE: Make sure your rootReader makes the TTree pointer accessible.
+        // Often it's named 'tree' or retrieved via a getter like 'GetTree()'.
+        outTree = reader.inputTree->CloneTree(0);
+
+        // Attach our new branches
+        outTree->Branch("pT2_pt",      &pT2_pt);
+        outTree->Branch("pT2_eta",     &pT2_eta);
+        outTree->Branch("pT2_phi",     &pT2_phi);
+        outTree->Branch("pT2_plsIdx",  &pT2_plsIdx);
+        outTree->Branch("pT2_lsIdx",   &pT2_lsIdx);
+        outTree->Branch("pT2_isFake",  &pT2_isFake);
+        outTree->Branch("pT2_isUsed",  &pT2_isUsed);
+        outTree->Branch("pT2_isDuplicate", &pT2_isDuplicate);
+        outTree->Branch("pT2_deltaPt", &pT2_delta_pt);
+        outTree->Branch("pT2_deltaEta",&pT2_delta_eta);
+        outTree->Branch("pT2_deltaPhi",&pT2_delta_phi);
+        outTree->Branch("pT2_dR",      &pT2_dR);
+        outTree->Branch("pT2_matched_simIdx", &pT2_matched_simIdx); 
+        outTree->Branch("sim_pT2_matched", &sim_pT2_matched);
+    }
+    // ===================================
+
     print_creature();
 
     // Main Looper
@@ -166,6 +258,21 @@ int main(int argc, char** argv) {
         pt2s.clear();
         reader.pls_isUsed.clear();
         reader.ls_isUsed.clear();
+        
+        // === NEW: Clear pT2 vectors from previous event ===
+        if (writeRoot) {
+            pT2_pt.clear();  pT2_eta.clear(); pT2_phi.clear();
+            pT2_plsIdx.clear(); pT2_lsIdx.clear();
+            pT2_isFake.clear(); pT2_isUsed.clear(); pT2_isDuplicate.clear();
+            pT2_delta_pt.clear(); pT2_delta_eta.clear(); pT2_delta_phi.clear();
+            pT2_dR.clear();
+            pT2_matched_simIdx.clear();
+            
+            if (reader.sim_pt) {
+                sim_pT2_matched.assign(reader.sim_pt->size(), 0);
+            }
+        }
+        // ==================================================
 
         // Get used masks for the LS and pLS
         UsedMask usedMask = buildUsedMask(reader);
@@ -232,9 +339,70 @@ int main(int argc, char** argv) {
             std::vector<double> betas = extra_cuts::calculateLSTdBeta(plsIdx, lsIdx, reader);
             double dBeta = betas[2];
             double betaOut = betas[1];
+            double betaIn = betas[0];
             double lst_zResGeo = extra_cuts::calculateLSTOriginZResidual(plsIdx, lsIdx, reader);
             double lst_zResKin = extra_cuts::calculateLSTKinematicZResidual(plsIdx, lsIdx, reader);
-          
+            
+           /* if (lst_dPhi > -100.0 && dBeta > -100.0) {
+                b_lst_dPhi  = lst_dPhi;
+                b_betaIn    = betaIn;
+                b_betaOut   = betaOut;
+                b_dBeta     = dBeta;
+                b_zResGeo   = lst_zResGeo;
+                b_zResKin   = lst_zResKin;
+                b_delta_pt  = pt2.delta_pt;
+                b_delta_eta = pt2.delta_eta;
+                b_delta_phi = pt2.delta_phi;
+                b_heli_dXY0 = heli[0];
+                b_heli_dZ0  = heli[1];
+                b_heli_dXY1 = heli[2];
+                b_heli_dZ1  = heli[3];
+                b_rz_simple0 = rz_simple.first;
+                b_rz_simple1 = rz_simple.second;
+                b_event_id  = ievt;
+
+                // The Machine Learning labels and categories!
+                b_is_real    = pt2.is_real ? 1 : 0;
+                b_is_used    = pt2.is_used ? 1 : 0;
+                b_combo_idx  = comboIdx;  // 0 to 12 (or -1 if invalid)
+                b_charge_idx = cIdx;      // 0 = Pos, 1 = Neg
+
+                bdtTree->Fill();
+            }*/
+            // === NEW: Push data to branches ===
+            // This happens ONLY for pt2s passing the > 0.8 pT requirement above.
+            if (writeRoot) {
+                // Approximate overall pT2 kinematics using its internal pLS
+                pT2_pt.push_back(reader.pls_pt->at(plsIdx));
+                pT2_eta.push_back(reader.pls_eta->at(plsIdx));
+                pT2_phi.push_back(reader.pls_phi->at(plsIdx));
+
+                pT2_plsIdx.push_back(plsIdx);
+                pT2_lsIdx.push_back(lsIdx);
+                pT2_isFake.push_back(!pt2.is_real);
+                pT2_isUsed.push_back(pt2.is_used);
+
+                pT2_delta_pt.push_back(pt2.delta_pt);
+                pT2_delta_eta.push_back(pt2.delta_eta);
+                pT2_delta_phi.push_back(pt2.delta_phi);
+                pT2_dR.push_back(dR);
+                // -------- TRUTH MATCHING --------
+                if (pt2.is_real) {
+                    // Get the sim track ID from the pLS
+                    int simIdx = reader.pls_simIdx->at(plsIdx);
+                    pT2_matched_simIdx.push_back({simIdx});
+
+                    // Register that this sim track was successfully found!
+                    if (simIdx >= 0 && simIdx < sim_pT2_matched.size()) {
+                        sim_pT2_matched[simIdx] += 1;
+                    }
+                } /*else {
+                    // Push an empty vector for fakes
+                    pT2_matched_simIdx.push_back({});
+                }*/
+            }
+            // ==================================
+
             //if(heli[1] > myCutZ0 ||  heli[3] > myCutZ1 ){continue;}
             //if(heli[0] > 2.3896 ||  heli[2] > 3.4234 ){continue;}
             //if(pt2.delta_phi < -0.3493 || pt2.delta_phi > 0.3457){continue;}
@@ -248,6 +416,8 @@ int main(int argc, char** argv) {
                 hists.real_pt2_deltaETA[comboIdx][cIdx]->Fill(pt2.delta_eta);
                 hists.real_pt2_deltaPHI[comboIdx][cIdx]->Fill(pt2.delta_phi);
                 hists.real_pt2_deltaR[comboIdx][cIdx]->Fill(dR);
+                hists.real_pt2_pls_ETA[comboIdx][cIdx]->Fill(reader.pls_eta->at(plsIdx));
+                hists.real_pt2_ls_ETA[comboIdx][cIdx]->Fill(reader.ls_eta->at(lsIdx));
 
                 if (dAngle > -1.0) hists.real_pt2_deltaAngle[comboIdx][cIdx]->Fill(dAngle);
                 if (lst_dPhi > -100.0) hists.real_pt2_LSTdPhi[comboIdx][cIdx]->Fill(lst_dPhi);
@@ -275,6 +445,9 @@ int main(int argc, char** argv) {
                     hists.real_unused_pt2_deltaETA[comboIdx][cIdx]->Fill(pt2.delta_eta);
                     hists.real_unused_pt2_deltaPHI[comboIdx][cIdx]->Fill(pt2.delta_phi);
                     hists.real_unused_pt2_deltaR[comboIdx][cIdx]->Fill(dR);
+                    hists.real_unused_pt2_pls_ETA[comboIdx][cIdx]->Fill(reader.pls_eta->at(plsIdx));
+                    hists.real_unused_pt2_ls_ETA[comboIdx][cIdx]->Fill(reader.ls_eta->at(lsIdx));
+
                     if (dAngle > -1.0) hists.real_unused_pt2_deltaAngle[comboIdx][cIdx]->Fill(dAngle);
                     if (lst_dPhi > -100.0) hists.real_unused_pt2_LSTdPhi[comboIdx][cIdx]->Fill(lst_dPhi);
                     if (dBeta > -100.0) hists.real_unused_pt2_LSTdBeta[comboIdx][cIdx]->Fill(dBeta);
@@ -300,6 +473,8 @@ int main(int argc, char** argv) {
                 hists.fake_pt2_deltaETA[comboIdx][cIdx]->Fill(pt2.delta_eta);
                 hists.fake_pt2_deltaPHI[comboIdx][cIdx]->Fill(pt2.delta_phi);
                 hists.fake_pt2_deltaR[comboIdx][cIdx]->Fill(dR);
+                hists.fake_pt2_pls_ETA[comboIdx][cIdx]->Fill(reader.pls_eta->at(plsIdx));
+                hists.fake_pt2_ls_ETA[comboIdx][cIdx]->Fill(reader.ls_eta->at(lsIdx));
 
                 if (dAngle > -1.0) hists.fake_pt2_deltaAngle[comboIdx][cIdx]->Fill(dAngle);
                 if (lst_dPhi > -100.0) hists.fake_pt2_LSTdPhi[comboIdx][cIdx]->Fill(lst_dPhi);
@@ -327,6 +502,8 @@ int main(int argc, char** argv) {
                     hists.fake_unused_pt2_deltaETA[comboIdx][cIdx]->Fill(pt2.delta_eta);
                     hists.fake_unused_pt2_deltaPHI[comboIdx][cIdx]->Fill(pt2.delta_phi);
                     hists.fake_unused_pt2_deltaR[comboIdx][cIdx]->Fill(dR);
+                    hists.fake_unused_pt2_pls_ETA[comboIdx][cIdx]->Fill(reader.pls_eta->at(plsIdx));
+                    hists.fake_unused_pt2_ls_ETA[comboIdx][cIdx]->Fill(reader.ls_eta->at(lsIdx));
 
                     if (dAngle > -1.0) hists.fake_unused_pt2_deltaAngle[comboIdx][cIdx]->Fill(dAngle);
                     if (lst_dPhi > -100.0) hists.fake_unused_pt2_LSTdPhi[comboIdx][cIdx]->Fill(lst_dPhi);
@@ -350,12 +527,164 @@ int main(int argc, char** argv) {
             }      
         } 
     }
+        if (writeRoot) {
+            // Check for duplicates
+            for (size_t i = 0; i < pT2_matched_simIdx.size(); i++) {
+                bool isDup = false;
+                if (!pT2_matched_simIdx[i].empty()) {
+                    int simIdx = pT2_matched_simIdx[i][0];
+                    // If this sim track was found more than once, it's a duplicate
+                    if (simIdx >= 0 && simIdx < sim_pT2_matched.size() && sim_pT2_matched[simIdx] > 1) {
+                        isDup = true;
+                    }
+                }
+                pT2_isDuplicate.push_back(isDup ? 1 : 0);
+            }
+
+            // CRITICAL: Fill the TTree entry for this event!
+            outTree->Fill();
+        }
     }
-   
-    
+    // --- AUTOMATED CUT CALCULATION ---
+    std::cout << "\n" << std::string(80, '=') << std::endl;
+    std::cout << "IDEAL CUTS PER CATEGORY (Target Efficiency: " << targetPercent << "%)" << std::endl;
+    std::cout << std::string(80, '=') << std::endl;
+
+    for (int i = 0; i < 13; ++i) {
+        for (int c = 0; c < 2; ++c) { // Loop over charge (0 = Pos, 1 = Neg)
+
+            // Skip if this specific geometry+charge combo has no events
+            if (hists.real_pt2_deltaPT[i][c]->GetEntries() == 0) continue;
+
+            // 1-Sided configuration (upper bound only)
+            double q_1[1];
+            double p_1[1] = { targetPercent / 100.0 };
+
+            // 2-Sided configuration (symmetric tails)
+            double tail = (1.0 - (targetPercent / 100.0)) / 2.0;
+            double q_2[2];
+            double p_2[2] = { tail, 1.0 - tail };
+
+            // --- Extrapolation Variables (1-Sided) ---
+            double cut_dZ0 = 0, cut_dZ1 = 0;
+            double cut_dXY0 = 0, cut_dXY1 = 0;
+
+            // --- Simple R-Z & Kinematic Variables (2-Sided) ---
+            double cut_RZ0Min = 0, cut_RZ0Max = 0;
+            double cut_RZ1Min = 0, cut_RZ1Max = 0;
+            double cut_dPhiMin = 0, cut_dPhiMax = 0;
+            double cut_dPtMin = 0,  cut_dPtMax = 0;
+
+            // --- LST Variables (2-Sided) ---
+            double cut_LSTdPhiMin = 0,    cut_LSTdPhiMax = 0;
+            double cut_LSTdBetaMin = 0,   cut_LSTdBetaMax = 0;
+            double cut_LSTbetaOutMin = 0, cut_LSTbetaOutMax = 0;
+            double cut_LSTOrgZMin = 0,    cut_LSTOrgZMax = 0;
+            double cut_LSTKinZMin = 0,    cut_LSTKinZMax = 0;
+
+            // --- Calculate 1-Sided Quantiles ---
+            if (hists.real_pt2_MD0_dZ[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD0_dZ[i][c]->GetQuantiles(1, q_1, p_1);
+                cut_dZ0 = q_1[0];
+            }
+            if (hists.real_pt2_MD1_dZ[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD1_dZ[i][c]->GetQuantiles(1, q_1, p_1);
+                cut_dZ1 = q_1[0];
+            }
+            if (hists.real_pt2_MD0_dXY[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD0_dXY[i][c]->GetQuantiles(1, q_1, p_1);
+                cut_dXY0 = q_1[0];
+            }
+            if (hists.real_pt2_MD1_dXY[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD1_dXY[i][c]->GetQuantiles(1, q_1, p_1);
+                cut_dXY1 = q_1[0];
+            }
+
+            // --- Calculate 2-Sided Quantiles (Standard) ---
+            if (hists.real_pt2_MD0_rz_simple[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD0_rz_simple[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_RZ0Min = q_2[0]; cut_RZ0Max = q_2[1];
+            }
+            if (hists.real_pt2_MD1_rz_simple[i][c]->GetEntries() > 0) {
+                hists.real_pt2_MD1_rz_simple[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_RZ1Min = q_2[0]; cut_RZ1Max = q_2[1];
+            }
+            if (hists.real_pt2_deltaPHI[i][c]->GetEntries() > 0) {
+                hists.real_pt2_deltaPHI[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_dPhiMin = q_2[0]; cut_dPhiMax = q_2[1];
+            }
+            if (hists.real_pt2_deltaPT[i][c]->GetEntries() > 0) {
+                hists.real_pt2_deltaPT[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_dPtMin = q_2[0]; cut_dPtMax = q_2[1];
+            }
+
+            // --- Calculate 2-Sided Quantiles (LST) ---
+            if (hists.real_pt2_LSTdPhi[i][c]->GetEntries() > 0) {
+                hists.real_pt2_LSTdPhi[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_LSTdPhiMin = q_2[0]; cut_LSTdPhiMax = q_2[1];
+            }
+            if (hists.real_pt2_LSTdBeta[i][c]->GetEntries() > 0) {
+                hists.real_pt2_LSTdBeta[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_LSTdBetaMin = q_2[0]; cut_LSTdBetaMax = q_2[1];
+            }
+            if (hists.real_pt2_LSTbetaOut[i][c]->GetEntries() > 0) {
+                hists.real_pt2_LSTbetaOut[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_LSTbetaOutMin = q_2[0]; cut_LSTbetaOutMax = q_2[1];
+            }
+            if (hists.real_pt2_LSTOrgZRes[i][c]->GetEntries() > 0) {
+                hists.real_pt2_LSTOrgZRes[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_LSTOrgZMin = q_2[0]; cut_LSTOrgZMax = q_2[1];
+            }
+            if (hists.real_pt2_LSTKinZRes[i][c]->GetEntries() > 0) {
+                hists.real_pt2_LSTKinZRes[i][c]->GetQuantiles(2, q_2, p_2);
+                cut_LSTKinZMin = q_2[0]; cut_LSTKinZMax = q_2[1];
+            }
+
+            // --- Print Formatting ---
+            std::cout << "\n>>> CATEGORY: " << hists.catTitles[i] << " | CHARGE: " << hists.chargeTitles[c] << " <<<" << std::endl;
+            std::cout << std::fixed << std::setprecision(4);
+
+            std::cout << "  [Helical Extrapolation Cuts]" << std::endl;
+            std::cout << "    MD0 dZ Cut:          < " << cut_dZ0 << " cm" << std::endl;
+            std::cout << "    MD1 dZ Cut:          < " << cut_dZ1 << " cm" << std::endl;
+            std::cout << "    MD0 dXY Cut:         < " << cut_dXY0 << " cm" << std::endl;
+            std::cout << "    MD1 dXY Cut:         < " << cut_dXY1 << " cm" << std::endl;
+
+            std::cout << "[Simple Pointing Cuts]" << std::endl;
+            std::cout << "    MD0 R-Z Res:           " << std::setw(8) << cut_RZ0Min << " to " << cut_RZ0Max << " cm" << std::endl;
+            std::cout << "    MD1 R-Z Res:           " << std::setw(8) << cut_RZ1Min << " to " << cut_RZ1Max << " cm" << std::endl;
+
+            std::cout << "  [Kinematic Cuts]" << std::endl;
+            std::cout << "    Delta Phi:             " << std::setw(8) << cut_dPhiMin << " to " << cut_dPhiMax << " rad" << std::endl;
+            std::cout << "    Delta pT:              " << std::setw(8) << cut_dPtMin << " to " << cut_dPtMax << " GeV" << std::endl;
+
+            std::cout << "  [LST Component Cuts]" << std::endl;
+            std::cout << "    LST Delta Phi:         " << std::setw(8) << cut_LSTdPhiMin << " to " << cut_LSTdPhiMax << " rad" << std::endl;
+            std::cout << "    LST Delta Beta:        " << std::setw(8) << cut_LSTdBetaMin << " to " << cut_LSTdBetaMax << " rad" << std::endl;
+            std::cout << "    LST Beta Out:          " << std::setw(8) << cut_LSTbetaOutMin << " to " << cut_LSTbetaOutMax << " rad" << std::endl;
+            std::cout << "    LST Geometric Z-Res:   " << std::setw(8) << cut_LSTOrgZMin << " to " << cut_LSTOrgZMax << " cm" << std::endl;
+            std::cout << "    LST Kinematic Z-Res:   " << std::setw(8) << cut_LSTKinZMin << " to " << cut_LSTKinZMax << " cm" << std::endl;
+        }
+    }
+    std::cout << "\n" << std::string(80, '=') << "\n" << std::endl;
+     
+   /* bdtFile->cd();      // Ensure we are focused on the BDT file
+    bdtTree->Write();   // Write the tree to the disk
+    bdtFile->Close();   // Safely close the file to prevent corruption
+    std::cout << "Saved BDT Training Data to: " << bdtFileName << std::endl;
+    */
     auto recipes = getPt2Recipes(hists);
     Plotting plotter; 
     plotter.plotRecipes(recipes, outputDir);
+    
+    // === NEW: Write to Output Root File ===
+    if (writeRoot) {
+        outRootFile->cd();
+        outTree->Write(); // Write the TTree containing pT3 branches + new pT2 branches!
+        outRootFile->Close();
+        std::cout << "Saved ROOT file containing old + new pT2 branches to: " << outputDir << "/LSTNtuple_with_pT2.root" << std::endl;
+    }
+    // =======================================
 
 
     return 0;

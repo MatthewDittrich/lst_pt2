@@ -45,6 +45,48 @@ std::vector<PlotRecipe> getPt2Recipes(const HistogramManager& hists) {
             .printYields = true
         });
 
+        // --- pLS Absolute Eta ---
+        recipes.push_back({
+            .title = "pLS Absolute #eta" + ttl,
+            .xAxis = "pLS #eta",
+            .yAxis = "Entries",
+            .filename = "pt2_all_pls_ETA" + sfx,
+            .hists = {hists.real_pt2_pls_ETA[i][c], hists.fake_pt2_pls_ETA[i][c]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused pLS Absolute #eta" + ttl,
+            .xAxis = "pLS #eta",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_pls_ETA" + sfx,
+            .hists = {hists.real_unused_pt2_pls_ETA[i][c], hists.fake_unused_pt2_pls_ETA[i][c]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        // --- LS Absolute Eta ---
+        recipes.push_back({
+            .title = "LS Absolute #eta" + ttl,
+            .xAxis = "LS #eta",
+            .yAxis = "Entries",
+            .filename = "pt2_all_ls_ETA" + sfx,
+            .hists = {hists.real_pt2_ls_ETA[i][c], hists.fake_pt2_ls_ETA[i][c]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
+        recipes.push_back({
+            .title = "Unused LS Absolute #eta" + ttl,
+            .xAxis = "LS #eta",
+            .yAxis = "Entries",
+            .filename = "pt2_unused_ls_ETA" + sfx,
+            .hists = {hists.real_unused_pt2_ls_ETA[i][c], hists.fake_unused_pt2_ls_ETA[i][c]},
+            .legend = {"Real", "Fake"},
+            .printYields = true
+        });
+
         recipes.push_back({
             .title = "pT2 Delta R" + ttl,
             .xAxis = "#Delta R",

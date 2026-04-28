@@ -83,6 +83,56 @@ void HistogramManager::init() {
             180, -1.0, 1.0
         );
 
+        // pLS Absolute Eta
+        real_pt2_pls_ETA[i][c] = new TH1D(
+            ("real_pt2_pls_ETA"+sfx).c_str(), 
+            ("Real pLS #eta"+ttl+";pLS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        fake_pt2_pls_ETA[i][c] = new TH1D(
+            ("fake_pt2_pls_ETA"+sfx).c_str(), 
+            ("Fake pLS #eta"+ttl+";pLS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        real_unused_pt2_pls_ETA[i][c] = new TH1D(
+            ("real_unused_pt2_pls_ETA"+sfx).c_str(), 
+            ("Real Unused pLS #eta"+ttl+";pLS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        fake_unused_pt2_pls_ETA[i][c] = new TH1D(
+            ("fake_unused_pt2_pls_ETA"+sfx).c_str(), 
+            ("Fake Unused pLS #eta"+ttl+";pLS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+
+        // LS Absolute Eta
+        real_pt2_ls_ETA[i][c] = new TH1D(
+            ("real_pt2_ls_ETA"+sfx).c_str(), 
+            ("Real LS #eta"+ttl+";LS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        fake_pt2_ls_ETA[i][c] = new TH1D(
+            ("fake_pt2_ls_ETA"+sfx).c_str(), 
+            ("Fake LS #eta"+ttl+";LS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        real_unused_pt2_ls_ETA[i][c] = new TH1D(
+            ("real_unused_pt2_ls_ETA"+sfx).c_str(), 
+            ("Real Unused LS #eta"+ttl+";LS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        
+        fake_unused_pt2_ls_ETA[i][c] = new TH1D(
+            ("fake_unused_pt2_ls_ETA"+sfx).c_str(), 
+            ("Fake Unused LS #eta"+ttl+";LS #eta;Entries").c_str(), 
+            180, -4.0, 4.0
+        );
+        //-------------------------------------------------
         real_pt2_deltaR[i][c] = new TH1D(
             ("real_pt2_deltaR" + sfx).c_str(),
             ("Real pT2 #Delta R" + ttl + "; #Delta R; Entries").c_str(),

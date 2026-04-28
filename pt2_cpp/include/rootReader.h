@@ -92,6 +92,8 @@ public:
 
 private:
     TFile* inputFile;
+
+public:
     TTree* inputTree;
 };
 #endif

@@ -16,13 +16,13 @@ public:
     // --- The 13 Valid Connections ---
     std::vector<std::string> catNames = {
         "L1F_to_L2F", "L1F_to_L2T", "L1T_to_L2F", "L1T_to_L2T", "L1T_to_E1PS",
-        "L2F_to_L3Fp", "L2F_to_L3Tp", "L2T_to_L3Fp", "L2T_to_L3Tp", "L2T_to_E1PS",
-        "E1PS_to_E2PS", "E1PS_to_E22S", "E2PS_to_E3PSp"
+        "L2F_to_L3F", "L2F_to_L3T", "L2T_to_L3F", "L2T_to_L3T", "L2T_to_E1PS",
+        "E1PS_to_E2PS", "E1PS_to_E22S", "E2PS_to_E3PS"
     };
     std::vector<std::string> catTitles = {
         "Bar L1F -> Bar L2F", "Bar L1F -> Bar L2T", "Bar L1T -> Bar L2F", "Bar L1T -> Bar L2T", "Bar L1T -> Enc D1(PS)",
-        "Bar L2F -> Bar L3F+", "Bar L2F -> Bar L3T+", "Bar L2T -> Bar L3F+", "Bar L2T -> Bar L3T+", "Bar L2T -> Enc D1(PS)",
-        "Enc D1(PS) -> Enc D2(PS)", "Enc D1(PS) -> Enc D2(2S)", "Enc D2(PS) -> Enc D3+(PS)"
+        "Bar L2F -> Bar L3F", "Bar L2F -> Bar L3T+", "Bar L2T -> Bar L3F", "Bar L2T -> Bar L3T", "Bar L2T -> Enc D1(PS)",
+        "Enc D1(PS) -> Enc D2(PS)", "Enc D1(PS) -> Enc D2(2S)", "Enc D2(PS) -> Enc D3(PS)"
     };
 
     std::vector<std::string> chargeNames = {"Pos", "Neg"};
@@ -54,6 +54,18 @@ public:
     TH1D* fake_unused_pt2_deltaPHI[13][2];
     TH1D* fake_unused_pt2_deltaR[13][2];
     TH1D* fake_unused_pt2_deltaAngle[13][2];
+
+    // --- pLS Absolute Eta ---
+    TH1D* real_pt2_pls_ETA[13][2];
+    TH1D* fake_pt2_pls_ETA[13][2];
+    TH1D* real_unused_pt2_pls_ETA[13][2];
+    TH1D* fake_unused_pt2_pls_ETA[13][2];
+
+    // --- LS Absolute Eta ---
+    TH1D* real_pt2_ls_ETA[13][2];
+    TH1D* fake_pt2_ls_ETA[13][2];
+    TH1D* real_unused_pt2_ls_ETA[13][2];
+    TH1D* fake_unused_pt2_ls_ETA[13][2];
 
     // LST specific variables
     TH1D* real_pt2_LSTdPhi[13][2];

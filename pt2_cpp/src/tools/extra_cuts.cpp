@@ -4,7 +4,7 @@
 
 namespace extra_cuts{
      
-     int getCategoryFromDetId(uint32_t detId) {
+   /*  int getCategoryFromDetId(uint32_t detId) {
         int subdet = (detId >> 25) & 0x7;
         
         if (subdet == 4) { // ENDCAP
@@ -27,6 +27,33 @@ namespace extra_cuts{
             return 6; // Layers 4, 5, 6 (These are all 2S Flat)
         }
         return 6; // Fallback
+    }*/
+    int getCategoryFromDetId(uint32_t detId) {
+        int subdet = (detId >> 25) & 0x7;
+
+        if (subdet == 4) { // ENDCAP
+            int disk = (detId >> 18) & 0x7;
+            int ring = (detId >> 12) & 0xF;
+            bool isPS = (ring <= 10);
+
+            if (disk == 1) return isPS ? 7 : 8;
+            if (disk == 2) return isPS ? 9 : 10;
+            if (disk == 3) return isPS ? 11 : 12;  // STRICTLY Disk 3 ONLY
+
+            return -1; // Disks 4 and 5 are completely rejected
+        }
+        if (subdet == 5) { // BARREL
+            int layer = (detId >> 20) & 0x7;
+            int side  = (detId >> 18) & 0x3;
+            bool isTilted = (side == 1 || side == 2);
+
+            if (layer == 1) return isTilted ? 1 : 0;
+            if (layer == 2) return isTilted ? 3 : 2;
+            if (layer == 3) return isTilted ? 5 : 4;
+
+            return -1; // Layers 4, 5, and 6 are completely rejected
+        }
+        return -1; // Fallback for safety
     }
 
     int getConnectionIndex(int c0, int c1) {
