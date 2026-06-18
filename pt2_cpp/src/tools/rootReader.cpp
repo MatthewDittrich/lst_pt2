@@ -26,6 +26,16 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("tc_pt5Idx", &tc_pt5Idx);
     inputTree->SetBranchAddress("tc_pt3Idx", &tc_pt3Idx);
     inputTree->SetBranchAddress("tc_t5Idx", &tc_t5Idx);
+    inputTree->SetBranchAddress("tc_pt", &tc_pt);
+    inputTree->SetBranchAddress("tc_eta", &tc_eta);
+    inputTree->SetBranchAddress("tc_phi", &tc_phi);
+    inputTree->SetBranchAddress("tc_isFake", &tc_isFake);
+    inputTree->SetBranchAddress("tc_isDuplicate", &tc_isDuplicate);
+    inputTree->SetBranchAddress("tc_type", &tc_type);
+    inputTree->SetBranchAddress("tc_simIdxAll", &tc_simIdxAll);
+    inputTree->SetBranchAddress("tc_simIdx", &tc_simIdx);
+    inputTree->SetBranchAddress("tc_nhits", &tc_nhits);
+    inputTree->SetBranchAddress("tc_nlayers", &tc_nlayers);
     // PT5 Branches
     inputTree->SetBranchAddress("pT5_t5Idx", &pt5_t5Idx);
     inputTree->SetBranchAddress("pT5_plsIdx", &pt5_plsIdx);
@@ -81,6 +91,8 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("sim_simHitX", &sim_simHitX);
     inputTree->SetBranchAddress("sim_simHitY", &sim_simHitY);
     inputTree->SetBranchAddress("sim_simHitZ", &sim_simHitZ);
+    inputTree->SetBranchAddress("sim_tcIdx", &sim_tcIdx);
+    inputTree->SetBranchAddress("sim_tcIdxAll", &sim_tcIdxAll);
     return true;
 }
 

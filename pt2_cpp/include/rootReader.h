@@ -28,6 +28,16 @@ public:
     std::vector<int>   *tc_pt5Idx = nullptr;
     std::vector<int>   *tc_pt3Idx = nullptr;
     std::vector<int>   *tc_t5Idx = nullptr;
+    std::vector<float> *tc_pt = nullptr;
+    std::vector<float>* tc_eta = nullptr;
+    std::vector<float>* tc_phi = nullptr;
+    std::vector<int>* tc_isFake = nullptr;
+    std::vector<int>* tc_isDuplicate = nullptr;
+    std::vector<int>* tc_type = nullptr;
+    std::vector<std::vector<int>>*  tc_simIdxAll = nullptr;
+    std::vector<int>* tc_simIdx = nullptr;
+    std::vector<int>* tc_nhits = nullptr;
+    std::vector<int>* tc_nlayers = nullptr;
     // pT5 Variables
     std::vector<int>   *pt5_plsIdx = nullptr;
     std::vector<int>   *pt5_t5Idx = nullptr;
@@ -80,6 +90,8 @@ public:
     std::vector<float>* sim_vy = nullptr;
     std::vector<float>* sim_vz = nullptr;
     std::vector<int>* sim_pdgId = nullptr;
+    std::vector<int>* sim_tcIdx = nullptr;
+    std::vector<std::vector<int>>* sim_tcIdxAll = nullptr;
     std::vector<std::vector<float>>* sim_simHitX = nullptr;
     std::vector<std::vector<float>>* sim_simHitY = nullptr;
     std::vector<std::vector<float>>* sim_simHitZ = nullptr;

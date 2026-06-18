@@ -81,7 +81,8 @@ int main(int argc, char** argv) {
     }
     if (inputFile.empty()){ 
         if (lowPT){
-            inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple_LowPT.root";
+            inputFile = "/blue/avery/aaponteutani/CMSSW_16_1_0_pre3/src/RecoTracker/LSTCore/standalone/muon_ntuple_0p4/LSTNtuple.root"; //0.4GeV
+            //inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple_LowPT.root"; 0.6 GeV
         }
         else {
             inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
@@ -119,7 +120,8 @@ int main(int argc, char** argv) {
     // Get the Correct Pixel Map Directory
     std::string pixelMapFileDir;
     if (lowPT){
-        pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p6GeV/";
+        //pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p6GeV/";
+        pixelMapFileDir = "/blue/p.chang/aaponteutani/LSTGeometry/output/pixelmap/"; //0.4 GeV
     }
     else{
         pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p8GeV/";
@@ -396,10 +398,10 @@ int main(int argc, char** argv) {
                     if (simIdx >= 0 && simIdx < sim_pT2_matched.size()) {
                         sim_pT2_matched[simIdx] += 1;
                     }
-                } /*else {
+                } else {
                     // Push an empty vector for fakes
                     pT2_matched_simIdx.push_back({});
-                }*/
+                }
             }
             // ==================================
 
@@ -527,7 +529,7 @@ int main(int argc, char** argv) {
             }      
         } 
     }
-        if (writeRoot) {
+         if (writeRoot) {
             // Check for duplicates
             for (size_t i = 0; i < pT2_matched_simIdx.size(); i++) {
                 bool isDup = false;
@@ -540,12 +542,49 @@ int main(int argc, char** argv) {
                 }
                 pT2_isDuplicate.push_back(isDup ? 1 : 0);
             }
+            // === INJECT pT2 INTO TC ===
+            if (!reader.tc_pt || !reader.sim_tcIdx || !reader.sim_tcIdxAll) {
+                std::cerr << "ERROR: tc_ or sim_tc branches are not loaded in rootReader!" << std::endl;
+                return 1; 
+            }
 
+            for (size_t i = 0; i < pT2_pt.size(); i++) {
+                
+                // 1. Get the new global ID this track will have in the main array
+                int new_tc_index = reader.tc_pt->size();
+
+                // 2. Inject the track
+                reader.tc_pt->push_back(pT2_pt[i]);
+                reader.tc_eta->push_back(pT2_eta[i]);
+                reader.tc_phi->push_back(pT2_phi[i]);
+                reader.tc_isFake->push_back(pT2_isFake[i]);
+                reader.tc_isDuplicate->push_back(pT2_isDuplicate[i]);
+                reader.tc_type->push_back(4); // Spoof as pLS to pass the filter
+                
+                int primary_simIdx = pT2_matched_simIdx[i].empty() ? -1 : pT2_matched_simIdx[i][0];
+                reader.tc_simIdx->push_back(primary_simIdx);
+                reader.tc_simIdxAll->push_back(pT2_matched_simIdx[i]);
+                reader.tc_nhits->push_back(2);
+                reader.tc_nlayers->push_back(2);
+
+                // 3. === THE REVERSE TRUTH MATCH ===
+                // Tell the simulated particle that this new track rescued it!
+            /*    if (primary_simIdx >= 0 && primary_simIdx < reader.sim_tcIdxAll->size()) {
+                    // Add our new track ID to the particle's list of successful matches
+                    reader.sim_tcIdxAll->at(primary_simIdx).push_back(new_tc_index);
+                    
+                    // If the particle was completely lost before, officially mark it as found
+                    if (reader.sim_tcIdx->at(primary_simIdx) == -1) {
+                        reader.sim_tcIdx->at(primary_simIdx) = new_tc_index;
+                    }
+                }*/
+            }
+            // ==========================
             // CRITICAL: Fill the TTree entry for this event!
             outTree->Fill();
         }
     }
-    // --- AUTOMATED CUT CALCULATION ---
+   // --- AUTOMATED CUT CALCULATION ---
     std::cout << "\n" << std::string(80, '=') << std::endl;
     std::cout << "IDEAL CUTS PER CATEGORY (Target Efficiency: " << targetPercent << "%)" << std::endl;
     std::cout << std::string(80, '=') << std::endl;
