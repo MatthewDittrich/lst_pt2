@@ -8,10 +8,12 @@ make
 ```
 Once correctly compiled, code can be ran as follows:
 ```
-./build_pt2
+./bin -p -o output
 ```
 The full list of run options are as follows:
 ```
 -i Input File Path"
 -o Output Directory";
+-p plot
+-k low_pt
 ```
