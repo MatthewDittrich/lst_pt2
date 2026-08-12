@@ -38,6 +38,10 @@ public:
     std::vector<int>* tc_simIdx = nullptr;
     std::vector<int>* tc_nhits = nullptr;
     std::vector<int>* tc_nlayers = nullptr;
+    std::vector<int>* tc_nhitOT = nullptr;
+    std::vector<float>* tc_pMatched = nullptr;
+    std::vector<std::vector<float>>* tc_simIdxAllFrac = nullptr;
+    std::vector<int>* tc_plsIdx = nullptr;
     // pT5 Variables
     std::vector<int>   *pt5_plsIdx = nullptr;
     std::vector<int>   *pt5_t5Idx = nullptr;

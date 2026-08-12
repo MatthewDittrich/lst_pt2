@@ -81,8 +81,10 @@ int main(int argc, char** argv) {
     }
     if (inputFile.empty()){ 
         if (lowPT){
-            inputFile = "/blue/avery/aaponteutani/CMSSW_16_1_0_pre3/src/RecoTracker/LSTCore/standalone/muon_ntuple_0p4/LSTNtuple.root"; //0.4GeV
-            //inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple_LowPT.root"; 0.6 GeV
+            inputFile = "/blue/avery/aaponteutani/CMSSW_16_1_0/src/RecoTracker/LSTCore/standalone/LSTNtuple_pionGun_0p3.root"; //0.5GeV
+           // inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple_LowPT.root"; //0.6 GeV
+           //   inputFile = "/blue/avery/aaponteutani/CMSSW_16_1_0/src/RecoTracker/LSTCore/standalone/LSTNtuple_PU200_0p5.root";//0.5 GeV
+           // inputFile = "/blue/avery/aaponteutani/CMSSW_16_1_0/src/RecoTracker/LSTCore/standalone/LSTNtuple_PU200_0p6.root";//0.6 GeV
         }
         else {
             inputFile = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/ROOT_FILES/LSTNtuple.root";
@@ -120,8 +122,9 @@ int main(int argc, char** argv) {
     // Get the Correct Pixel Map Directory
     std::string pixelMapFileDir;
     if (lowPT){
-        //pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p6GeV/";
-        pixelMapFileDir = "/blue/p.chang/aaponteutani/LSTGeometry/output/pixelmap/"; //0.4 GeV
+       // pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p6GeV/";
+       // pixelMapFileDir = "/blue/p.chang/aaponteutani/LSTGeometry/output_0p4/pixelmap/"; //0.4 GeV
+        pixelMapFileDir = "/blue/p.chang/aaponteutani/LSTGeometry/output_0p3/pixelmap/"; //0.5 GeV
     }
     else{
         pixelMapFileDir = "/cmsuf/data/store/user/t2/users/matthew.dittrich/PT2_DATA/PIXEL_MAPS/Pixel_Maps_0p8GeV/";
@@ -329,7 +332,7 @@ int main(int argc, char** argv) {
             pt2.is_used = pt2UsedCalculator(reader, plsIdx, lsIdx);
 
             // Using only pls_pt from 0.6 to 0.8
-            if((reader.pls_pt->at(plsIdx)) > 0.8){continue;}
+            if((reader.pls_pt->at(plsIdx)) > 0.5){continue;}
 
             // Physics Calculations
             float dR = std::sqrt(pt2.delta_eta * pt2.delta_eta + pt2.delta_phi * pt2.delta_phi);
@@ -542,7 +545,7 @@ int main(int argc, char** argv) {
                 }
                 pT2_isDuplicate.push_back(isDup ? 1 : 0);
             }
-            // === INJECT pT2 INTO TC ===
+                        // === INJECT pT2 INTO TC ===
             if (!reader.tc_pt || !reader.sim_tcIdx || !reader.sim_tcIdxAll) {
                 std::cerr << "ERROR: tc_ or sim_tc branches are not loaded in rootReader!" << std::endl;
                 return 1; 
@@ -559,25 +562,50 @@ int main(int argc, char** argv) {
                 reader.tc_phi->push_back(pT2_phi[i]);
                 reader.tc_isFake->push_back(pT2_isFake[i]);
                 reader.tc_isDuplicate->push_back(pT2_isDuplicate[i]);
-                reader.tc_type->push_back(4); // Spoof as pLS to pass the filter
+                reader.tc_type->push_back(2); // Spoof as pLS to pass the filter
                 
                 int primary_simIdx = pT2_matched_simIdx[i].empty() ? -1 : pT2_matched_simIdx[i][0];
                 reader.tc_simIdx->push_back(primary_simIdx);
                 reader.tc_simIdxAll->push_back(pT2_matched_simIdx[i]);
                 reader.tc_nhits->push_back(2);
                 reader.tc_nlayers->push_back(2);
+                
+                // pT2 has 0 Outer Tracker hits
+                if (reader.tc_nhitOT) reader.tc_nhitOT->push_back(0);
+
+                // If fake, match frac is 0. If real, let's say 1.0 (100% matched)
+                if (reader.tc_pMatched) reader.tc_pMatched->push_back(pT2_isFake[i] ? 0.0 : 1.0);
+
+                // tc_simIdxAllFrac must be the same length as the tc_simIdxAll array
+                if (reader.tc_simIdxAllFrac) {
+                    std::vector<float> frac;
+                    if (!pT2_matched_simIdx[i].empty()) {
+                        frac.push_back(1.0); // 100% match
+                    }
+                    reader.tc_simIdxAllFrac->push_back(frac);
+                }
+
+                // Indices to higher level LST objects. Since pT2 doesn't use these, they get -1 (Null)
+                if (reader.tc_pt5Idx) reader.tc_pt5Idx->push_back(-1);
+                if (reader.tc_pt3Idx) reader.tc_pt3Idx->push_back(-1);
+                if (reader.tc_t5Idx)  reader.tc_t5Idx->push_back(-1);
+
+                // We DO know the underlying pLS index, so we can save it!
+                if (reader.tc_plsIdx) reader.tc_plsIdx->push_back(pT2_plsIdx[i]);
 
                 // 3. === THE REVERSE TRUTH MATCH ===
                 // Tell the simulated particle that this new track rescued it!
-            /*    if (primary_simIdx >= 0 && primary_simIdx < reader.sim_tcIdxAll->size()) {
+                if (primary_simIdx >= 0 && primary_simIdx < reader.sim_tcIdxAll->size()) {
                     // Add our new track ID to the particle's list of successful matches
                     reader.sim_tcIdxAll->at(primary_simIdx).push_back(new_tc_index);
                     
                     // If the particle was completely lost before, officially mark it as found
                     if (reader.sim_tcIdx->at(primary_simIdx) == -1) {
                         reader.sim_tcIdx->at(primary_simIdx) = new_tc_index;
+                        std::cout << "found" <<std::endl;
                     }
-                }*/
+                   // reader.sim_tcIdx->at(primary_simIdx) = new_tc_index;
+                }
             }
             // ==========================
             // CRITICAL: Fill the TTree entry for this event!

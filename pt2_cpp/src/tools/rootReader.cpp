@@ -36,6 +36,10 @@ bool rootReader::Init(const std::string& filename, const std::string& treename) 
     inputTree->SetBranchAddress("tc_simIdx", &tc_simIdx);
     inputTree->SetBranchAddress("tc_nhits", &tc_nhits);
     inputTree->SetBranchAddress("tc_nlayers", &tc_nlayers);
+    inputTree->SetBranchAddress("tc_nhitOT", &tc_nhitOT);
+    inputTree->SetBranchAddress("tc_pMatched", &tc_pMatched);
+    inputTree->SetBranchAddress("tc_simIdxAllFrac", &tc_simIdxAllFrac);
+    inputTree->SetBranchAddress("tc_plsIdx", &tc_plsIdx);
     // PT5 Branches
     inputTree->SetBranchAddress("pT5_t5Idx", &pt5_t5Idx);
     inputTree->SetBranchAddress("pT5_plsIdx", &pt5_plsIdx);

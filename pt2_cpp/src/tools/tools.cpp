@@ -145,7 +145,7 @@ int CalculateSuperbin(const rootReader& reader, size_t j, bool lowPT) {
 }
 
 
-float CalculatePlsZ(const rootReader& reader, size_t j) {
+/*float CalculatePlsZ(const rootReader& reader, size_t j) {
     //TODO: This is just a rough approximation that I don't really understand
     int nhit = reader.pls_nhit->at(j);
     if (nhit != 3 && nhit != 4) {
@@ -172,6 +172,40 @@ float CalculatePlsZ(const rootReader& reader, size_t j) {
     if (count == 0) return p0[2]; 
     t /= count;
     return p0[2] + t * dz;
+}*/
+
+float CalculatePlsZ(const rootReader& reader, size_t j) {
+    int nhit = reader.pls_nhit->at(j);
+    if (nhit != 3 && nhit != 4) {
+        throw std::runtime_error("CalculatePlsZ: nhit must be 3 or 4");
+    }
+
+    // 1. Get the coordinates of the inner-most hit (hit 0)
+    float x0 = reader.pls_hit0_x->at(j);
+    float y0 = reader.pls_hit0_y->at(j);
+    float z0 = reader.pls_hit0_z->at(j);
+
+    // 2. Get the coordinates of the outer-most hit (hit 2 or 3)
+    float x1 = (nhit == 3) ? reader.pls_hit2_x->at(j) : reader.pls_hit3_x->at(j);
+    float y1 = (nhit == 3) ? reader.pls_hit2_y->at(j) : reader.pls_hit3_y->at(j);
+    float z1 = (nhit == 3) ? reader.pls_hit2_z->at(j) : reader.pls_hit3_z->at(j);
+
+    // 3. Calculate the transverse radius R from the beamline
+    float r0 = std::sqrt(x0*x0 + y0*y0);
+    float r1 = std::sqrt(x1*x1 + y1*y1);
+
+    // 4. Calculate the changes in R and Z
+    float dr = r1 - r0;
+    float dz = z1 - z0;
+
+    // Protect against division by zero (e.g., if a track somehow has two hits at the exact same radius)
+    if (dr == 0.0f) {
+        return z0;
+    }
+
+    // 5. Linear extrapolation in the R-Z plane back to the beamline (R = 0)
+    // Formula: z_origin = z0 - r0 * (slope)
+    return z0 - r0 * (dz / dr);
 }
 
 
@@ -183,7 +217,19 @@ void buildPt2sForPLS(size_t pls_idx,
                     const DetIdToLSMap& detIdToLS, 
                     pT2Collection& pt2s)
 {
-    int superbin = reader.pls_superbin[pls_idx];
+    // =========================================================
+    // SANITY CHECK MODE: No pixel map / superbin cuts applied.
+    // Pair this pLS with EVERY single LS in the event.
+    // =========================================================
+
+    size_t nLS = reader.ls_pt->size(); // Get the total number of LS
+    
+    for (size_t ls_idx = 0; ls_idx < nLS; ++ls_idx) {
+        if (pt2TruthFinder(reader, pls_idx, ls_idx)) {
+        pT2 obj(pls_idx, ls_idx);
+        pt2s.push_back(obj); }
+    }
+/*    int superbin = reader.pls_superbin[pls_idx];
     // Determine which SuperbinToDetIdMap to use
     const SuperbinToDetIdMap* selectedMap = nullptr;
     float pt = reader.pls_pt->at(pls_idx);
@@ -212,7 +258,7 @@ void buildPt2sForPLS(size_t pls_idx,
             pT2 obj(pls_idx, ls_idx);
             pt2s.push_back(obj);
         }
-    }
+    }*/
 }
 
 
